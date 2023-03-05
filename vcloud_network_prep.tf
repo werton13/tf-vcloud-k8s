@@ -43,7 +43,7 @@ resource "vcd_vapp_firewall_rules" "k8s_mgmt_vapp_net_fw" {
   rule {
     name             = var.fw_rule1_name
     policy           = var.fw_rule1_action
-    protocol = var.fw_rule1_proto
+    protocol = ${var.fw_rule1_proto}
     destination_port = var.fw_rule1_dst_port
     destination_ip   = var.fw_rule1_dst_ip
     source_port      = var.fw_rule1_src_port
