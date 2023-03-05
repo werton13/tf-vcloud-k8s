@@ -1,0 +1,48 @@
+#cloud-config
+version: v1
+users:
+  - name: local
+  - name: ${vm_user_name}
+    gecos: ${vm_user_displayname}
+    passwd: ${vm_user_password}
+    groups: sudo 
+    lock_passwd: false
+    shell: /bin/bash
+    ssh_authorized_keys: ${vm_user_ssh_key}
+
+apt:
+  conf: |
+    Acquire {
+      Retries "60"
+    }
+    DPkg {
+      Lock {
+        Timeout "60"
+      }
+    }
+
+package_update: true
+packages_upgrade: true
+packages:
+  - net-tools
+  - nmap
+  - git
+  - tree
+  - openssh-server
+  - sshpass
+ # - ansible
+ # - ansible-core
+
+write_files:
+  - content: |
+      ${hosts_entry1}
+      ${hosts_entry2}
+      ${hosts_entry3}
+      ${hosts_entry4}
+      ${hosts_entry5}
+    path: /etc/hosts
+    append: true
+runcmd:
+  - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
+  - [ systemctl, daemon-reload ]
+  - [ systemctl, restart, --no-block, ssh.service ]
