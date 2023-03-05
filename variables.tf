@@ -126,7 +126,7 @@ variable fw_rule1_action {
 }
 variable fw_rule1_proto {
   type        = string
-  default     = ""
+  default     = "any"
   description = "firewall rule protocol - TCP/UDP"
 }
 variable fw_rule1_src_ip {
