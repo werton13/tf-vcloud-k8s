@@ -224,7 +224,7 @@ variable fw_rule3_dst_port {
 
 # variable to define quantity and size of K8s nodes
 variable "vms" {
-    description: "variable to define quantity and size of K8s nodes, please check readme for example"
+    description = "variable to define quantity and size of K8s nodes, please check readme for example"
     type = map(object({
         pref = string
         vm_cpu_count = string
