@@ -30,7 +30,7 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
   #}
   network {
     type               = "org"
-    name               = var.var.vcloud_orgvnet
+    name               = var.vcloud_orgvnet
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
     ip                 = "${var.vms.masters.ip_pool[count.index]}"
