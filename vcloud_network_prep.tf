@@ -5,6 +5,14 @@ resource "vcd_vapp" "k8s_mgmt_vapp" {
    }   
 }
 
+resource "vcd_vapp_org_network" "vappOrgNet" {
+  depends_on  = [vcd_vapp.k8s_mgmt_vapp]
+  org = var.vcloud_orgname
+  vdc = var.vcloud_vdc
+  vapp_name = var.vapp_name
+  org_network_name = var.vcloud_orgvnet 
+}
+
 # decided to stop using vApp
 #resource "vcd_vapp_network" "k8s_mgmt_vapp_net" {
 #  org  = var.vcloud_orgname

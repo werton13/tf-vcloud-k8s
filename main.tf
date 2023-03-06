@@ -50,7 +50,8 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   #                  vcd_vapp_firewall_rules.k8s_mgmt_vapp_net_fw,
   #                  vcd_vapp_nat_rules.k8s_mgmt_vapp_net_nat
   #                 ]
-  depends_on       = [vcd_vapp.k8s_mgmt_vapp]
+  depends_on       = [vcd_vapp.k8s_mgmt_vapp,
+                      vcd_vapp_org_network.vappOrgNet]
   
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
   name             = "${var.vms.workers.pref}-${count.index}"
