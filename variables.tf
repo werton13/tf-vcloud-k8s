@@ -82,145 +82,145 @@ variable "vm_user_ssh_key" {
    description = "user ssh key for a new vm user"
  }
 # vApp configuration variables --------------------------------
-variable vcd_vapp_net_gw {
-  type        = string
-  default     = "10.10.13.1"
-  description = "vApp network default gateway IP"
-}
-variable vcd_vapp_net_mask {
-  type        = string
-  default     = "255.255.255.0"
-  description = "vApp network mask - like 255.255.255.0"
-}
-variable vcd_vapp_net_dns1 {
-  type        = string
-  default     = "8.8.8.8"
-  description = "DNS1 for vApp network"
-}
-variable vcd_vapp_net_dns2 {
-  type        = string
-  default     = "1.1.1.1"
-  description = "DNS2 for vApp network"
-}
-variable static_ip_pool_start {
-  type        = string
-  default     = "10.10.13.100"
-  description = "first IP in the vApp network static pool"
-}
-variable static_ip_pool_end {
-  type        = string
-  default     = "10.10.13.200"
-  description = "last IP in the vApp network static pool"
-}
+#variable vcd_vapp_net_gw {
+#  type        = string
+#  default     = "10.10.13.1"
+#  description = "vApp network default gateway IP"
+#}
+#variable vcd_vapp_net_mask {
+#  type        = string
+#  default     = "255.255.255.0"
+#  description = "vApp network mask - like 255.255.255.0"
+#}
+#variable vcd_vapp_net_dns1 {
+#  type        = string
+#  default     = "8.8.8.8"
+#  description = "DNS1 for vApp network"
+#}
+#variable vcd_vapp_net_dns2 {
+#  type        = string
+#  default     = "1.1.1.1"
+#  description = "DNS2 for vApp network"
+#}
+#variable static_ip_pool_start {
+#  type        = string
+#  default     = "10.10.13.100"
+#  description = "first IP in the vApp network static pool"
+#}
+#variable static_ip_pool_end {
+#  type        = string
+#  default     = "10.10.13.200"
+#  description = "last IP in the vApp network static pool"
+#}
 
 # fw rule1
-variable fw_rule1_name {
-  type        = string
-  default     = ""
-  description = "firewall rule name for vAp network"
-}
-variable fw_rule1_action {
-  type        = string
-  default     = "allow"
-  description = "firewall rule policy action -allow/deny"
-}
-variable fw_rule1_proto {
-  type        = string
-  default     = ""
-  description = "firewall rule protocol - TCP/UDP"
-}
-variable fw_rule1_src_ip {
-  type        = string
-  default     = ""
-  description = "firewall rule source IP"
-}
-variable fw_rule1_src_port {
-  type        = string
-  default     = ""
-  description = "firewall rule source port"
-}
-variable fw_rule1_dst_ip {
-  type        = string
-  default     = ""
-  description = "firewall rule destination IP"
-}
-variable fw_rule1_dst_port {
-  type        = string
-  default     = ""
-  description = "firewall rule destination port"
-}
-# fw rule2
-variable fw_rule2_name {
-  type        = string
-  default     = ""
-  description = "firewall rule name for vAp network"
-}
-variable fw_rule2_action {
-  type        = string
-  default     = "allow"
-  description = "firewall rule policy action -allow/deny"
-}
-variable fw_rule2_proto {
-  type        = string
-  default     = ""
-  description = "firewall rule protocol - TCP/UDP"
-}
-variable fw_rule2_src_ip {
-  type        = string
-  default     = ""
-  description = "firewall rule source IP"
-}
-variable fw_rule2_src_port {
-  type        = string
-  default     = ""
-  description = "firewall rule source port"
-}
-variable fw_rule2_dst_ip {
-  type        = string
-  default     = ""
-  description = "firewall rule destination IP"
-}
-variable fw_rule2_dst_port {
-  type        = string
-  default     = ""
-  description = "firewall rule destination port"
-}
-# fw rule3
-variable fw_rule3_name {
-  type        = string
-  default     = ""
-  description = "firewall rule name for vAp network"
-}
-variable fw_rule3_action {
-  type        = string
-  default     = "allow"
-  description = "firewall rule policy action -allow/deny"
-}
-variable fw_rule3_proto {
-  type        = string
-  default     = ""
-  description = "firewall rule protocol - TCP/UDP"
-}
-variable fw_rule3_src_ip {
-  type        = string
-  default     = ""
-  description = "firewall rule source IP"
-}
-variable fw_rule3_src_port {
-  type        = string
-  default     = ""
-  description = "firewall rule source port"
-}
-variable fw_rule3_dst_ip {
-  type        = string
-  default     = ""
-  description = "firewall rule destination IP"
-}
-variable fw_rule3_dst_port {
-  type        = string
-  default     = ""
-  description = "firewall rule destination port"
-}
+#variable fw_rule1_name {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule name for vAp network"
+#}
+#variable fw_rule1_action {
+#  type        = string
+#  default     = "allow"
+#  description = "firewall rule policy action -allow/deny"
+#}
+#variable fw_rule1_proto {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule protocol - TCP/UDP"
+#}
+#variable fw_rule1_src_ip {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule source IP"
+#}
+#variable fw_rule1_src_port {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule source port"
+#}
+#variable fw_rule1_dst_ip {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule destination IP"
+#}
+#variable fw_rule1_dst_port {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule destination port"
+#}
+## fw rule2
+#variable fw_rule2_name {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule name for vAp network"
+#}
+#variable fw_rule2_action {
+#  type        = string
+#  default     = "allow"
+#  description = "firewall rule policy action -allow/deny"
+#}
+#variable fw_rule2_proto {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule protocol - TCP/UDP"
+#}
+#variable fw_rule2_src_ip {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule source IP"
+#}
+#variable fw_rule2_src_port {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule source port"
+#}
+#variable fw_rule2_dst_ip {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule destination IP"
+#}
+#variable fw_rule2_dst_port {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule destination port"
+#}
+## fw rule3
+#variable fw_rule3_name {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule name for vAp network"
+#}
+#variable fw_rule3_action {
+#  type        = string
+#  default     = "allow"
+#  description = "firewall rule policy action -allow/deny"
+#}
+#variable fw_rule3_proto {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule protocol - TCP/UDP"
+#}
+#variable fw_rule3_src_ip {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule source IP"
+#}
+#variable fw_rule3_src_port {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule source port"
+#}
+#variable fw_rule3_dst_ip {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule destination IP"
+#}
+#variable fw_rule3_dst_port {
+#  type        = string
+#  default     = ""
+#  description = "firewall rule destination port"
+#}
 
 # variable to define quantity and size of K8s nodes
 variable "vms" {
@@ -241,9 +241,9 @@ variable "vms" {
         vm_ram_size  = "4096"
         vm_disk_size = "40"
         vm_count = "1"
-        ip_pool =  ["10.10.13.110",
-                    "10.10.13.111",
-                    "10.10.13.112"]
+        ip_pool =  ["192.168.100.110",
+                    "192.168.100.111",
+                    "192.168.100.112"]
       },
       workers = {
         pref = "k8s-w"
@@ -251,9 +251,9 @@ variable "vms" {
         vm_ram_size  = "8192"
         vm_disk_size = "40"
         vm_count = "3"
-        ip_pool =  ["10.10.13.114",
-                    "10.10.13.115",
-                    "10.10.13.116"]
+        ip_pool =  ["192.168.100.114",
+                    "192.168.100.115",
+                    "192.168.100.116"]
       
       }
   }
