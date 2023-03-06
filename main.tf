@@ -74,7 +74,7 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   #}
   network {
     type               = "org"
-    name               = var.var.vcloud_orgvnet
+    name               = var.vcloud_orgvnet
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
     ip                 = "${var.vms.workers.ip_pool[count.index]}"
