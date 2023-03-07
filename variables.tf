@@ -219,6 +219,26 @@ variable ingress_ext_fqdn {
   description = "FQDN to build general prefix for the K8s Ingress controller endpoint's, published to outside"
 }
 
+# sensitive variables for Alert manager telegram integration
+variable alertmgr_telegram_receiver_name {
+  type        = string
+  default     = ""
+  description = "alert manager receiver name for a Telegram receiver"
+}
+variable alertmgr_telegram_bot_token {
+  type        = string
+  default     = ""
+  description = "telegram bot token for alertmanager integration"
+}
+variable alertmgr_telegram_chatid {
+  type        = string
+  default     = ""
+  description = "telegram chat_id for alertmanager integration"
+}
+
+
+
+
 
 
 

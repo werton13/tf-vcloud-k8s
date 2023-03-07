@@ -37,6 +37,11 @@ module "vcloud-k8s-cluster" {
   sc_storage_policy_name     = var.sc_storage_policy_name
   sc_name                    = var.sc_name
   ingress_ext_fqdn           = var.ingress_ext_fqdn
+  os_nic1_name               = var.os_nic1_name
+
+  alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
+  alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
+  alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
 }
 
 ```

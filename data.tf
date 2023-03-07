@@ -42,6 +42,10 @@ template = file("${path.module}/templates/userdata_m.yaml")
 
     ingress_ext_fqdn    = var.ingress_ext_fqdn
 
+    alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
+    alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
+    alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
+
     hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"
     hosts_entry2        = "${split("/", var.vms.masters.ip_pool[1])[0]}  ${var.vms.masters.pref}-1"
     hosts_entry3        = "${split("/", var.vms.workers.ip_pool[0])[0]}  ${var.vms.workers.pref}-0"
