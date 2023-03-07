@@ -81,146 +81,7 @@ variable "vm_user_ssh_key" {
    default     = ""
    description = "user ssh key for a new vm user"
  }
-# vApp configuration variables --------------------------------
-#variable vcd_vapp_net_gw {
-#  type        = string
-#  default     = "10.10.13.1"
-#  description = "vApp network default gateway IP"
-#}
-#variable vcd_vapp_net_mask {
-#  type        = string
-#  default     = "255.255.255.0"
-#  description = "vApp network mask - like 255.255.255.0"
-#}
-#variable vcd_vapp_net_dns1 {
-#  type        = string
-#  default     = "8.8.8.8"
-#  description = "DNS1 for vApp network"
-#}
-#variable vcd_vapp_net_dns2 {
-#  type        = string
-#  default     = "1.1.1.1"
-#  description = "DNS2 for vApp network"
-#}
-#variable static_ip_pool_start {
-#  type        = string
-#  default     = "10.10.13.100"
-#  description = "first IP in the vApp network static pool"
-#}
-#variable static_ip_pool_end {
-#  type        = string
-#  default     = "10.10.13.200"
-#  description = "last IP in the vApp network static pool"
-#}
 
-# fw rule1
-#variable fw_rule1_name {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule name for vAp network"
-#}
-#variable fw_rule1_action {
-#  type        = string
-#  default     = "allow"
-#  description = "firewall rule policy action -allow/deny"
-#}
-#variable fw_rule1_proto {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule protocol - TCP/UDP"
-#}
-#variable fw_rule1_src_ip {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule source IP"
-#}
-#variable fw_rule1_src_port {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule source port"
-#}
-#variable fw_rule1_dst_ip {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule destination IP"
-#}
-#variable fw_rule1_dst_port {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule destination port"
-#}
-## fw rule2
-#variable fw_rule2_name {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule name for vAp network"
-#}
-#variable fw_rule2_action {
-#  type        = string
-#  default     = "allow"
-#  description = "firewall rule policy action -allow/deny"
-#}
-#variable fw_rule2_proto {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule protocol - TCP/UDP"
-#}
-#variable fw_rule2_src_ip {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule source IP"
-#}
-#variable fw_rule2_src_port {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule source port"
-#}
-#variable fw_rule2_dst_ip {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule destination IP"
-#}
-#variable fw_rule2_dst_port {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule destination port"
-#}
-## fw rule3
-#variable fw_rule3_name {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule name for vAp network"
-#}
-#variable fw_rule3_action {
-#  type        = string
-#  default     = "allow"
-#  description = "firewall rule policy action -allow/deny"
-#}
-#variable fw_rule3_proto {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule protocol - TCP/UDP"
-#}
-#variable fw_rule3_src_ip {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule source IP"
-#}
-#variable fw_rule3_src_port {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule source port"
-#}
-#variable fw_rule3_dst_ip {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule destination IP"
-#}
-#variable fw_rule3_dst_port {
-#  type        = string
-#  default     = ""
-#  description = "firewall rule destination port"
-#}
 
 # variable to define quantity and size of K8s nodes
 variable "vms" {
@@ -260,7 +121,7 @@ variable "vms" {
 
  }
 
-############ for Ansible playbook
+############ variables for Ansible playbook
 variable "ansible_repo_url" {
    type        = string
    default     = "https://github.com/werton13/k8s-kubeadm-ansible.git"
@@ -311,11 +172,7 @@ variable "calico_version" {
   default     = "v3.25.0"
   description = "Calico CNI version"
  }
-#variable "vsphere_csi_driver_version" {
-#  type        = string
-#  default     = ""
-#  description = "description"
-# }
+
 variable "k8s_controlPlane_Endpoint" {
   type        = string
   default     = ""
