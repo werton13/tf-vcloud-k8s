@@ -69,3 +69,46 @@ module "vcloud-k8s-cluster" {
 }
 
 ```
+<details>
+  <summary>Default values</summary>
+  
+vcloud_allow_unverified_ssl = "true"
+vcloud_max_retry_timeout    = "240"
+vms = {
+    masters = {
+      pref = "k8s-m"
+      vm_cpu_count = "2"
+      vm_ram_size  = "4096"
+      vm_disk_size = "40"
+      vm_count = "1"
+      ip_pool =  ["192.168.100.110",
+                  "192.168.100.111"]
+    },
+    workers = {
+      pref = "k8s-w"
+      vm_cpu_count = "4"
+      vm_ram_size  = "8192"
+      vm_disk_size = "40"
+      vm_count = "3"
+      ip_pool =  ["192.168.100.114",
+                  "192.168.100.115",
+                  "192.168.100.116"]
+
+    }
+}
+ansible_repo_url  = "https://github.com/werton13/k8s-kubeadm-ansible.git"
+ansible_repo_name = "k8s-kubeadm-ansible"
+ansible_playbook  = "main.yaml"
+os_admin_username = "kuberadm"
+
+k8s_ver           = "1.22.17-00"
+k8s_version_short = "1.22.0"
+calico_version    = "v3.25.0"
+
+k8s_service_subnet = "10.96.0.0/12"
+k8s_pod_subnet     = "10.244.0.0/22"
+calico_network_cidr_blocksize = "26"
+
+
+  
+</details>
