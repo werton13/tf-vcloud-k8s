@@ -8,7 +8,7 @@ All customusation and configuration performing by a dedicated Ansible playbook: 
 Ansible playbook run from a first master node.
 
 Currently the following list of Kubernetes addons installing:
-<font size = "10">
+<font size = 10>
   - Tigera operator for Calico CNI: https://docs.tigera.io/calico/3.25/about
   - vCloud CSI driver: https://github.com/vmware/cloud-director-named-disk-csi-driver
   - Kubernetes metrics server: https://github.com/kubernetes-sigs/metrics-server
