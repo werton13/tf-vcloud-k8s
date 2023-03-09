@@ -71,7 +71,8 @@ module "vcloud-k8s-cluster" {
 ```
 <details>
   <summary>Default values</summary>
-  
+
+```  
 vcloud_allow_unverified_ssl = "true"
 vcloud_max_retry_timeout    = "240"
 vms = {
@@ -108,7 +109,7 @@ calico_version    = "v3.25.0"
 k8s_service_subnet = "10.96.0.0/12"
 k8s_pod_subnet     = "10.244.0.0/22"
 calico_network_cidr_blocksize = "26"
-
+```
 
   
 </details>
