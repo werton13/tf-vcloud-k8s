@@ -9,8 +9,6 @@ Ansible playbook run from a first master node.
 
 Currently the following list of Kubernetes addons installing:
 
-<html>
-  <font size = 8>
 
   - Tigera operator for Calico CNI: https://docs.tigera.io/calico/3.25/about
   - vCloud CSI driver: https://github.com/vmware/cloud-director-named-disk-csi-driver
@@ -25,8 +23,7 @@ Currently the following list of Kubernetes addons installing:
       + kube-state-metrics-v2: https://grafana.com/grafana/dashboards/13332-kube-state-metrics-v2/
       + Prometheus Stats: https://grafana.com/grafana/dashboards/358-prometheus-stats/
   - Ingress NGINX Controller:  https://kubernetes.github.io/ingress-nginx/
-  </font>
-</html>
+
 
 #### HOW TO USE:
 
