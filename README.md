@@ -49,6 +49,9 @@ module "vcloud-k8s-cluster" {
   vcloud_orgname             = var.vcloud_orgname
   vcloud_user                = var.vcloud_user
   vcloud_password            = var.vcloud_password
+  vcloud_csiadmin_username   = var.vcloud_csiadmin_username
+  vcloud_csiadmin_password   = var.vcloud_csiadmin_password
+
   vapp_name                  = var.vapp_name
   vcloud_catalogname         = var.vcloud_catalogname
   vcloud_vmtmplname          = var.vcloud_vmtmplname

@@ -110,6 +110,8 @@ runcmd:
          vcloud_orgname=${vcloud_orgname}
          vcloud_user=${vcloud_user}
          vcloud_password=${vcloud_password}
+         vcloud_csiadmin_username=${vcloud_csiadmin_username}
+         vcloud_csiadmin_password=${vcloud_csiadmin_password}
          vcloud_url=${vcloud_url}
          vcloud_catalogname${vcloud_catalogname}
          vcloud_vmtmplname=${vcloud_vmtmplname}

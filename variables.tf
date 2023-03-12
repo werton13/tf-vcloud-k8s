@@ -36,6 +36,18 @@ variable vcloud_password {
   default     = ""
   description = "vCloud tenant admin password"
  }
+
+variable vcloud_csiadmin_username {
+  type        = string
+  default     = ""
+  description = "dedicated vcloud user account for creating named disks"
+}
+variable vcloud_csiadmin_password {
+  type        = string
+  default     = ""
+  description = "dedicated vcloud user account password for creating named disks"
+}
+
 variable vapp_name {
   type        = string
   default     = ""
