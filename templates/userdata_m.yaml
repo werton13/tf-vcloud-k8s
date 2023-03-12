@@ -113,7 +113,7 @@ runcmd:
          vcloud_csiadmin_username=${vcloud_csiadmin_username}
          vcloud_csiadmin_password=${vcloud_csiadmin_password}
          vcloud_url=${vcloud_url}
-         vcloud_catalogname${vcloud_catalogname}
+         vcloud_catalogname=${vcloud_catalogname}
          vcloud_vmtmplname=${vcloud_vmtmplname}
          vcloud_orgvnet=${vcloud_orgvnet}
          vapp_name=${vapp_name}
