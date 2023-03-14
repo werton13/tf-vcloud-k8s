@@ -75,6 +75,9 @@ write_files:
       ${hosts_entry3}
       ${hosts_entry4}
       ${hosts_entry5}
+      ${test_array}[1]
+      ${test_array}[0]
+
     path: /etc/hosts
     append: true
   - content: |
@@ -107,6 +110,9 @@ runcmd:
   - test  $(hostname) = ${master0_name}  && 
     ansible-playbook "/${ansible_repo_name}/${ansible_playbook}"
      -e "vcloud_vdc=${vcloud_vdc}
+         test_array=${test_array}
+         workers_count=${workers_count}
+         worker0_name=${worker0_name} 
          vcloud_orgname=${vcloud_orgname}
          vcloud_user=${vcloud_user}
          vcloud_password=${vcloud_password}

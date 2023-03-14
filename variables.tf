@@ -247,6 +247,23 @@ variable alertmgr_telegram_chatid {
   default     = ""
   description = "telegram chat_id for alertmanager integration"
 }
+### test block ###########################################
+variable worker0_name  {
+  type        = string
+  default     = ""
+  description = "description"
+}
+variable workers_count {
+  type        = string
+  default     = ""
+  description = "description"
+}
+variable test_array {
+  type        = list(string)
+  default     = ""
+  description = "description"
+}
+
 
 
 
