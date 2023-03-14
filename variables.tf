@@ -6,6 +6,12 @@ variable vcloud_url {
   description = "vcloud director url"
  }
 
+variable vcloud_ip {
+  type        = string
+  default     = ""
+  description = "description"
+}
+
 variable vcloud_allow_unverified_ssl {
   type        = string
   description = "vCD allow unverified SSL"
@@ -107,29 +113,29 @@ variable "vms" {
         ip_pool = list(string)
     }))
   
-    default = {
-      masters = {
-        pref = "k8s-m"
-        vm_cpu_count = "2"
-        vm_ram_size  = "4096"
-        vm_disk_size = "40"
-        vm_count = "1"
-        ip_pool =  ["192.168.100.110",
-                    "192.168.100.111",
-                    "192.168.100.112"]
-      },
-      workers = {
-        pref = "k8s-w"
-        vm_cpu_count = "4"
-        vm_ram_size  = "8192"
-        vm_disk_size = "40"
-        vm_count = "3"
-        ip_pool =  ["192.168.100.114",
-                    "192.168.100.115",
-                    "192.168.100.116"]
-      
-      }
-  }
+  #  default = {
+  #    masters = {
+  #      pref = "k8s-m"
+  #      vm_cpu_count = "2"
+  #      vm_ram_size  = "4096"
+  #      vm_disk_size = "40"
+  #      vm_count = "1"
+  #      ip_pool =  ["192.168.100.110",
+  #                  "192.168.100.111",
+  #                  "192.168.100.112"]
+  #    },
+  #    workers = {
+  #      pref = "k8s-w"
+  #      vm_cpu_count = "4"
+  #      vm_ram_size  = "8192"
+  #      vm_disk_size = "40"
+  #      vm_count = "3"
+  #      ip_pool =  ["192.168.100.114",
+  #                  "192.168.100.115",
+  #                  "192.168.100.116"]
+  #    
+  #    }
+  #}
 
  }
 
@@ -258,11 +264,11 @@ variable workers_count {
   default     = ""
   description = "description"
 }
-variable test_array {
-  type        = list(string)
-  default     = []
-  description = "description"
-}
+#variable test_array {
+#  type        = list(string)
+#  default     = []
+#  description = "description"
+#}
 
 
 

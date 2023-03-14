@@ -70,13 +70,17 @@ packages:
 
 write_files:
   - content: |
+      ${hosts_entry0}
       ${hosts_entry1}
       ${hosts_entry2}
       ${hosts_entry3}
       ${hosts_entry4}
       ${hosts_entry5}
-      ${test_array}[1]
-      ${test_array}[0]
+      ${hosts_entry6}
+      ${hosts_entry7}
+      ${hosts_entry8}
+      ${hosts_entry9}
+      ${hosts_entry10}
 
     path: /etc/hosts
     append: true
@@ -84,11 +88,16 @@ write_files:
       [masters]
       ${master0_ip}
       ${master1_ip}
+      ${master2_ip}
 
       [workers]   
       ${worker0_ip}
       ${worker1_ip}
       ${worker2_ip}
+      ${worker3_ip}
+      ${worker4_ip}
+      ${worker5_ip}
+      ${worker6_ip}
 
       [all:vars]
       ansible_connection=ssh

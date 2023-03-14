@@ -12,6 +12,7 @@ template = file("${path.module}/templates/userdata_m.yaml")
     vcloud_csiadmin_username   = var.vcloud_csiadmin_username
     vcloud_csiadmin_password   = var.vcloud_csiadmin_password
     vcloud_url         = var.vcloud_url
+
     vcloud_catalogname = var.vcloud_catalogname
     vcloud_vmtmplname  = var.vcloud_vmtmplname
     vcloud_orgvnet     = var.vcloud_orgvnet
@@ -48,23 +49,37 @@ template = file("${path.module}/templates/userdata_m.yaml")
     alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
     alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
     alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
+    
+    #vcloud_fqdn        = "${substr(var.vcloud_url, 8, -4}"
+    #vcloud_ip          = var.vcloud_ip
 
+    hosts_entry0        = "${var.vcloud_ip}  ${substr(var.vcloud_url, 8, -4}"
     hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"
     hosts_entry2        = "${split("/", var.vms.masters.ip_pool[1])[0]}  ${var.vms.masters.pref}-1"
-    hosts_entry3        = "${split("/", var.vms.workers.ip_pool[0])[0]}  ${var.vms.workers.pref}-0"
-    hosts_entry4        = "${split("/", var.vms.workers.ip_pool[1])[0]}  ${var.vms.workers.pref}-1"
-    hosts_entry5        = "${split("/", var.vms.workers.ip_pool[2])[0]}  ${var.vms.workers.pref}-2"
+    hosts_entry3        = "${split("/", var.vms.masters.ip_pool[2])[0]}  ${var.vms.masters.pref}-2"
+
+    hosts_entry4        = "${split("/", var.vms.workers.ip_pool[0])[0]}  ${var.vms.workers.pref}-0"
+    hosts_entry5        = "${split("/", var.vms.workers.ip_pool[1])[0]}  ${var.vms.workers.pref}-1"
+    hosts_entry6        = "${split("/", var.vms.workers.ip_pool[2])[0]}  ${var.vms.workers.pref}-2"
+    hosts_entry7        = "${split("/", var.vms.workers.ip_pool[3])[0]}  ${var.vms.workers.pref}-3"
+    hosts_entry8        = "${split("/", var.vms.workers.ip_pool[4])[0]}  ${var.vms.workers.pref}-4"
+    hosts_entry9        = "${split("/", var.vms.workers.ip_pool[5])[0]}  ${var.vms.workers.pref}-5"
+    hosts_entry10       = "${split("/", var.vms.workers.ip_pool[6])[0]}  ${var.vms.workers.pref}-6"
     
     master0_name        = "${var.vms.masters.pref}-0"
     worker0_name        = "${var.vms.workers.pref}-0"
-   
-    #test_array          =  var.test_array
-    
+       
     master0_ip          = "${split("/", var.vms.masters.ip_pool[0])[0]}"
     master1_ip          = "${split("/", var.vms.masters.ip_pool[1])[0]}"
+    master2_ip          = "${split("/", var.vms.masters.ip_pool[2])[0]}"
+
     worker0_ip          = "${split("/", var.vms.workers.ip_pool[0])[0]}" 
     worker1_ip          = "${split("/", var.vms.workers.ip_pool[1])[0]}"
     worker2_ip          = "${split("/", var.vms.workers.ip_pool[2])[0]}"
+    worker3_ip          = "${split("/", var.vms.workers.ip_pool[3])[0]}" 
+    worker4_ip          = "${split("/", var.vms.workers.ip_pool[4])[0]}"
+    worker5_ip          = "${split("/", var.vms.workers.ip_pool[5])[0]}"
+    worker6_ip          = "${split("/", var.vms.workers.ip_pool[6])[0]}" 
 
     workers_count       = var.vms.workers.vm_count
     masters_count       = var.vms.masters.vm_count
