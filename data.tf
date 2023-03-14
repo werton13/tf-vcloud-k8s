@@ -57,8 +57,8 @@ template = file("${path.module}/templates/userdata_m.yaml")
     
     master0_name        = "${var.vms.masters.pref}-0"
     worker0_name        = "${var.vms.workers.pref}-0"
-    workers_count       =  "${var.vms.workers.count}"
-    test_array          =  var.test_array
+   
+    #test_array          =  var.test_array
     
     master0_ip          = "${split("/", var.vms.masters.ip_pool[0])[0]}"
     master1_ip          = "${split("/", var.vms.masters.ip_pool[1])[0]}"
@@ -66,6 +66,7 @@ template = file("${path.module}/templates/userdata_m.yaml")
     worker1_ip          = "${split("/", var.vms.workers.ip_pool[1])[0]}"
     worker2_ip          = "${split("/", var.vms.workers.ip_pool[2])[0]}"
 
+    workers_count       = var.vms.workers.vm_count
     masters_count       = var.vms.masters.vm_count
     ansible_ssh_pass    = var.ansible_ssh_pass
   }
