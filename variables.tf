@@ -260,7 +260,7 @@ variable workers_count {
 }
 variable test_array {
   type        = list(string)
-  default     = ""
+  default     = []
   description = "description"
 }
 
