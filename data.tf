@@ -57,7 +57,7 @@ template = file("${path.module}/templates/userdata_m.yaml")
     
     master0_name        = "${var.vms.masters.pref}-0"
     worker0_name        = "${var.vms.workers.pref}-0"
-    workers_count       =  var.vms.workers.count
+    workers_count       =  "${var.vms.workers.count}"
     test_array          =  var.test_array
     
     master0_ip          = "${split("/", var.vms.masters.ip_pool[0])[0]}"
