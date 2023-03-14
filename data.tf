@@ -53,7 +53,7 @@ template = file("${path.module}/templates/userdata_m.yaml")
     #vcloud_fqdn        = "${substr(var.vcloud_url, 8, -4}"
     #vcloud_ip          = var.vcloud_ip
 
-    hosts_entry0        = "${var.vcloud_ip}  ${substr((var.vcloud_url),8,-4}"
+    hosts_entry0        = "${var.vcloud_ip}  ${substr((var.vcloud_url), 8, -4)}"
     hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"
     hosts_entry2        = "${split("/", var.vms.masters.ip_pool[1])[0]}  ${var.vms.masters.pref}-1"
     hosts_entry3        = "${split("/", var.vms.masters.ip_pool[2])[0]}  ${var.vms.masters.pref}-2"
