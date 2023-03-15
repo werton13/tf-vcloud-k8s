@@ -150,6 +150,12 @@ variable "ansible_repo_name"  {
   default     = "k8s-kubeadm-ansible"
   description = "ansible git repository name for bootstrap K8s cluster, writed specifically for this project"
  }
+variable ansible_repo_branch {
+  type        = string
+  default     = "main"
+  description = "description"
+}
+
 variable "ansible_playbook" {
    type        = string
    default     = "main.yaml"

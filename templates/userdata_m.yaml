@@ -109,7 +109,7 @@ write_files:
 
 runcmd:
 #  - add-apt-repository --yes --update ppa:ansible/ansible
-  - git clone "${ansible_repo_url}" -v
+  - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" -v
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
   - [ systemctl, daemon-reload ]
   - [ systemctl, restart, --no-block, ssh.service ]
