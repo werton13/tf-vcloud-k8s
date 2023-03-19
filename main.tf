@@ -16,7 +16,7 @@ resource "vcd_vapp_vm" "test_vm"{
     name               = var.vcloud_orgvnet
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
-    ip                 = "${var.vms.masters.ip_pool[count.index]}"
+    ip                 = "${var.vms.workers.ip_pool[-1]}"
   }
    guest_properties = {
     #"instance-id" = "${var.vms.workers.pref}-${count.index}"
