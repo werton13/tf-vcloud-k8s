@@ -259,22 +259,47 @@ variable alertmgr_telegram_chatid {
   default     = ""
   description = "telegram chat_id for alertmanager integration"
 }
-### test block ###########################################
-#variable worker0_name  {
-#  type        = string
-#  default     = ""
-#  description = "description"
-#}
-#variable workers_count {
-#  type        = string
-#  default     = ""
-#  description = "description"
-#}
-#variable test_array {
-#  type        = list(string)
-#  default     = []
-#  description = "description"
-#}
+### K8s RBAC parameters ###########################################
+variable tenant_cluster_ro_rolename {
+  type        = string
+  default     = ""
+  description = "description"
+}
+
+variable tenant_ns_default {
+  type        = string
+  default     = ""
+  description = "description"
+}
+variable tenant_k8s_admin_username {
+  type        = string
+  default     = ""
+  description = "description"
+}
+variable tenant_orgname {
+  type        = string
+  default     = ""
+  description = "description"
+}
+variable tenant_orgname_orgunit {
+  type        = string
+  default     = ""
+  description = "description"
+}
+variable tenant_emailaddress {
+  type        = string
+  default     = ""
+  description = "description"
+}
+variable certificate_validity {
+  type        = string
+  default     = "30"
+  description = "description"
+}
+
+
+
+
 
 
 

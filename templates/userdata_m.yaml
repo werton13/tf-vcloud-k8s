@@ -148,6 +148,13 @@ runcmd:
          alertmgr_telegram_receiver_name=${alertmgr_telegram_receiver_name}
          alertmgr_telegram_bot_token=${alertmgr_telegram_bot_token}
          alertmgr_telegram_chatid=${alertmgr_telegram_chatid}
-         masters_count=${masters_count}"
+         masters_count=${masters_count}
+         tenant_cluster_ro_rolename=${tenant_cluster_ro_rolename}
+         tenant_ns_default=${tenant_ns_default}
+         tenant_k8s_admin_username=${tenant_k8s_admin_username}
+         tenant_orgname=${tenant_orgname}
+         tenant_orgname_orgunit=${tenant_orgname_orgunit}
+         tenant_emailaddress=${tenant_emailaddress}
+         certificate_validity=${certificate_validity}"
 
  

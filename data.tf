@@ -85,6 +85,17 @@ template = file("${path.module}/templates/userdata_m.yaml")
     workers_count       = var.vms.workers.vm_count
     masters_count       = var.vms.masters.vm_count
     ansible_ssh_pass    = var.ansible_ssh_pass
+    
+    tenant_cluster_ro_rolename = var.tenant_cluster_ro_rolename
+    tenant_ns_default          = var.tenant_ns_default
+    tenant_k8s_admin_username  = var.tenant_k8s_admin_username
+    tenant_orgname             = var.tenant_orgname
+    tenant_orgname_orgunit     = var.tenant_orgname_orgunit
+    tenant_emailaddress        = var.tenant_emailaddress
+    certificate_validity       = var.certificate_validity
+   
+
+
   }
 }
 data "template_file" "cloudinit_worker_node" {
