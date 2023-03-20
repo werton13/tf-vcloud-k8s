@@ -148,39 +148,39 @@ data "vcd_catalog" "vcd_dp_linux" {
 
 }
 
-data "template_file" "test_node" {
-#  template = file("./templates/userdata.yaml") 
-template = file("${path.module}/templates/userdata_t.yaml")
-  vars = {
-    vm_user_name        = var.vm_user_name
-    vm_user_password    = var.vm_user_password
-    vm_user_displayname = var.vm_user_displayname     
-    vm_user_ssh_key     = var.vm_user_ssh_key
-    vm_user_ssh_pk      = var.vm_user_ssh_pk
-
-    ansible_repo_url    = var.ansible_repo_url
-    ansible_repo_name   = var.ansible_repo_name
-    ansible_playbook    = var.ansible_playbook
-    ansible_repo_branch = var.ansible_repo_branch 
-
-    os_admin_username   = var.os_admin_username
-    os_nic1_name        = var.os_nic1_name
-
-    
-    os_admin_username   = var.os_admin_username
-    os_nic1_name        = var.os_nic1_name
-
-    
-
-    ansible_ssh_pass    = var.ansible_ssh_pass
-
-    master0_name        = "${var.vms.masters.pref}-0"
-    vcloud_vdc          = var.vcloud_vdc
-  
-    
-
-   
-
-
-  }
-}
+#data "template_file" "test_node" {
+##  template = file("./templates/userdata.yaml") 
+#template = file("${path.module}/templates/userdata_t.yaml")
+#  vars = {
+#    vm_user_name        = var.vm_user_name
+#    vm_user_password    = var.vm_user_password
+#    vm_user_displayname = var.vm_user_displayname     
+#    vm_user_ssh_key     = var.vm_user_ssh_key
+#    vm_user_ssh_pk      = var.vm_user_ssh_pk
+#
+#    ansible_repo_url    = var.ansible_repo_url
+#    ansible_repo_name   = var.ansible_repo_name
+#    ansible_playbook    = var.ansible_playbook
+#    ansible_repo_branch = var.ansible_repo_branch 
+#
+#    os_admin_username   = var.os_admin_username
+#    os_nic1_name        = var.os_nic1_name
+#
+#    
+#    os_admin_username   = var.os_admin_username
+#    os_nic1_name        = var.os_nic1_name
+#
+#    
+#
+#    ansible_ssh_pass    = var.ansible_ssh_pass
+#
+#    master0_name        = "${var.vms.masters.pref}-0"
+#    vcloud_vdc          = var.vcloud_vdc
+#  
+#    
+#
+#   
+#
+#
+#  }
+#}

@@ -85,7 +85,7 @@ write_files:
 
   - content: |                                                                                                                                                           
       @reboot /ansible_starter.sh                                                                                                                                              
-      /usr/bin/crontab /var/spool/cron/root    
+       
     path: /var/spool/cron/root  
 
   - content: |
@@ -103,9 +103,11 @@ runcmd:
 #  - add-apt-repository --yes --update ppa:ansible/ansible
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" -v
   - git clone https://github.com/nokogerra/ubuntu-ansible-basic-roles.git
-  - cp -r ./ubuntu-ansible-basic-roles/roles/*  /home/kuberadm/.ansible/roles/
+  - cp -r /ubuntu-ansible-basic-roles/roles/ /k8s-kubeadm-ansible/
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
   - [ systemctl, daemon-reload ]
   - [ systemctl, restart, --no-block, ssh.service ]
   - [ ansible-galaxy, collection, install, kubernetes.core ]
   - chmod u+x /ansible_starter.sh
+  - /usr/bin/crontab /var/spool/cron/root
+   
