@@ -78,7 +78,7 @@ resource "vcd_vm_internal_disk" "engine_disk" {
   size_in_mb      = each.value.sizegb * 1024
   bus_number      = each.value.bus_num
   unit_number     = each.value.unit_num
-  storage_profile = each.value.storage_profile
+  #storage_profile = each.value.storage_profile
 }
 
 
