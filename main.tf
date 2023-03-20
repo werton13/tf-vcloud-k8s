@@ -72,8 +72,8 @@ resource "vcd_vm_internal_disk" "engine_disk" {
                     vcd_vapp_org_network.vappOrgNet,
                     vcd_vapp_vm.test_vm]
   for_each        = var.add_disks
-  vapp_name       = vcd_vapp_vm.vm.vapp_name
-  vm_name         = vcd_vapp_vm.vm.name
+  vapp_name       = vcd_vapp_vm.test_vm.vapp_name
+  vm_name         = vcd_vapp_vm.test_vm.name
   bus_type        = each.value.bus_type
   size_in_mb      = each.value.sizegb * 1024
   bus_number      = each.value.bus_num
