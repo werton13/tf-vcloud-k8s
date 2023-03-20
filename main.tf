@@ -1,5 +1,5 @@
 resource "vcd_vapp_vm" "test_vm"{
-  depends_on       = [vcd_vapp.k8s_mgmt_vapp,
+  depends_on       = [vcd_vapp.k8s_mgmt_vapp
                      ]
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
   name             = "test_vm"
