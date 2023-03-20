@@ -49,6 +49,9 @@ resource "vcd_vapp_vm" "test_vm"{
 # additional_disk_1
 
 resource "vcd_vm_internal_disk" "data1_disk" {
+depends_on       = [vcd_vapp.k8s_mgmt_vapp,
+                    vcd_vapp_org_network.vappOrgNet,
+                    vcd_vapp_vm,test_vm]
 count           = var.vms.masters.vm_count + var.vms.workers.vm_count
 vapp_name       = var.vapp_name
 bus_type        = var.add_disks.disk1.bus_type
