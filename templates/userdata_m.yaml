@@ -110,13 +110,16 @@ write_files:
 runcmd:
 #  - add-apt-repository --yes --update ppa:ansible/ansible
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" -v
+  - git clone https://github.com/nokogerra/ubuntu-ansible-basic-roles.git
+  - cp -r ./ubuntu-ansible-basic-roles/roles/  /k8s-kubeadm-ansible/  
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
   - [ systemctl, daemon-reload ]
   - [ systemctl, restart, --no-block, ssh.service ]
   - [ ansible-galaxy, collection, install, kubernetes.core ]
   - cd "/${ansible_repo_name}"
-  - touch iwashere
-  - test  $(hostname) = ${master0_name}  && 
+  - cat > /runner.sh << EOF
+    #/bin/bash
+    test  $(hostname) = ${master0_name}  && 
     ansible-playbook "/${ansible_repo_name}/${ansible_playbook}"
      -e "vcloud_vdc=${vcloud_vdc}
          workers_count=${workers_count}
@@ -156,5 +159,6 @@ runcmd:
          tenant_orgname_orgunit=${tenant_orgname_orgunit}
          tenant_emailaddress=${tenant_emailaddress}
          certificate_validity=${certificate_validity}"
+    EOF
 
  

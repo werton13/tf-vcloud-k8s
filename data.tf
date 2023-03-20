@@ -161,15 +161,11 @@ template = file("${path.module}/templates/userdata_t.yaml")
     ansible_repo_url    = var.ansible_repo_url
     ansible_repo_name   = var.ansible_repo_name
     ansible_playbook    = var.ansible_playbook
-    
+    ansible_repo_branch = var.ansible_repo_branch 
+
     os_admin_username   = var.os_admin_username
     os_nic1_name        = var.os_nic1_name
 
-
-    ansible_repo_url    = var.ansible_repo_url
-    ansible_repo_name   = var.ansible_repo_name
-    ansible_repo_branch = var.ansible_repo_branch
-    ansible_playbook    = var.ansible_playbook
     
     os_admin_username   = var.os_admin_username
     os_nic1_name        = var.os_nic1_name
@@ -177,6 +173,10 @@ template = file("${path.module}/templates/userdata_t.yaml")
     
 
     ansible_ssh_pass    = var.ansible_ssh_pass
+
+    master0_name        = "${var.vms.masters.pref}-0"
+    vcloud_vdc          = var.vcloud_vdc
+  
     
 
    
