@@ -72,8 +72,8 @@ resource "vcd_vm_internal_disk" "workers_disks" {
                       vcd_vapp_org_network.vappOrgNet
                      ]
   for_each        = var.add_disks
-  vapp_name       = vcd_vapp_vm.k8s_workers_vms.vapp_name
-  vm_name         = vcd_vapp_vm.k8s_workers_vms.name
+  vapp_name       = vcd_vapp_vm.k8s_workers_vms[count.index].vapp_name
+  vm_name         = vcd_vapp_vm.k8s_workers_vms[count.index].name
   bus_type        = each.value.bus_type
   size_in_mb      = each.value.sizegb * 1024
   bus_number      = each.value.bus_num
@@ -85,8 +85,8 @@ resource "vcd_vm_internal_disk" "masters_disks" {
                       vcd_vapp_org_network.vappOrgNet
                      ]
   for_each        = var.add_disks
-  vapp_name       = vcd_vapp_vm.k8s_masters_vms.vapp_name
-  vm_name         = vcd_vapp_vm.k8s_masters_vms.name
+  vapp_name       = vcd_vapp_vm.k8s_masters_vms[count.index].vapp_name
+  vm_name         = vcd_vapp_vm.k8s_masters_vms[count.index].name
   bus_type        = each.value.bus_type
   size_in_mb      = each.value.sizegb * 1024
   bus_number      = each.value.bus_num
