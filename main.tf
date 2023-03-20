@@ -68,6 +68,9 @@ resource "vcd_vapp_vm" "test_vm"{
 ###################################
 # second way
 resource "vcd_vm_internal_disk" "engine_disk" {
+  depends_on       = [vcd_vapp.k8s_mgmt_vapp,
+                    vcd_vapp_org_network.vappOrgNet,
+                    vcd_vapp_vm.test_vm]
   for_each        = var.add_disks
   vapp_name       = vcd_vapp_vm.vm.vapp_name
   vm_name         = vcd_vapp_vm.vm.name
