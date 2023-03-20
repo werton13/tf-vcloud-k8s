@@ -51,10 +51,10 @@ resource "vcd_vapp_vm" "test_vm"{
 resource "vcd_vm_internal_disk" "data1_disk" {
 count           = var.vms.masters.vm_count + var.vms.workers.vm_count
 vapp_name       = var.vapp_name
-bus_type        = var.add_disk.disk1.bus_type
-size_in_mb      = var.add_disk.disk1.sizegb * 1024
-bus_number      = var.add_disk.disk1.bus_num
-unit_number     = var.add_disk.disk1.unit_num
+bus_type        = var.add_disks.disk1.bus_type
+size_in_mb      = var.add_disks.disk1.sizegb * 1024
+bus_number      = var.add_disks.disk1.bus_num
+unit_number     = var.add_disks.disk1.unit_num
 
 #  vm_name         = vcd_vapp_vm.vm.name
 vm_name = count.index <= (var.vms.masters.count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index}"
