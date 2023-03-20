@@ -134,6 +134,13 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
     adapter_type       = "VMXNET3"
     ip                 = "${var.vms.masters.ip_pool[count.index]}"
   }
+  override_template_disk {
+    size_in_mb      = var.system_disk_size * 1024
+    bus_type        = var.system_disk_bus
+  #  storage_profile = var.mod_system_disk_storage_profile
+    bus_number      = 0
+    unit_number     = 0
+  }
 
   guest_properties = {
     "instance-id" = "${var.vms.masters.pref}-${count.index}"
@@ -166,6 +173,14 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
     adapter_type       = "VMXNET3"
     ip                 = "${var.vms.workers.ip_pool[count.index]}"
   }
+  override_template_disk {
+    size_in_mb      = var.system_disk_size * 1024
+    bus_type        = var.system_disk_bus
+  #  storage_profile = var.mod_system_disk_storage_profile
+    bus_number      = 0
+    unit_number     = 0
+  }
+
   guest_properties = {
     "instance-id" = "${var.vms.workers.pref}-${count.index}"
     "hostname"    = "${var.vms.workers.pref}-${count.index}"
