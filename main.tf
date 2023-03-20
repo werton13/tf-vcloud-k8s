@@ -18,30 +18,31 @@ resource "vcd_vapp_vm" "test_vm"{
     adapter_type       = "VMXNET3"
     ip                 = "${var.vms.workers.ip_pool[-1]}"
   }
+    override_template_disk {
+    size_in_mb      = var.mod_system_disk_size * 1024
+    bus_type        = var.mod_system_disk_bus
+    storage_profile = var.mod_system_disk_storage_profile
+    bus_number      = 0
+    unit_number     = 0
+  }
    guest_properties = {
     #"instance-id" = "${var.vms.workers.pref}-${count.index}"
     "hostname"    = "testvm"
     "user-data"   = "${base64encode(data.template_file.cloudinit_worker_node.rendered)}"
   }
-  add_disks = {
-          disk1 = {
-            sizegb = "15"
-            bus_num = "1"
-            unit_num = "0"
-            storage_profile = "DPLabCompNonSSD" 
-            bus_type = "paravirtual" 
-          }
-          disk2 = {
-            sizegb = "5"
-            bus_num = "1"
-            unit_num = "1"
-            storage_profile = "DPLabCompNonSSD"
-            bus_type = "paravirtual"  
-          }
 }
 
-}
 
+resource "vcd_vm_internal_disk" "engine_disk" {
+  for_each        = var.mod_add_disks
+  vapp_name       = vcd_vapp_vm.vm.vapp_name
+  vm_name         = vcd_vapp_vm.vm.name
+  bus_type        = each.value.bus_type
+  size_in_mb      = each.value.sizegb * 1024
+  bus_number      = each.value.bus_num
+  unit_number     = each.value.unit_num
+  storage_profile = each.value.storage_profile
+}
 
 #resource "vcd_vapp_vm" "k8s_masters_vms" {
 #

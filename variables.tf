@@ -297,6 +297,35 @@ variable certificate_validity {
   description = "description"
 }
 
+#Additional disks vars
+variable "add_disks" {
+  type = map(object({
+    sizegb          = string
+    bus_num         = string
+    unit_num        = string
+    storage_profile = string
+    bus_type        = string
+  }))
+  default = {}
+}
+
+
+#System disk vars
+variable "system_disk_bus" {
+  description = ""
+  default     = "default"
+}
+
+variable "system_disk_size" {
+  description = ""
+  default     = "default"
+}
+
+variable "system_disk_storage_profile" {
+  description = ""
+  default     = "default"
+}
+
 
 
 
