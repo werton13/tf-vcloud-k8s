@@ -76,10 +76,10 @@ write_files:
     path: /etc/hosts
     append: true
   - content: |
-      #/bin/bash
+      #!/bin/bash
       test  $(hostname) = ${master0_name}  && 
       ansible-playbook "/${ansible_repo_name}/${ansible_playbook}"
-       -e "vcloud_vdc=${vcloud_vdc}"
+      -e "vcloud_vdc=${vcloud_vdc}"
     path: /runner.sh
   - content: |
       [masters]
@@ -101,8 +101,3 @@ runcmd:
   - [ systemctl, daemon-reload ]
   - [ systemctl, restart, --no-block, ssh.service ]
   - [ ansible-galaxy, collection, install, kubernetes.core ]
-
-
-
-
- 
