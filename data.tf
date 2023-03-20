@@ -150,7 +150,7 @@ data "vcd_catalog" "vcd_dp_linux" {
 
 data "template_file" "test_node" {
 #  template = file("./templates/userdata.yaml") 
-template = file("${path.module}/templates/userdata_m.yaml")
+template = file("${path.module}/templates/userdata_t.yaml")
   vars = {
     vm_user_name        = var.vm_user_name
     vm_user_password    = var.vm_user_password
