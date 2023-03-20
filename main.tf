@@ -50,7 +50,6 @@ resource "vcd_vapp_vm" "test_vm"{
 
 resource "vcd_vm_internal_disk" "data1_disk" {
 count           = var.vms.masters.vm_count + var.vms.workers.vm_count
-size_in_mb      = var.add_disks.disk1.sizegb * 1024
 vapp_name       = var.vapp_name
 bus_type        = var.add_disk.disk1.bus_type
 size_in_mb      = var.add_disk.disk1.sizegb * 1024
