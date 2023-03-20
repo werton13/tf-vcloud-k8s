@@ -67,13 +67,26 @@
 #}
 ###################################
 # second way
-resource "vcd_vm_internal_disk" "engine_disk" {
+resource "vcd_vm_internal_disk" "workers_disks" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
-                    vcd_vapp_org_network.vappOrgNet
-                    ]
+                      vcd_vapp_org_network.vappOrgNet
+                     ]
   for_each        = var.add_disks
-  vapp_name       = vcd_vapp_vm.test_vm.vapp_name
-  vm_name         = vcd_vapp_vm.test_vm.name
+  vapp_name       = vcd_vapp_vm.k8s_workers_vms.vapp_name
+  vm_name         = vcd_vapp_vm.k8s_workers_vms.name
+  bus_type        = each.value.bus_type
+  size_in_mb      = each.value.sizegb * 1024
+  bus_number      = each.value.bus_num
+  unit_number     = each.value.unit_num
+  #storage_profile = each.value.storage_profile
+}
+resource "vcd_vm_internal_disk" "masters_disks" {
+  depends_on       = [vcd_vapp.k8s_mgmt_vapp,
+                      vcd_vapp_org_network.vappOrgNet
+                     ]
+  for_each        = var.add_disks
+  vapp_name       = vcd_vapp_vm.k8s_masters_vms.vapp_name
+  vm_name         = vcd_vapp_vm.k8s_masters_vms.name
   bus_type        = each.value.bus_type
   size_in_mb      = each.value.sizegb * 1024
   bus_number      = each.value.bus_num
@@ -81,9 +94,7 @@ resource "vcd_vm_internal_disk" "engine_disk" {
   #storage_profile = each.value.storage_profile
 }
 
-
 ###################################
-
 
 
 resource "vcd_vapp_vm" "k8s_masters_vms" {
