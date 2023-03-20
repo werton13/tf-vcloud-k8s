@@ -147,3 +147,64 @@ data "vcd_catalog" "vcd_dp_linux" {
     name = var.vcloud_catalogname
 
 }
+
+data "template_file" "test_node" {
+#  template = file("./templates/userdata.yaml") 
+template = file("${path.module}/templates/userdata_m.yaml")
+  vars = {
+
+
+
+    ansible_repo_url    = var.ansible_repo_url
+    ansible_repo_name   = var.ansible_repo_name
+    ansible_repo_branch = var.ansible_repo_branch
+    ansible_playbook    = var.ansible_playbook
+    
+    os_admin_username   = var.os_admin_username
+    os_nic1_name        = var.os_nic1_name
+
+    
+    hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
+    hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"
+    hosts_entry2        = "${split("/", var.vms.masters.ip_pool[1])[0]}  ${var.vms.masters.pref}-1"
+    hosts_entry3        = "${split("/", var.vms.masters.ip_pool[2])[0]}  ${var.vms.masters.pref}-2"
+
+    hosts_entry4        = "${split("/", var.vms.workers.ip_pool[0])[0]}  ${var.vms.workers.pref}-0"
+    hosts_entry5        = "${split("/", var.vms.workers.ip_pool[1])[0]}  ${var.vms.workers.pref}-1"
+    hosts_entry6        = "${split("/", var.vms.workers.ip_pool[2])[0]}  ${var.vms.workers.pref}-2"
+    hosts_entry7        = "${split("/", var.vms.workers.ip_pool[3])[0]}  ${var.vms.workers.pref}-3"
+    hosts_entry8        = "${split("/", var.vms.workers.ip_pool[4])[0]}  ${var.vms.workers.pref}-4"
+    hosts_entry9        = "${split("/", var.vms.workers.ip_pool[5])[0]}  ${var.vms.workers.pref}-5"
+    hosts_entry10       = "${split("/", var.vms.workers.ip_pool[6])[0]}  ${var.vms.workers.pref}-6"
+    
+    master0_name        = "${var.vms.masters.pref}-0"
+    worker0_name        = "${var.vms.workers.pref}-0"
+       
+    master0_ip          = "${split("/", var.vms.masters.ip_pool[0])[0]}"
+    master1_ip          = "${split("/", var.vms.masters.ip_pool[1])[0]}"
+    master2_ip          = "${split("/", var.vms.masters.ip_pool[2])[0]}"
+
+    worker0_ip          = "${split("/", var.vms.workers.ip_pool[0])[0]}" 
+    worker1_ip          = "${split("/", var.vms.workers.ip_pool[1])[0]}"
+    worker2_ip          = "${split("/", var.vms.workers.ip_pool[2])[0]}"
+    worker3_ip          = "${split("/", var.vms.workers.ip_pool[3])[0]}" 
+    worker4_ip          = "${split("/", var.vms.workers.ip_pool[4])[0]}"
+    worker5_ip          = "${split("/", var.vms.workers.ip_pool[5])[0]}"
+    worker6_ip          = "${split("/", var.vms.workers.ip_pool[6])[0]}" 
+
+    workers_count       = var.vms.workers.vm_count
+    masters_count       = var.vms.masters.vm_count
+    ansible_ssh_pass    = var.ansible_ssh_pass
+    
+    tenant_cluster_ro_rolename = var.tenant_cluster_ro_rolename
+    tenant_ns_default          = var.tenant_ns_default
+    tenant_k8s_admin_username  = var.tenant_k8s_admin_username
+    tenant_orgname             = var.tenant_orgname
+    tenant_orgname_orgunit     = var.tenant_orgname_orgunit
+    tenant_emailaddress        = var.tenant_emailaddress
+    certificate_validity       = var.certificate_validity
+   
+
+
+  }
+}

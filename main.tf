@@ -28,7 +28,7 @@ resource "vcd_vapp_vm" "test_vm"{
    guest_properties = {
     #"instance-id" = "${var.vms.workers.pref}-${count.index}"
     "hostname"    = "testvm"
-    "user-data"   = "${base64encode(data.template_file.cloudinit_worker_node.rendered)}"
+    "user-data"   = "${base64encode(data.template_file.test_node.rendered)}"
   }
 }
 
