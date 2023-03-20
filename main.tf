@@ -16,7 +16,7 @@ resource "vcd_vapp_vm" "test_vm"{
     name               = var.vcloud_orgvnet
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
-    ip                 = "${var.vms.workers.ip_pool[-1]}"
+    ip                 = "${var.vms.workers.ip_pool[0]}"
   }
   override_template_disk {
     size_in_mb      = var.system_disk_size * 1024
