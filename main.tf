@@ -57,7 +57,7 @@ bus_number      = var.add_disks.disk1.bus_num
 unit_number     = var.add_disks.disk1.unit_num
 
 #  vm_name         = vcd_vapp_vm.vm.name
-vm_name = count.index <= (var.vms.masters.count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index}"
+vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index}"
 #vm_name = (if count.index <= masters.count ) "${var.vms.masters.pref}-${count.index}"
 #          (if count.index > masters.count )  "${var.vms.workers.pref}-${count.index}"
      
