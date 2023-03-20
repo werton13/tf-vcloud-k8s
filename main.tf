@@ -52,17 +52,17 @@ resource "vcd_vm_internal_disk" "data1_disk" {
 depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                     vcd_vapp_org_network.vappOrgNet,
                     vcd_vapp_vm.test_vm]
-count           = var.vms.masters.vm_count + var.vms.workers.vm_count
+#count           = var.vms.masters.vm_count + var.vms.workers.vm_count
+count = 2
 vapp_name       = var.vapp_name
 bus_type        = var.add_disks.disk1.bus_type
 size_in_mb      = var.add_disks.disk1.sizegb * 1024
 bus_number      = var.add_disks.disk1.bus_num
 unit_number     = var.add_disks.disk1.unit_num
 
-#  vm_name         = vcd_vapp_vm.vm.name
-vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
-#vm_name = (if count.index <= masters.count ) "${var.vms.masters.pref}-${count.index}"
-#          (if count.index > masters.count )  "${var.vms.workers.pref}-${count.index}"
+
+#vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
+vm_name = "test_vm"
      
 
 }
