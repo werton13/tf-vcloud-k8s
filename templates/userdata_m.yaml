@@ -165,7 +165,8 @@ runcmd:
   - chmod u+x /k8s-kubeadm-ansible/ansible_starter.sh
   - /usr/bin/crontab /var/spool/cron/root
   - cd "/${ansible_repo_name}"
-  - ansible-playbook prepare_hosts_disks.yaml
+  - ansible-playbook reboot_hosts_before_disks_remap.yaml
+  #- ansible-playbook prepare_hosts_disks.yaml
 
 
  
