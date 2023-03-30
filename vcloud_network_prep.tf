@@ -15,6 +15,7 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
 
 ###----- configure load balancer for a Kubernetes API-server---------------------------------------------------------------
 resource "vcd_lb_virtual_server" "kube_api" {
+  depend_on    = [vcd_lb_server_pool.kube_api]
   org          = var.vcloud_orgname
   vdc          = var.vcloud_vdc
   edge_gateway = var.vcloud_edgegw
@@ -53,8 +54,8 @@ resource "vcd_lb_virtual_server" "kube_api" {
 
 
 resource "vcd_lb_server_pool" "kube_api" {
-  org          = var.org
-  vdc          = var.vdc
+  org          = var.vcloud_orgname
+  vdc          = var.vcloud_vdc
   edge_gateway = var.edge_gateway
 
   name                 = "kube_api"
