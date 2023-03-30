@@ -220,7 +220,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     hosts_entry10       = "${split("/", var.vms.workers.ip_pool[6])[0]}  ${var.vms.workers.pref}-6"
     
     
-    dvm_name            = "${var.vmc.dvm.pref}"
+    dvm_name            = "${var.vms.dvm.pref}"
     master0_name        = "${var.vms.masters.pref}-0"
     master1_name        = "${var.vms.masters.pref}-1"
     master2_name        = "${var.vms.masters.pref}-2"
