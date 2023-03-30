@@ -56,7 +56,7 @@ resource "vcd_lb_virtual_server" "kube_api" {
 resource "vcd_lb_server_pool" "kube_api" {
   org          = var.vcloud_orgname
   vdc          = var.vcloud_vdc
-  edge_gateway = var.edge_gateway
+  edge_gateway = var.vcloud_edgegw
 
   name                 = "kube_api"
   description          = "description"
