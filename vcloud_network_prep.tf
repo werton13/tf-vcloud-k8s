@@ -66,7 +66,7 @@ resource "vcd_lb_server_pool" "kube_api" {
     member {
     condition       = "enabled"
     name            = "${var.vms.masters.pref}-0"
-    ip_address      = data.template_file.cloudinit_dvm.master0_ip
+    ip_address      = "${split("/", var.vms.masters.ip_pool[0])[0]}"
     port            = 6443
     monitor_port    = 6443
     weight          = 1
@@ -76,7 +76,7 @@ resource "vcd_lb_server_pool" "kube_api" {
     member {
     condition       = "drain"
     name            = "${var.vms.masters.pref}-1"
-    ip_address      = data.template_file.cloudinit_dvm.master1_ip
+    ip_address      = "${split("/", var.vms.masters.ip_pool[1])[0]}"
     port            = 6443
     monitor_port    = 6443
     weight          = 1
@@ -86,7 +86,7 @@ resource "vcd_lb_server_pool" "kube_api" {
     member {
     condition       = "drain"
     name            = "${var.vms.masters.pref}-2"
-    ip_address      = data.template_file.cloudinit_dvm.master2_ip
+    ip_address      = "${split("/", var.vms.masters.ip_pool[2])[0]}"
     port            = 6443
     monitor_port    = 6443
     weight          = 1
