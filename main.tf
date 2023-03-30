@@ -195,7 +195,7 @@ resource "vcd_vapp_vm" "dvm" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_vm.k8s_masters_vms]
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
-  name             = "${var.vmc.dvm.pref}"
+  name             = "${var.vms.dvm.pref}"
   
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
