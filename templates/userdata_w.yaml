@@ -35,11 +35,18 @@ packages:
 
 write_files:
   - content: |
+      ${hosts_entry0}
       ${hosts_entry1}
       ${hosts_entry2}
       ${hosts_entry3}
       ${hosts_entry4}
       ${hosts_entry5}
+      ${hosts_entry6}
+      ${hosts_entry7}
+      ${hosts_entry8}
+      ${hosts_entry9}
+      ${hosts_entry10}
+      ${hosts_entry11}
     path: /etc/hosts
     append: true
 runcmd:

@@ -75,6 +75,12 @@ variable vcloud_orgvnet {
   default     = ""
   description = "Name of vcloud org-level virtual network which will binded to vApp vnet"
 }
+variable vcloud_edgegw {
+  type        = string
+  default     = ""
+  description = "vcloud edge gateway name"
+}
+
 
 #vm configuration variables--------------------------------
 variable "vm_user_name" {

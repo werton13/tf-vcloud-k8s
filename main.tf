@@ -188,3 +188,42 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   }
 
 }
+
+### -- the last VM is deployment VM, from there all Ansible automation will run
+resource "vcd_vapp_vm" "dvm" {
+
+  depends_on       = [vcd_vapp.k8s_mgmt_vapp,
+                      vcd_vapp_vm.k8s_masters_vms]
+  vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
+  name             = "${var.vmc.dvm.pref}"
+  
+
+  catalog_name     = data.vcd_catalog.vcd_dp_linux.name
+  template_name    = var.vcloud_vmtmplname 
+  hardware_version = "vmx-15"
+  cpus             = var.vms.dvm.vm_cpu_count
+  memory           = var.vms.dvm.vm_ram_size
+  cpu_cores        = 1
+
+  network {
+    type               = "org"
+    name               = var.vcloud_orgvnet
+    ip_allocation_mode = "MANUAL"
+    adapter_type       = "VMXNET3"
+    ip                 = "${var.vms.dvm.ip_pool[0]}"
+  }
+  override_template_disk {
+    size_in_mb      = var.system_disk_size * 1024
+    bus_type        = var.system_disk_bus
+  #  storage_profile = var.mod_system_disk_storage_profile
+    bus_number      = 0
+    unit_number     = 0
+  }
+
+  guest_properties = {
+    "instance-id" = "${var.vms.dvm.pref}"
+    "hostname"    = "${var.vms.dvm.pref}"
+    "user-data"   = "${base64encode(data.template_file.cloudinit_dvm.rendered)}"
+  }
+
+}
