@@ -100,8 +100,8 @@ write_files:
       ${worker2_name}
       ${worker3_name}
       ${worker4_name}
-      ${worker5_name}
-      ${worker6_name}
+#      ${worker5_name}
+#      ${worker6_name}
 
       [all:vars]
       ansible_connection=ssh
