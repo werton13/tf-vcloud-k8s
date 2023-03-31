@@ -66,6 +66,7 @@ template = file("${path.module}/templates/userdata_m.yaml")
     hosts_entry8        = "${split("/", var.vms.workers.ip_pool[4])[0]}  ${var.vms.workers.pref}-4"
     hosts_entry9        = "${split("/", var.vms.workers.ip_pool[5])[0]}  ${var.vms.workers.pref}-5"
     hosts_entry10       = "${split("/", var.vms.workers.ip_pool[6])[0]}  ${var.vms.workers.pref}-6"
+    hosts_entry11       = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
     
     master0_name        = "${var.vms.masters.pref}-0"
     worker0_name        = "${var.vms.workers.pref}-0"
@@ -129,11 +130,19 @@ template = file("${path.module}/templates/userdata_w.yaml")
     sc_name             = var.sc_name
     
     
+    hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
     hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"
     hosts_entry2        = "${split("/", var.vms.masters.ip_pool[1])[0]}  ${var.vms.masters.pref}-1"
-    hosts_entry3        = "${split("/", var.vms.workers.ip_pool[0])[0]}  ${var.vms.workers.pref}-0"
-    hosts_entry4        = "${split("/", var.vms.workers.ip_pool[1])[0]}  ${var.vms.workers.pref}-1"
-    hosts_entry5        = "${split("/", var.vms.workers.ip_pool[2])[0]}  ${var.vms.workers.pref}-2"
+    hosts_entry3        = "${split("/", var.vms.masters.ip_pool[2])[0]}  ${var.vms.masters.pref}-2"
+
+    hosts_entry4        = "${split("/", var.vms.workers.ip_pool[0])[0]}  ${var.vms.workers.pref}-0"
+    hosts_entry5        = "${split("/", var.vms.workers.ip_pool[1])[0]}  ${var.vms.workers.pref}-1"
+    hosts_entry6        = "${split("/", var.vms.workers.ip_pool[2])[0]}  ${var.vms.workers.pref}-2"
+    hosts_entry7        = "${split("/", var.vms.workers.ip_pool[3])[0]}  ${var.vms.workers.pref}-3"
+    hosts_entry8        = "${split("/", var.vms.workers.ip_pool[4])[0]}  ${var.vms.workers.pref}-4"
+    hosts_entry9        = "${split("/", var.vms.workers.ip_pool[5])[0]}  ${var.vms.workers.pref}-5"
+    hosts_entry10       = "${split("/", var.vms.workers.ip_pool[6])[0]}  ${var.vms.workers.pref}-6"
+    hosts_entry11       = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
     
     master0_ip          =  "${split("/", var.vms.masters.ip_pool[0])[0]}"
     master1_ip          =  "${split("/", var.vms.masters.ip_pool[1])[0]}"
@@ -218,6 +227,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     hosts_entry8        = "${split("/", var.vms.workers.ip_pool[4])[0]}  ${var.vms.workers.pref}-4"
     hosts_entry9        = "${split("/", var.vms.workers.ip_pool[5])[0]}  ${var.vms.workers.pref}-5"
     hosts_entry10       = "${split("/", var.vms.workers.ip_pool[6])[0]}  ${var.vms.workers.pref}-6"
+    hosts_entry11       = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
     
     
     dvm_name            = "${var.vms.dvm.pref}"
