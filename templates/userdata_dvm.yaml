@@ -162,8 +162,8 @@ runcmd:
 #  - add-apt-repository --yes --update ppa:ansible/ansible
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" -v
   - git clone https://github.com/nokogerra/ubuntu-ansible-basic-roles.git
-  - cp -r /ubuntu-ansible-basic-roles/roles/  /k8s-kubeadm-ansible/
-  - cp /ansible_starter.sh /k8s-kubeadm-ansible/
+  - cp -r /ubuntu-ansible-basic-roles/roles/   "/${ansible_repo_name}"
+  - cp /ansible_starter.sh  "/${ansible_repo_name}"
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
   - [ systemctl, daemon-reload ]
   - [ systemctl, restart, --no-block, ssh.service ]
@@ -171,6 +171,7 @@ runcmd:
 #  - chmod u+x /k8s-kubeadm-ansible/ansible_starter.sh
 #  - /usr/bin/crontab /var/spool/cron/root
   - cd "/${ansible_repo_name}"
+  - ansible-galaxy install -r requirements.yml -p roles/
   - ansible-playbook "/${ansible_repo_name}/${ansible_playbook}"
      -e "vcloud_vdc=${vcloud_vdc} 
        master0_ip=${master0_ip}
