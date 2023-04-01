@@ -202,7 +202,7 @@ runcmd:
        sc_storage_policy_name=${sc_storage_policy_name}
        sc_name=${sc_name}
        ingress_ext_fqdn=${ingress_ext_fqdn}
-       alertmgr_telegram_receiver_name='${alertmgr_telegram_receiver_name}
+       alertmgr_telegram_receiver_name=${alertmgr_telegram_receiver_name}
        alertmgr_telegram_bot_token=${alertmgr_telegram_bot_token}
        alertmgr_telegram_chatid=${alertmgr_telegram_chatid}
        tenant_cluster_ro_rolename=${tenant_cluster_ro_rolename}
