@@ -160,8 +160,8 @@ runcmd:
 #  - add-apt-repository --yes --update ppa:ansible/ansible
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" -v
   - git clone https://github.com/nokogerra/ubuntu-ansible-basic-roles.git
-#  - cp -r /ubuntu-ansible-basic-roles/roles/  ${ansible_repo_name}
-#  - cp /ansible_starter.sh  ${ansible_repo_name}
+  - cp -r /ubuntu-ansible-basic-roles/roles/  ${ansible_repo_name}
+  - cp /ansible_starter.sh  ${ansible_repo_name}
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
   - [ systemctl, daemon-reload ]
   - [ systemctl, restart, --no-block, ssh.service ]
