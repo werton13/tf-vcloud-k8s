@@ -109,8 +109,8 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
 ### -- the last VM is deployment VM, from there all Ansible automation will run
 resource "vcd_vapp_vm" "dvm" {
 
-  #depends_on       = [vcd_vapp.k8s_mgmt_vapp,
-  #                    vcd_vapp_vm.k8s_masters_vms]
+  depends_on       = [vcd_vapp.k8s_mgmt_vapp,
+                      vcd_vapp_vm.k8s_masters_vms]
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
   name             = "${var.vms.dvm.pref}"
   
