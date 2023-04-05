@@ -57,7 +57,7 @@ resource "vcd_lb_server_pool" "kube_api" {
   algorithm            = "round-robin" #ip-hash, round-robin, uri, leastconn, url, or httpheader
   #algorithm_parameters = "headerName=host"
   enable_transparency  = false
-  monitor_id = data.vcd_lb_service_monitor.kube_api.id
+  monitor_id = vcd_lb_service_monitor.kube_api.id
 
     member {
     condition       = "enabled"
