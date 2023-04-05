@@ -47,7 +47,7 @@ resource "vcd_lb_service_monitor" "kube_api" {
   #}
 }
 
-resource "vcd_lb_server_pool" "kube_api" {
+resource "vcd_lb_server_pool" "kube_api_lb_pool" {
   org          = var.vcloud_orgname
   vdc          = var.vcloud_vdc
   edge_gateway = var.vcloud_edgegw
@@ -59,7 +59,7 @@ resource "vcd_lb_server_pool" "kube_api" {
   algorithm            = "round-robin" #ip-hash, round-robin, uri, leastconn, url, or httpheader
   #algorithm_parameters = "headerName=host"
   enable_transparency  = false
-  #monitor_id = vcd_lb_service_monitor.kube_api.id
+  monitor_id = vcd_lb_service_monitor.kube_api.id
 
     member {
     condition       = "enabled"
@@ -70,7 +70,7 @@ resource "vcd_lb_server_pool" "kube_api" {
     weight          = 1
     min_connections = 0
     max_connections = 100
-  }
+   }
     member {
     condition       = "drain"
     name            = "${var.vms.masters.pref}-1"
@@ -80,7 +80,7 @@ resource "vcd_lb_server_pool" "kube_api" {
     weight          = 1
     min_connections = 0
     max_connections = 100
-  }
+   }
     member {
     condition       = "drain"
     name            = "${var.vms.masters.pref}-2"
@@ -95,8 +95,8 @@ resource "vcd_lb_server_pool" "kube_api" {
 
 }
 
-resource "vcd_lb_virtual_server" "kube_api" {
-  depends_on    = [vcd_lb_server_pool.kube_api]
+resource "vcd_lb_virtual_server" "kube_api_lb_vs" {
+  depends_on    = [vcd_lb_server_pool.kube_api_lb_pool]
   org          = var.vcloud_orgname
   vdc          = var.vcloud_vdc
   edge_gateway = var.vcloud_edgegw
@@ -108,7 +108,7 @@ resource "vcd_lb_virtual_server" "kube_api" {
   protocol   = "https"
   port       = 6443
 
-  server_pool_id = vcd_lb_server_pool.kube_api.id
+  server_pool_id = vcd_lb_server_pool.kube_api_lb_pool.id
   app_profile_id = vcd_lb_app_profile.kube_api.id
   #app_rule_ids   = [vcd_lb_app_rule.redirect.id]
 }
