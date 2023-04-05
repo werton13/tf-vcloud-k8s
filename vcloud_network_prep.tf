@@ -14,44 +14,38 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
 }
 
 ###----- configure load balancer for a Kubernetes API-server---------------------------------------------------------------
-resource "vcd_lb_virtual_server" "kube_api" {
-  depends_on    = [vcd_lb_server_pool.kube_api]
+resource "vcd_lb_app_profile" "kube_api" {
+  org          = var.vcloud_orgname
+  vdc          = var.vcloud_vdc
+  edge_gateway = var.vcloud_edgegw
+  enable_ssl_passthrough  = "true"
+  persistence_mechanism   = "ssl-sessionid"
+
+  name = "http-app-profile"
+  type = var.protocol
+}
+
+resource "vcd_lb_service_monitor" "kube_api" {
   org          = var.vcloud_orgname
   vdc          = var.vcloud_vdc
   edge_gateway = var.vcloud_edgegw
 
-  name       = "kube_api"
-  #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
-  ip_address = var.k8s_controlPlane_Endpoint
-  #protocol   = var.protocol
-  protocol   = "https"
-  port       = 6443
-
-  server_pool_id = vcd_lb_server_pool.kube_api.id
-  #app_profile_id = vcd_lb_app_profile.http.id
-  #app_rule_ids   = [vcd_lb_app_rule.redirect.id]
+  name        = "kube_api"
+  interval    = "10"
+  timeout     = "15"
+  max_retries = "3"
+  type        = "https"
+  expected    = "HTTP/1.0 200 OK"
+  method      = "GET"
+  url         = "/readyz"
+  #send        = "{\"key\": \"value\"}"
+  send        = "HTTP/2"
+  receive     = "ok"
+  #extension = {
+  #  content-type = "application/json"
+  #  linespan     = ""
+  #}
 }
-
-
-#resource "vcd_lb_service_monitor" "monitor" {
-#  org          = var.org
-#  vdc          = var.vdc
-#  edge_gateway = var.edge_gateway
-#
-#  name        = "http-monitor"
-#  interval    = "5"
-#  timeout     = "20"
-#  max_retries = "3"
-#  type        = var.protocol
-#  method      = "GET"
-#  url         = "/health"
-#  send        = "{\"key\": \"value\"}"
-#  extension = {
-#    content-type = "application/json"
-#    linespan     = ""
-#  }
-#}
-
 
 resource "vcd_lb_server_pool" "kube_api" {
   org          = var.vcloud_orgname
@@ -60,9 +54,10 @@ resource "vcd_lb_server_pool" "kube_api" {
 
   name                 = "kube_api"
   description          = "description"
-  algorithm            = "httpheader"
-  algorithm_parameters = "headerName=host"
-  enable_transparency  = true
+  algorithm            = "round-robin" #ip-hash, round-robin, uri, leastconn, url, or httpheader
+  #algorithm_parameters = "headerName=host"
+  enable_transparency  = false
+  monitor_id = data.vcd_lb_service_monitor.kube_api.id
 
     member {
     condition       = "enabled"
@@ -97,3 +92,25 @@ resource "vcd_lb_server_pool" "kube_api" {
 
 
 }
+
+resource "vcd_lb_virtual_server" "kube_api" {
+  depends_on    = [vcd_lb_server_pool.kube_api]
+  org          = var.vcloud_orgname
+  vdc          = var.vcloud_vdc
+  edge_gateway = var.vcloud_edgegw
+
+  name       = "kube_api"
+  #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
+  ip_address = var.k8s_controlPlane_Endpoint
+  #protocol   = var.protocol
+  protocol   = "https"
+  port       = 6443
+
+  server_pool_id = vcd_lb_server_pool.kube_api.id
+  app_profile_id = vcd_lb_app_profile.kube_api.id
+  #app_rule_ids   = [vcd_lb_app_rule.redirect.id]
+}
+
+
+
+
