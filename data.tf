@@ -277,6 +277,7 @@ data "vcd_lb_service_monitor" "kube_api" {
     org          = var.vcloud_orgname
     vdc          = var.vcloud_vdc
     edge_gateway = var.vcloud_edgegw
+    name         = "kube_api"
 
 }
 
