@@ -152,13 +152,6 @@ template = file("${path.module}/templates/userdata_w.yaml")
   }
 }
 
-data "vcd_catalog" "vcd_dp_linux" {
-    org  = var.vcloud_orgname
-    name = var.vcloud_catalogname
-
-}
-
-
 data "template_file" "cloudinit_dvm" {
 #  template = file("./templates/userdata.yaml") 
 template = file("${path.module}/templates/userdata_dvm.yaml")
@@ -272,6 +265,21 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
 
   }
 }
+
+data "vcd_catalog" "vcd_dp_linux" {
+    org  = var.vcloud_orgname
+    name = var.vcloud_catalogname
+
+}
+
+# monitor_id = data.vcd_lb_service_monitor.kube_api.id
+data "vcd_lb_service_monitor" "kube_api" {
+    org          = var.vcloud_orgname
+    vdc          = var.vcloud_vdc
+    edge_gateway = var.vcloud_edgegw
+
+}
+
 #data "template_file" "test_node" {
 ##  template = file("./templates/userdata.yaml") 
 #template = file("${path.module}/templates/userdata_t.yaml")
