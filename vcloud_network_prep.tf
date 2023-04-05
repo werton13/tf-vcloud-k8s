@@ -56,8 +56,7 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
 
   name                 = "kube_api"
   description          = "description"
-  algorithm            = "round-robin" #ip-hash, round-robin, uri, leastconn, url, or httpheader
-  #algorithm_parameters = "headerName=host"
+  algorithm            = "round-robin"
   enable_transparency  = false
   monitor_id = vcd_lb_service_monitor.kube_api.id
 
@@ -95,24 +94,24 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
 
 }
 
-resource "vcd_lb_virtual_server" "kube_api_lb_vs" {
-  depends_on    = [vcd_lb_server_pool.kube_api_lb_pool]
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
-
-  name       = "kube_api"
-  #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
-  ip_address = var.k8s_controlPlane_Endpoint
-  #protocol   = var.protocol
-  protocol   = "https"
-  port       = 6443
-
-  server_pool_id = vcd_lb_server_pool.kube_api_lb_pool.id
-  app_profile_id = vcd_lb_app_profile.kube_api.id
-  #app_rule_ids   = [vcd_lb_app_rule.redirect.id]
-}
-
+#resource "vcd_lb_virtual_server" "kube_api_lb_vs" {
+#  depends_on    = [vcd_lb_server_pool.kube_api_lb_pool]
+#  org          = var.vcloud_orgname
+#  vdc          = var.vcloud_vdc
+#  edge_gateway = var.vcloud_edgegw
+#
+#  name       = "kube_api"
+#  #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
+#  ip_address = var.k8s_controlPlane_Endpoint
+#  #protocol   = var.protocol
+#  protocol   = "https"
+#  port       = 6443
+#
+#  server_pool_id = vcd_lb_server_pool.kube_api_lb_pool.id
+#  app_profile_id = vcd_lb_app_profile.kube_api.id
+#  #app_rule_ids   = [vcd_lb_app_rule.redirect.id]
+#}
+#
 
 
 
