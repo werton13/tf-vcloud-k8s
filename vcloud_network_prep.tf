@@ -22,7 +22,7 @@ resource "vcd_lb_app_profile" "kube_api" {
   persistence_mechanism   = "ssl-sessionid"
 
   name = "http-app-profile"
-  type = var.protocol
+  type = "https"
 }
 
 resource "vcd_lb_service_monitor" "kube_api" {
