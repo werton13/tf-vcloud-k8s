@@ -14,16 +14,16 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
 }
 
 ###----- configure load balancer for a Kubernetes API-server---------------------------------------------------------------
-resource "vcd_lb_app_profile" "kube_api" {
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
-  enable_ssl_passthrough  = "true"
-  persistence_mechanism   = "ssl-sessionid"
-
-  name = "http-app-profile"
-  type = "https"
-}
+#resource "vcd_lb_app_profile" "kube_api" {
+#  org          = var.vcloud_orgname
+#  vdc          = var.vcloud_vdc
+#  edge_gateway = var.vcloud_edgegw
+#  enable_ssl_passthrough  = "true"
+#  persistence_mechanism   = "ssl-sessionid"
+#
+#  name = "http-app-profile"
+#  type = "https"
+#}
 
 #resource "vcd_lb_service_monitor" "kube_api" {
 #  org          = var.vcloud_orgname
