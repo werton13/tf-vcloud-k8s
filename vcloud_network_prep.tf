@@ -25,27 +25,27 @@ resource "vcd_lb_app_profile" "kube_api" {
   type = "https"
 }
 
-resource "vcd_lb_service_monitor" "kube_api" {
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
-
-  name        = "kube_api"
-  interval    = "10"
-  timeout     = "15"
-  max_retries = "3"
-  type        = "https"
-  expected    = "HTTP/1.0 200 OK"
-  method      = "GET"
-  url         = "/readyz"
-  #send        = "{\"key\": \"value\"}"
-  send        = "HTTP/2"
-  receive     = "ok"
-  #extension = {
-  #  content-type = "application/json"
-  #  linespan     = ""
-  #}
-}
+#resource "vcd_lb_service_monitor" "kube_api" {
+#  org          = var.vcloud_orgname
+#  vdc          = var.vcloud_vdc
+#  edge_gateway = var.vcloud_edgegw
+#
+#  name        = "kube_api"
+#  interval    = "10"
+#  timeout     = "15"
+#  max_retries = "3"
+#  type        = "https"
+#  expected    = "HTTP/1.0 200 OK"
+#  method      = "GET"
+#  url         = "/readyz"
+#  #send        = "{\"key\": \"value\"}"
+#  send        = "HTTP/2"
+#  receive     = "ok"
+#  #extension = {
+#  #  content-type = "application/json"
+#  #  linespan     = ""
+#  #}
+#}
 
 #resource "vcd_lb_server_pool" "kube_api_lb_pool" {
 #  org          = var.vcloud_orgname
