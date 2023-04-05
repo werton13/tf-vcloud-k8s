@@ -273,13 +273,13 @@ data "vcd_catalog" "vcd_dp_linux" {
 }
 
 # monitor_id = data.vcd_lb_service_monitor.kube_api.id
-data "vcd_lb_service_monitor" "kube_api" {
-    org          = var.vcloud_orgname
-    vdc          = var.vcloud_vdc
-    edge_gateway = var.vcloud_edgegw
-    name         = "kube_api"
-
-}
+#data "vcd_lb_service_monitor" "kube_api" {
+#    org          = var.vcloud_orgname
+#    vdc          = var.vcloud_vdc
+#    edge_gateway = var.vcloud_edgegw
+#    name         = "kube_api"
+#
+#}
 
 #data "template_file" "test_node" {
 ##  template = file("./templates/userdata.yaml") 

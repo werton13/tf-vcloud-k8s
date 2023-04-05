@@ -51,6 +51,8 @@ resource "vcd_lb_server_pool" "kube_api" {
   org          = var.vcloud_orgname
   vdc          = var.vcloud_vdc
   edge_gateway = var.vcloud_edgegw
+  depends_on  = [vcd_vapp.k8s_mgmt_vapp,
+                vcd_lb_service_monitor.kube_api]
 
   name                 = "kube_api"
   description          = "description"
