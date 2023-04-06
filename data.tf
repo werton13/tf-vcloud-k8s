@@ -189,7 +189,9 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     k8s_ver             = var.k8s_ver
     k8s_version_short   = var.k8s_version_short
     calico_version      = var.calico_version
+    helm_version        = var.helm_version
     
+    k8s_cluster_name    = var.k8s_cluster_name
     k8s_controlPlane_Endpoint = var.k8s_controlPlane_Endpoint
     k8s_service_subnet  = var.k8s_service_subnet
     k8s_pod_subnet      = var.k8s_pod_subnet
@@ -199,6 +201,8 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     sc_name             = var.sc_name
 
     ingress_ext_fqdn    = var.ingress_ext_fqdn
+    ingress_controller_nodeport_http  = var.ingress_controller_nodeport_http 
+    ingress_controller_nodeport_https = var.ingress_controller_nodeport_https
     
 
     alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name

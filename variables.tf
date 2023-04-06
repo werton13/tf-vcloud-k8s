@@ -182,10 +182,29 @@ variable ansible_ssh_pass {
   default     = ""
   description = "password value for creating ansible inventory - should be in clear text"
  }
-
-
+variable k8s_cluster_name {
+  type        = string
+  default     = "k8s_cluster"
+  description = "k8s cluster name "
+}
+variable ingress_controller_nodeport_http {
+  type        = string
+  default     = "30888"
+  description = "node port value for ingress controller service http endpoint"
+}
+variable ingress_controller_nodeport_https {
+  type        = string
+  default     = "30443"
+  description = "node port value for ingress controller service https endpoint"
+}
 
 ############# Versions of components
+variable helm_version {
+  type        = string
+  default     = "v3.11.1"
+  description = "Helm version "
+}
+
 
 variable "k8s_ver" {
   type        = string

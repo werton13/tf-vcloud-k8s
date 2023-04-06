@@ -132,6 +132,10 @@ write_files:
            k8s_ver='${k8s_ver}'
            k8s_version_short='${k8s_version_short}'
            calico_version='${calico_version}'
+           k8s_cluster_name='${k8s_cluster_name}'
+           helm_version='${helm_version}'
+           ingress_controller_nodeport_http='${ingress_controller_nodeport_http}'
+           ingress_controller_nodeport_https='${ingress_controller_nodeport_https}'
            k8s_controlPlane_Endpoint='${k8s_controlPlane_Endpoint}'
            k8s_service_subnet='${k8s_service_subnet}'
            k8s_pod_subnet='${k8s_pod_subnet}'
@@ -191,6 +195,10 @@ runcmd:
        cloud_type=${cloud_type}
        os_admin_username=${os_admin_username}
        os_nic1_name=${os_nic1_name}
+       k8s_cluster_name=${k8s_cluster_name}
+       helm_version=${helm_version}
+       ingress_controller_nodeport_http=${ingress_controller_nodeport_http}
+       ingress_controller_nodeport_https=${ingress_controller_nodeport_https}
        k8s_ver=${k8s_ver}
        k8s_version_short=${k8s_version_short}
        calico_version=${calico_version}
