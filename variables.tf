@@ -198,6 +198,13 @@ variable ingress_controller_nodeport_https {
   description = "node port value for ingress controller service https endpoint"
 }
 
+variable ingress_lb_ip  {
+  type        = string
+  default     = ""
+  description = "IP from org vnet for HTTP LB to ingress controller"
+}
+
+
 ############# Versions of components
 variable helm_version {
   type        = string
