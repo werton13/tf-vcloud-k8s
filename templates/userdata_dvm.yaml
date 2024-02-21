@@ -101,7 +101,6 @@ write_files:
       ${worker3_name}
       ${worker4_name}
       ${worker5_name}
-      ${worker6_name}
 
       [all:vars]
       ansible_connection=ssh
@@ -166,7 +165,7 @@ runcmd:
 #  - add-apt-repository --yes --update ppa:ansible/ansible
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" -v
   - git clone https://github.com/nokogerra/ubuntu-ansible-basic-roles.git
-  - cp -r /ubuntu-ansible-basic-roles/roles/  ${ansible_repo_name}
+  - cp -r /ubuntu-ansible-basic-roles/*  ${ansible_repo_name}/roles/
   - cp /ansible_starter.sh  ${ansible_repo_name}
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
   - [ systemctl, daemon-reload ]

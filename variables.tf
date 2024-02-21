@@ -225,7 +225,7 @@ variable "k8s_version_short" {
  }
 variable "calico_version" {
   type        = string
-  default     = "v3.25.0"
+  default     = "v3.27.2"
   description = "Calico CNI version"
  }
 
