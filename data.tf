@@ -253,7 +253,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     worker5_ip          = "${split("/", var.vms.workers.ip_pool[5])[0]}"
     worker6_ip          = "${split("/", var.vms.workers.ip_pool[6])[0]}"
 
-    dns_def             =  var.dns_def
+    def_dns             =  var.dns_def
     env_dns1            =  var.env_dns1
     env_dns2            =  var.env_dns2
 

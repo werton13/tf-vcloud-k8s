@@ -111,7 +111,7 @@ write_files:
   - content: |
       #!/bin/bash
       ansible-playbook /${ansible_repo_name}/${ansible_playbook} -e "vcloud_vdc='${vcloud_vdc}' \
-           dns_def='${dns_def}'
+           def_dns='${dns_def}'
            env_dns1='${env_dns1}'
            env_dns2='${env_dns2}'
            master0_ip='${master0_ip}'
@@ -180,7 +180,7 @@ runcmd:
   - ansible-galaxy install -r requirements.yml -p roles/
   - ansible-playbook "/${ansible_repo_name}/${ansible_playbook}"
      -e "vcloud_vdc=${vcloud_vdc} 
-       dns_def=${dns_def}
+       def_dns=${dns_def}
        env_dns1=${env_dns1}
        env_dns2=${env_dns2}
        master0_ip=${master0_ip}
