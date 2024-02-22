@@ -146,17 +146,17 @@ variable "vms" {
  }
 
 ############ dns variables ############
-variable def_dns {
+variable "def_dns" {
   type        = string
   default     = ""
   description = "default dns ip address configured in the template"
 }
-variable env_dns1 {
+variable "env_dns1" {
   type        = string
   default     = ""
   description = "description"
 }
-variable env_dns2 {
+variable "env_dns2" {
   type        = string
   default     = ""
   description = "description"
