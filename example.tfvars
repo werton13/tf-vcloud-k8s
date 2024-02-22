@@ -4,7 +4,7 @@ vcloud_orgname  = "My_orgname"
 vcloud_user     = "My_vcloud_username"
 vcloud_password = "My_vcloud_password"
 variable vcloud_csiadmin_username = "vcloud_username_for_csi"
-variable vcloud_csiadmin_password = "vcloud_password_for_csi"
+variable vcloud_csiadmin_password = 'vcloud_password_for_csi' # use ordinary quotes
 
 vcloud_url      = "https://my_vcloud_web_portal_url/api"
 vcloud_catalogname = "my_vcloud_catalogue_name"
@@ -132,3 +132,7 @@ helm_version = "v3.11.1"
 k8s_cluster_name = "k8s-lab"
 ingress_controller_nodeport_http = "30888"
 ingress_controller_nodeport_https = "30443"
+
+def_dns  = "8.8.8.8"
+env_dns1 = "10.10.6.6"
+env_dns2 = "10.11.7.7"

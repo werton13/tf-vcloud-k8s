@@ -251,7 +251,12 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     worker3_ip          = "${split("/", var.vms.workers.ip_pool[3])[0]}" 
     worker4_ip          = "${split("/", var.vms.workers.ip_pool[4])[0]}"
     worker5_ip          = "${split("/", var.vms.workers.ip_pool[5])[0]}"
-    worker6_ip          = "${split("/", var.vms.workers.ip_pool[6])[0]}" 
+    worker6_ip          = "${split("/", var.vms.workers.ip_pool[6])[0]}"
+
+    dns_def             =  var.dns_def
+    env_dns1            =  var.env_dns1
+    env_dns2            =  var.env_dns2
+
 
     workers_count       = var.vms.workers.vm_count
     masters_count       = var.vms.masters.vm_count
