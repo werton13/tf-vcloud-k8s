@@ -102,11 +102,21 @@ write_files:
       ${worker4_name}
       ${worker5_name}
 
-      [all:vars]
+      [k8s-nodes:children]
+      masters
+      workers
+
+      [k8s-nodes:vars]
       ansible_connection=ssh
       ansible_user=${os_admin_username}
       ansible_ssh_pass=${ansible_ssh_pass}
       ansible_sudo_pass=${ansible_ssh_pass}
+
+      [dvm:vars]
+      ansible_connection=local
+      ansible_user=${os_admin_username}
+      ansible_sudo_pass=${ansible_ssh_pass}
+
     path: /K8s-inventory
   - content: |
       #!/bin/bash
