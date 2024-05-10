@@ -70,18 +70,9 @@ packages:
 
 write_files:
   - content: |
+      # first hosts_entry - always vcloud hostname/ip
       ${hosts_entry0}
-      ${hosts_entry1}
-      ${hosts_entry2}
-      ${hosts_entry3}
-      ${hosts_entry4}
-      ${hosts_entry5}
-      ${hosts_entry6}
-      ${hosts_entry7}
-      ${hosts_entry8}
-      ${hosts_entry9}
-      ${hosts_entry10}
-      ${hosts_entry11}
+      ${hosts_entry1} 
 
     path: /etc/hosts
     append: true
@@ -90,17 +81,8 @@ write_files:
       ${dvm_name}
 
       [masters]
-      ${master0_name}
-      ${master1_name}
-      ${master2_name}
 
       [workers]   
-      ${worker0_name}
-      ${worker1_name}
-      ${worker2_name}
-      ${worker3_name}
-      ${worker4_name}
-      ${worker5_name}
 
       [k8s-nodes:children]
       masters
@@ -118,6 +100,19 @@ write_files:
       ansible_sudo_pass=${ansible_ssh_pass}
 
     path: /K8s-inventory
+  - content: |
+      #!/bin/bash
+      export ip_net=$(echo $master0_ip|cut -d '.' -f1-3)
+      for (( m=1;m<=$masters_count;m++ ));do ip=$((109+m)); echo "$ip_net.$ip  $master_pref-$m" >> /etc/hosts; done
+      for (( w=1;w<=$workers_count;w++ ));do ip=$((113+w)); echo "$ip_net.$ip  $worker_pref-$w" >> /etc/hosts; done      
+    path:  /add_hosts_records.sh
+    permissions: "0744"
+  - content: |
+      #!/bin/bash
+      for (( i=$masters_count;i>=1;i-- ));do sed -i "/\[masters\]/a master_pref-$i" /K8s-inventory ;done
+      for (( i=$workers_count;i>=1;i-- ));do sed -i "/\[workers\]/a worker_pref-$i" /K8s-inventory ;done
+    path: /add_inventory_records.sh
+    permissions: "0744"
   - content: |
       #!/bin/bash
       ansible-playbook /${ansible_repo_name}/${ansible_playbook} -e "vcloud_vdc='${vcloud_vdc}' \
@@ -176,6 +171,8 @@ write_files:
 
 runcmd:
 #  - add-apt-repository --yes --update ppa:ansible/ansible
+  - /add_hosts_records.sh
+  - /add_inventory_records.sh
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" -v
   - git clone https://github.com/nokogerra/ubuntu-ansible-basic-roles.git
   - cp -r /ubuntu-ansible-basic-roles/*  ${ansible_repo_name}/roles/

@@ -54,35 +54,17 @@ template = file("${path.module}/templates/userdata_m.yaml")
     #vcloud_fqdn        = "${substr(var.vcloud_url, 8, -4}"
     #vcloud_ip          = var.vcloud_ip
 
-    hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
-    hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"
-    hosts_entry2        = "${split("/", var.vms.masters.ip_pool[1])[0]}  ${var.vms.masters.pref}-1"
-    hosts_entry3        = "${split("/", var.vms.masters.ip_pool[2])[0]}  ${var.vms.masters.pref}-2"
+    master_pref = "${var.vms.masters.pref}"
+    worker_pref = "${var.vms.workers.pref}"
 
-    hosts_entry4        = "${split("/", var.vms.workers.ip_pool[0])[0]}  ${var.vms.workers.pref}-0"
-    hosts_entry5        = "${split("/", var.vms.workers.ip_pool[1])[0]}  ${var.vms.workers.pref}-1"
-    hosts_entry6        = "${split("/", var.vms.workers.ip_pool[2])[0]}  ${var.vms.workers.pref}-2"
-    hosts_entry7        = "${split("/", var.vms.workers.ip_pool[3])[0]}  ${var.vms.workers.pref}-3"
-    hosts_entry8        = "${split("/", var.vms.workers.ip_pool[4])[0]}  ${var.vms.workers.pref}-4"
-    hosts_entry9        = "${split("/", var.vms.workers.ip_pool[5])[0]}  ${var.vms.workers.pref}-5"
-    hosts_entry10       = "${split("/", var.vms.workers.ip_pool[6])[0]}  ${var.vms.workers.pref}-6"
-    hosts_entry11       = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
-    
-    master0_name        = "${var.vms.masters.pref}-0"
-    worker0_name        = "${var.vms.workers.pref}-0"
-       
     master0_ip          = "${split("/", var.vms.masters.ip_pool[0])[0]}"
-    master1_ip          = "${split("/", var.vms.masters.ip_pool[1])[0]}"
-    master2_ip          = "${split("/", var.vms.masters.ip_pool[2])[0]}"
 
-    worker0_ip          = "${split("/", var.vms.workers.ip_pool[0])[0]}" 
-    worker1_ip          = "${split("/", var.vms.workers.ip_pool[1])[0]}"
-    worker2_ip          = "${split("/", var.vms.workers.ip_pool[2])[0]}"
-    worker3_ip          = "${split("/", var.vms.workers.ip_pool[3])[0]}" 
-    worker4_ip          = "${split("/", var.vms.workers.ip_pool[4])[0]}"
-    worker5_ip          = "${split("/", var.vms.workers.ip_pool[5])[0]}"
-    worker6_ip          = "${split("/", var.vms.workers.ip_pool[6])[0]}" 
+    hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
+    hosts_entry1        = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
 
+#    master0_name        = "${var.vms.masters.pref}-0"
+#    worker0_name        = "${var.vms.workers.pref}-0"
+       
     workers_count       = var.vms.workers.vm_count
     masters_count       = var.vms.masters.vm_count
     ansible_ssh_pass    = var.ansible_ssh_pass
@@ -95,8 +77,6 @@ template = file("${path.module}/templates/userdata_m.yaml")
     tenant_emailaddress        = var.tenant_emailaddress
     certificate_validity       = var.certificate_validity
    
-
-
   }
 }
 
@@ -129,26 +109,16 @@ template = file("${path.module}/templates/userdata_w.yaml")
     sc_storage_policy_name = var.sc_storage_policy_name
     sc_name             = var.sc_name
     
+    master_pref = "${var.vms.masters.pref}"
+    worker_pref = "${var.vms.workers.pref}"
     
+    workers_count       = var.vms.workers.vm_count
+    masters_count       = var.vms.masters.vm_count
+
+    master0_ip          = "${split("/", var.vms.masters.ip_pool[0])[0]}"
+
     hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
     hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"
-    hosts_entry2        = "${split("/", var.vms.masters.ip_pool[1])[0]}  ${var.vms.masters.pref}-1"
-    hosts_entry3        = "${split("/", var.vms.masters.ip_pool[2])[0]}  ${var.vms.masters.pref}-2"
-
-    hosts_entry4        = "${split("/", var.vms.workers.ip_pool[0])[0]}  ${var.vms.workers.pref}-0"
-    hosts_entry5        = "${split("/", var.vms.workers.ip_pool[1])[0]}  ${var.vms.workers.pref}-1"
-    hosts_entry6        = "${split("/", var.vms.workers.ip_pool[2])[0]}  ${var.vms.workers.pref}-2"
-    hosts_entry7        = "${split("/", var.vms.workers.ip_pool[3])[0]}  ${var.vms.workers.pref}-3"
-    hosts_entry8        = "${split("/", var.vms.workers.ip_pool[4])[0]}  ${var.vms.workers.pref}-4"
-    hosts_entry9        = "${split("/", var.vms.workers.ip_pool[5])[0]}  ${var.vms.workers.pref}-5"
-    hosts_entry10       = "${split("/", var.vms.workers.ip_pool[6])[0]}  ${var.vms.workers.pref}-6"
-    hosts_entry11       = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
-    
-    master0_ip          =  "${split("/", var.vms.masters.ip_pool[0])[0]}"
-    master1_ip          =  "${split("/", var.vms.masters.ip_pool[1])[0]}"
-    worker0_ip          =  "${split("/", var.vms.workers.ip_pool[0])[0]}" 
-    worker1_ip          =  "${split("/", var.vms.workers.ip_pool[1])[0]}"
-    worker2_ip          =  "${split("/", var.vms.workers.ip_pool[2])[0]}"
   }
 }
 
@@ -211,47 +181,24 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     
     #vcloud_fqdn        = "${substr(var.vcloud_url, 8, -4}"
     #vcloud_ip          = var.vcloud_ip
+    
+    master_pref = "${var.vms.masters.pref}"
+    worker_pref = "${var.vms.workers.pref}"
 
     hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
-    hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"
-    hosts_entry2        = "${split("/", var.vms.masters.ip_pool[1])[0]}  ${var.vms.masters.pref}-1"
-    hosts_entry3        = "${split("/", var.vms.masters.ip_pool[2])[0]}  ${var.vms.masters.pref}-2"
-
-    hosts_entry4        = "${split("/", var.vms.workers.ip_pool[0])[0]}  ${var.vms.workers.pref}-0"
-    hosts_entry5        = "${split("/", var.vms.workers.ip_pool[1])[0]}  ${var.vms.workers.pref}-1"
-    hosts_entry6        = "${split("/", var.vms.workers.ip_pool[2])[0]}  ${var.vms.workers.pref}-2"
-    hosts_entry7        = "${split("/", var.vms.workers.ip_pool[3])[0]}  ${var.vms.workers.pref}-3"
-    hosts_entry8        = "${split("/", var.vms.workers.ip_pool[4])[0]}  ${var.vms.workers.pref}-4"
-    hosts_entry9        = "${split("/", var.vms.workers.ip_pool[5])[0]}  ${var.vms.workers.pref}-5"
-    hosts_entry10       = "${split("/", var.vms.workers.ip_pool[6])[0]}  ${var.vms.workers.pref}-6"
-    hosts_entry11       = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
-    
+    hosts_entry1       = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
     
     dvm_name            = "${var.vms.dvm.pref}"
-    master0_name        = "${var.vms.masters.pref}-0"
-    master1_name        = "${var.vms.masters.pref}-1"
-    master2_name        = "${var.vms.masters.pref}-2"
+    #master0_name        = "${var.vms.masters.pref}-0"
+    #master1_name        = "${var.vms.masters.pref}-1"
+    #master2_name        = "${var.vms.masters.pref}-2"
 
     worker0_name        = "${var.vms.workers.pref}-0"
-    worker1_name        = "${var.vms.workers.pref}-1"
-    worker2_name        = "${var.vms.workers.pref}-2"
-    worker3_name        = "${var.vms.workers.pref}-3"
-    worker4_name        = "${var.vms.workers.pref}-4"
-    worker5_name        = "${var.vms.workers.pref}-5"
-    worker6_name        = "${var.vms.workers.pref}-6"
-    
-       
+     
     master0_ip          = "${split("/", var.vms.masters.ip_pool[0])[0]}"
     master1_ip          = "${split("/", var.vms.masters.ip_pool[1])[0]}"
     master2_ip          = "${split("/", var.vms.masters.ip_pool[2])[0]}"
 
-    worker0_ip          = "${split("/", var.vms.workers.ip_pool[0])[0]}" 
-    worker1_ip          = "${split("/", var.vms.workers.ip_pool[1])[0]}"
-    worker2_ip          = "${split("/", var.vms.workers.ip_pool[2])[0]}"
-    worker3_ip          = "${split("/", var.vms.workers.ip_pool[3])[0]}" 
-    worker4_ip          = "${split("/", var.vms.workers.ip_pool[4])[0]}"
-    worker5_ip          = "${split("/", var.vms.workers.ip_pool[5])[0]}"
-    worker6_ip          = "${split("/", var.vms.workers.ip_pool[6])[0]}"
 
     def_dns             =  var.def_dns
     env_dns1            =  var.env_dns1
@@ -269,8 +216,6 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     tenant_orgname_orgunit     = var.tenant_orgname_orgunit
     tenant_emailaddress        = var.tenant_emailaddress
     certificate_validity       = var.certificate_validity
-   
-
 
   }
 }
@@ -280,49 +225,3 @@ data "vcd_catalog" "vcd_dp_linux" {
     name = var.vcloud_catalogname
 
 }
-
-# monitor_id = data.vcd_lb_service_monitor.kube_api.id
-#data "vcd_lb_service_monitor" "kube_api" {
-#    org          = var.vcloud_orgname
-#    vdc          = var.vcloud_vdc
-#    edge_gateway = var.vcloud_edgegw
-#    name         = "kube_api"
-#
-#}
-
-#data "template_file" "test_node" {
-##  template = file("./templates/userdata.yaml") 
-#template = file("${path.module}/templates/userdata_t.yaml")
-#  vars = {
-#    vm_user_name        = var.vm_user_name
-#    vm_user_password    = var.vm_user_password
-#    vm_user_displayname = var.vm_user_displayname     
-#    vm_user_ssh_key     = var.vm_user_ssh_key
-#    vm_user_ssh_pk      = var.vm_user_ssh_pk
-#
-#    ansible_repo_url    = var.ansible_repo_url
-#    ansible_repo_name   = var.ansible_repo_name
-#    ansible_playbook    = var.ansible_playbook
-#    ansible_repo_branch = var.ansible_repo_branch 
-#
-#    os_admin_username   = var.os_admin_username
-#    os_nic1_name        = var.os_nic1_name
-#
-#    
-#    os_admin_username   = var.os_admin_username
-#    os_nic1_name        = var.os_nic1_name
-#
-#    
-#
-#    ansible_ssh_pass    = var.ansible_ssh_pass
-#
-#    master0_name        = "${var.vms.masters.pref}-0"
-#    vcloud_vdc          = var.vcloud_vdc
-#  
-#    
-#
-#   
-#
-#
-#  }
-#}

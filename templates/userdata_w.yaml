@@ -35,21 +35,21 @@ packages:
 
 write_files:
   - content: |
+      # first hosts_entry - always vcloud hostname/ip
       ${hosts_entry0}
-      ${hosts_entry1}
-      ${hosts_entry2}
-      ${hosts_entry3}
-      ${hosts_entry4}
-      ${hosts_entry5}
-      ${hosts_entry6}
-      ${hosts_entry7}
-      ${hosts_entry8}
-      ${hosts_entry9}
-      ${hosts_entry10}
-      ${hosts_entry11}
+      ${hosts_entry1} 
     path: /etc/hosts
     append: true
+  - content: |
+      #!/bin/bash
+      export ip_net=$(echo $master0_ip|cut -d '.' -f1-3)
+      for (( m=1;m<=$masters_count;m++ ));do ip=$((109+m)); echo "$ip_net.$ip  $master_pref-$m" >> /etc/hosts; done
+      for (( w=1;w<=$workers_count;w++ ));do ip=$((113+w)); echo "$ip_net.$ip  $worker_pref-$w" >> /etc/hosts; done      
+    path:  /add_hosts_records.sh
+    permissions: "0744"
+
 runcmd:
+  - /add_hosts_records.sh
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
   - [ systemctl, daemon-reload ]
   - [ systemctl, restart, --no-block, ssh.service ]
