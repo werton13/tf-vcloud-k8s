@@ -42,9 +42,9 @@ write_files:
     append: true
   - content: |
       #!/bin/bash
-      export ip_net=$(echo $master0_ip|cut -d '.' -f1-3)
-      for (( m=1;m<=$masters_count;m++ ));do ip=$((109+m)); echo "$ip_net.$ip  $master_pref-$m" >> /etc/hosts; done
-      for (( w=1;w<=$workers_count;w++ ));do ip=$((113+w)); echo "$ip_net.$ip  $worker_pref-$w" >> /etc/hosts; done      
+      export ip_net=$(echo '${master0_ip}'|cut -d '.' -f1-3)
+      for (( m=1;m<='${masters_count}';m++ ));do ip=$((109+m)); echo "$ip_net.$ip  '${master_pref}'-$m" >> /etc/hosts; done
+      for (( w=1;w<='${workers_count}';w++ ));do ip=$((113+w)); echo "$ip_net.$ip  '${worker_pref}'-$w" >> /etc/hosts; done      
     path:  /add_hosts_records.sh
     permissions: "0744"
 
