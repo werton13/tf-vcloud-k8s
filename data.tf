@@ -118,7 +118,7 @@ template = file("${path.module}/templates/userdata_w.yaml")
     master0_ip          = "${split("/", var.vms.masters.ip_pool[0])[0]}"
 
     hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
-    hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"
+    hosts_entry1        = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
   }
 }
 
