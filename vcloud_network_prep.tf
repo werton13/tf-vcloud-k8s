@@ -14,6 +14,12 @@ resource "vcd_vapp_org_network" "vappOrgNet" {
 }
 
 ###----- configure load balancer for a Kubernetes API-server---------------------------------------------------------------
+
+resource "vcd_edgegateway_settings" "egw-settings" {
+  edge_gateway_id         = data.vcd_edgegateway.egw.id
+  lb_enabled              = true
+}
+
 resource "vcd_lb_app_profile" "kube_api" {
   org          = var.vcloud_orgname
   vdc          = var.vcloud_vdc

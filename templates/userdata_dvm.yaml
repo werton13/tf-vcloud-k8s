@@ -131,6 +131,7 @@ write_files:
            vcloud_csiadmin_username='${vcloud_csiadmin_username}'
            vcloud_csiadmin_password='${vcloud_csiadmin_password}'
            vcloud_url='${vcloud_url}'
+           vcloud_ip='${vcloud_ip}'
            vcloud_catalogname='${vcloud_catalogname}'
            vcloud_vmtmplname='${vcloud_vmtmplname}'
            vcloud_orgvnet='${vcloud_orgvnet}'
@@ -202,6 +203,7 @@ runcmd:
        vcloud_csiadmin_username=${vcloud_csiadmin_username}
        vcloud_csiadmin_password=${vcloud_csiadmin_password}
        vcloud_url=${vcloud_url}
+       vcloud_ip=${vcloud_ip}
        vcloud_catalogname=${vcloud_catalogname}
        vcloud_vmtmplname=${vcloud_vmtmplname}
        vcloud_orgvnet=${vcloud_orgvnet}

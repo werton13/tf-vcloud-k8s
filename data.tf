@@ -180,7 +180,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
     
     #vcloud_fqdn        = "${substr(var.vcloud_url, 8, -4}"
-    #vcloud_ip          = var.vcloud_ip
+    vcloud_ip          = var.vcloud_ip
     
     master_pref = "${var.vms.masters.pref}"
     worker_pref = "${var.vms.workers.pref}"
@@ -223,5 +223,8 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
 data "vcd_catalog" "vcd_dp_linux" {
     org  = var.vcloud_orgname
     name = var.vcloud_catalogname
+}
 
+data "vcd_edgegateway" "egw" {
+  name = var.vcloud_edgegw
 }
