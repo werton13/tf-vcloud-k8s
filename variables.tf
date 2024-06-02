@@ -375,6 +375,11 @@ variable "system_disk_storage_profile" {
   description = ""
   default     = "default"
 }
+variable docker_mirror {
+  type        = string
+  default     = "mirror.gcr.io"
+  description = "allow to change global image registry from docker.io to some mirror, default google mirror"
+}
 
 
 

@@ -155,6 +155,8 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     
     os_admin_username   = var.os_admin_username
     os_nic1_name        = var.os_nic1_name
+    
+    docker_mirror       = var.docker_mirror
 
     k8s_ver             = var.k8s_ver
     k8s_version_short   = var.k8s_version_short

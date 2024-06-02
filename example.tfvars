@@ -18,6 +18,7 @@ vm_user_name  = "kuberadm"
 vm_user_displayname = "kunernetes cluster admin"
 vm_user_password = "$6$rounds=----."                 # mkpasswd  --method=SHA-512 --rounds=4096 somesecretpassword
 vm_user_ssh_key = "ssh-ed25519 somessh pub key here" # ssh-keygen -o -a 100 -t ed25519 -f ~/.ssh/id_ed25519 -C "john@example.com" '
+docker_mirror = "mirror.gcr.io"
 
 
 vms = {

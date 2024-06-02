@@ -105,6 +105,7 @@ vms = {
 
     }
 }
+docker_mirror     = "mirror.gcr.io"
 ansible_repo_url  = "https://github.com/werton13/k8s-kubeadm-ansible.git"
 ansible_repo_name = "k8s-kubeadm-ansible"
 ansible_playbook  = "main.yaml"
