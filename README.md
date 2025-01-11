@@ -104,6 +104,7 @@ module "vcloud-k8s-cluster" {
   k8s_ver           = var.k8s_ver  
   k8s_version_short = var.k8s_version_short
   calico_version    = var.calico_version
+  docker_mirror     = var.docker_mirror
 
   def_dns  = var.def_dns
   env_dns1 = var.env_dns1

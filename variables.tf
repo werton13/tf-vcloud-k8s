@@ -113,6 +113,12 @@ variable lbvm_count {
   description = "this variable passed into ansible playbook to ensure LB vm's waiting block will be skipped"
 }
 
+variable docker_mirror {
+  type        = string
+  default     = "mirror.gcr.io"
+  description = "allow to change global image registry from docker.io to some mirror, default google mirror"
+}
+
 # variable to define quantity and size of K8s nodes
 variable "vms" {
     description = "variable to define quantity and size of K8s nodes, please check readme for example"

@@ -93,7 +93,7 @@ ansible_repo_branch = "dev" #"main"
 ansible_playbook = "main.yaml"
 
 ############# Versions of components #############
-
+docker_mirror      = "mirror.gcr.io"
 k8s_ver = "1.28.6-1.1"
 k8s_version_short = "1.28.6"
 calico_version = "v3.27.2"
