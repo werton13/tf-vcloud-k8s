@@ -166,6 +166,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     vcloud_csiadmin_username   = var.vcloud_csiadmin_username
     vcloud_csiadmin_password   = var.vcloud_csiadmin_password
     vcloud_url         = var.vcloud_url
+    vcloud_ip          = var.vcloud_ip
 
     vcloud_catalogname = var.vcloud_catalogname
     vcloud_vmtmplname  = var.vcloud_vmtmplname
@@ -212,7 +213,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
     
     #vcloud_fqdn        = "${substr(var.vcloud_url, 8, -4}"
-    #vcloud_ip          = var.vcloud_ip
+    
 
     hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
     hosts_entry1        = "${split("/", var.vms.masters.ip_pool[0])[0]}  ${var.vms.masters.pref}-0"

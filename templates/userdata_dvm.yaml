@@ -207,6 +207,7 @@ runcmd:
        vcloud_password=${vcloud_password}
        vcloud_csiadmin_username=${vcloud_csiadmin_username}
        vcloud_csiadmin_password=${vcloud_csiadmin_password}
+       vcloud_ip=${vcloud_ip}
        vcloud_url=${vcloud_url}
        vcloud_catalogname=${vcloud_catalogname}
        vcloud_vmtmplname=${vcloud_vmtmplname}
