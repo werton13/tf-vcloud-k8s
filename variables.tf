@@ -107,6 +107,12 @@ variable "vm_user_ssh_key" {
  }
 
 
+variable lbvm_count {
+  type        = string
+  default     = "0"
+  description = "this variable passed into ansible playbook to ensure LB vm's waiting block will be skipped"
+}
+
 # variable to define quantity and size of K8s nodes
 variable "vms" {
     description = "variable to define quantity and size of K8s nodes, please check readme for example"

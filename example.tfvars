@@ -3,13 +3,15 @@ vcloud_vdc      = "My-VDC"
 vcloud_orgname  = "My_orgname"
 vcloud_user     = "My_vcloud_username"
 vcloud_password = "My_vcloud_password"
-variable vcloud_csiadmin_username = "vcloud_username_for_csi"
-variable vcloud_csiadmin_password = "vcloud_password_for_csi" # do not use specials like $,',\ - it could be
+vcloud_csiadmin_username = "vcloud_username_for_csi"
+vcloud_csiadmin_password = "vcloud_password_for_csi" # do not use specials like $,',\ - it could be
 
 vcloud_url      = "https://my_vcloud_web_portal_url/api"
+vcloud_ip       = "my_vcloud_web_portal IP address"
 vcloud_catalogname = "my_vcloud_catalogue_name"
 vcloud_vmtmplname  = "ubuntu22.04-uuid-enabled-v1"
 vcloud_orgvnet     = "my_vcloud_org_vnet_name"
+vcloud_edgegw      = "my_vcloud_edgegw"
 
 
 vapp_name = "my_vapp_name"
@@ -39,9 +41,9 @@ vms = {
       ip_pool =  ["192.168.100.114",
                   "192.168.100.115",
                   "192.168.100.116"]
-
     }
 }
+
 #System disk vars
 system_disk_bus = "paravirtual"
 system_disk_size =  "20"
@@ -65,8 +67,20 @@ system_disk_size =  "20"
           }
 }
 
-#############
+############# DNS config ##############
+def_dns  = "8.8.8.8"     # default dns configured in the base image
+env_dns1 = "10.10.6.6"   # desired DNS1 server IP address, specifical to the target environment
+env_dns2 = "10.11.7.7"   # desired DNS1 server IP address, specifical to the target environment
 
+############# K8s Networking parameters
+k8s_cluster_name = "k8s-lab"
+k8s_controlPlane_Endpoint = "192.168.100.200"
+ingress_lb_ip = "192.168.100.210"
+k8s_service_subnet = "10.96.0.0/12"
+k8s_pod_subnet = "10.244.0.0/22"
+calico_network_cidr_blocksize = "26"
+
+############# OS config parameters
 os_admin_username = "kuberadm"
 os_nic1_name = "ens192"
 ansible_ssh_pass = "somesecretpasswordhere"
@@ -81,39 +95,24 @@ ansible_playbook = "main.yaml"
 ############# Versions of components #############
 
 k8s_ver = "1.28.6-1.1"
-
 k8s_version_short = "1.28.6"
-
 calico_version = "v3.27.2"
-
 vsphere_csi_driver_version = "v2.7.0"
-
-############# K8s Networking parameters #############
-
-k8s_controlPlane_Endpoint = "192.168.100.110"
-k8s_service_subnet = "10.96.0.0/12"
-k8s_pod_subnet = "10.244.0.0/22"
-calico_network_cidr_blocksize = "26"
-
+helm_version = "v3.11.1"
 
 # vCloud CSI vars
-
 sc_storage_policy_name = "my_vcloud_stotage_policy_name"
 sc_name = "my storage_classname_desired" # for vcloud
 
+############# Ingress config #############
 ingress_ext_fqdn = "myenvironment.fqdn"
+ingress_controller_nodeport_http = "30888"
+ingress_controller_nodeport_https = "30443"
 
+############# Monitoring config #############
 alertmgr_telegram_receiver_name = "test-telegram"
 alertmgr_telegram_bot_token = "mytelegram_bot_secret_token"
 alertmgr_telegram_chatid = "-mytelegramchatid"
-
-# vCloud CSI vars
-sc_storage_policy_name = "SAS_DP"
-sc_name = "ssd-default" # for vcloud
-
-ingress_ext_fqdn = "testground.lab"
-
-
 # Go to this address and talk to BotFather to get a new bot.
 #  https://core.telegram.org/bots#6-botfather
 #
@@ -125,9 +124,6 @@ ingress_ext_fqdn = "testground.lab"
 #  after the bot is in the channel, type a message in the channel, then go to:
 #  https://api.telegram.org/botYOUR_BOT_TOKEN/getUpdates
 
-alertmgr_telegram_receiver_name = "test-telegram"
-alertmgr_telegram_bot_token = " your telegram bot token "
-alertmgr_telegram_chatid = " your telegram bot chat id"
 
 ############# K8s RBAC paramaters
 tenant_cluster_ro_rolename = "tenant-cluster-readonly"
@@ -139,12 +135,3 @@ tenant_emailaddress = "tenant-admin@tenant-orgname.lab"
 certificate_validity = "180"  #30/60 or 180 и.т.д.
 
 ######################################################################
-
-helm_version = "v3.11.1"
-k8s_cluster_name = "k8s-lab"
-ingress_controller_nodeport_http = "30888"
-ingress_controller_nodeport_https = "30443"
-
-def_dns  = "8.8.8.8"     # default dns configured in the base image
-env_dns1 = "10.10.6.6"   # desired DNS1 server IP address, specifical to the target environment
-env_dns2 = "10.11.7.7"   # desired DNS1 server IP address, specifical to the target environment

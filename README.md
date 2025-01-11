@@ -27,7 +27,10 @@ Currently the following list of Kubernetes addons installing:
 
 #### HOW TO USE:
 
-<b>To use this module you have to fill provider block and specify required variables as in the example below:</b>
+<b>To use this module you have to:
+  - copy variables file from this repo
+  - create terraform.tfvars file from example file in thi repo
+  - fill provider block and specify required variables as in the example below</b>
 
 
 ```hcl
@@ -80,7 +83,8 @@ module "vcloud-k8s-cluster" {
 <details>
   <summary><b>Default values</b></summary>
 
-```  
+```
+lbvm_count = "0"  
 vcloud_allow_unverified_ssl = "true"
 vcloud_max_retry_timeout    = "240"
 vms = {

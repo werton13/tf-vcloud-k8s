@@ -260,6 +260,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
 
     workers_count       = var.vms.workers.vm_count
     masters_count       = var.vms.masters.vm_count
+    lb_count            = var.lbvm_count
     ansible_ssh_pass    = var.ansible_ssh_pass
     
     tenant_cluster_ro_rolename = var.tenant_cluster_ro_rolename
