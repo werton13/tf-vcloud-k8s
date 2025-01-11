@@ -3,8 +3,8 @@ vcloud_vdc      = "My-VDC"
 vcloud_orgname  = "My_orgname"
 vcloud_user     = "My_vcloud_username"
 vcloud_password = "My_vcloud_password"
-variable vcloud_csiadmin_username = "vcloud_username_for_csi"
-variable vcloud_csiadmin_password = "vcloud_password_for_csi" # do not use specials like $,',\ - it could be
+vcloud_csiadmin_username = "vcloud_username_for_csi"
+vcloud_csiadmin_password = "vcloud_password_for_csi" # do not use specials like $,',\ - it could be
 
 vcloud_url      = "https://my_vcloud_web_portal_url/api"
 vcloud_catalogname = "my_vcloud_catalogue_name"
