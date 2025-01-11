@@ -45,20 +45,21 @@ provider "vcd" {
 }
 
 module "vcloud-k8s-cluster" {
-  source = "github.com/werton13/tf-vcloud-k8s"
+  source = "github.com/werton13/tf-vcloud-k8s?ref=dev"
 
   vcloud_url                 = var.vcloud_url
+  vcloud_ip                  = var.vcloud_ip
   vcloud_vdc                 = var.vcloud_vdc
   vcloud_orgname             = var.vcloud_orgname
   vcloud_user                = var.vcloud_user
   vcloud_password            = var.vcloud_password
   vcloud_csiadmin_username   = var.vcloud_csiadmin_username
   vcloud_csiadmin_password   = var.vcloud_csiadmin_password
-
   vapp_name                  = var.vapp_name
   vcloud_catalogname         = var.vcloud_catalogname
   vcloud_vmtmplname          = var.vcloud_vmtmplname
   vcloud_orgvnet             = var.vcloud_orgvnet
+  vcloud_edgegw              = var.vcloud_edgegw
 
   vm_user_name               = var.vm_user_name
   vm_user_password           = var.vm_user_password
@@ -66,17 +67,47 @@ module "vcloud-k8s-cluster" {
   vm_user_ssh_key            = var.vm_user_ssh_key
 
   ansible_ssh_pass           = var.ansible_ssh_pass
+  ansible_repo_url           = var.ansible_repo_url
+  ansible_repo_branch        = var.ansible_repo_branch
+  ansible_repo_name          = var.ansible_repo_name
 
+  k8s_cluster_name           = var.k8s_cluster_name
   k8s_controlPlane_Endpoint  = var.k8s_controlPlane_Endpoint
   k8s_cluster_id             = var.k8s_cluster_id
+  ingress_lb_ip              = var.ingress_lb_ip
   sc_storage_policy_name     = var.sc_storage_policy_name
   sc_name                    = var.sc_name
   ingress_ext_fqdn           = var.ingress_ext_fqdn
+  ingress_controller_nodeport_http  = var.ingress_controller_nodeport_http
+  ingress_controller_nodeport_https = var.ingress_controller_nodeport_https
   os_nic1_name               = var.os_nic1_name
+
 
   alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
   alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
   alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
+
+  vms = var.vms
+
+  tenant_cluster_ro_rolename = var.tenant_cluster_ro_rolename
+  tenant_ns_default          = var.tenant_ns_default
+  tenant_k8s_admin_username  = var.tenant_k8s_admin_username
+  tenant_orgname             = var.tenant_orgname
+  tenant_orgname_orgunit     = var.tenant_orgname_orgunit
+  tenant_emailaddress        = var.tenant_emailaddress
+  certificate_validity       = var.certificate_validity
+  
+  add_disks        = var.add_disks
+  system_disk_bus  = var.system_disk_bus
+  system_disk_size = var.system_disk_size
+  
+  k8s_ver           = var.k8s_ver  
+  k8s_version_short = var.k8s_version_short
+  calico_version    = var.calico_version
+
+  def_dns  = var.def_dns
+  env_dns1 = var.env_dns1
+  env_dns2 = var.env_dns2
 }
 
 ```
