@@ -44,7 +44,7 @@ variable "os_config" {
         vm_user_ssh_key     = string  #vm_user_ssh_key"
  #      vm_ipv4_gw          = string # to deprecate
         vm_ip_cidr          = string
-        vm_dns_server       = string
+ #       vm_dns_server       = string #not used
         def_dns             = string
         env_dns1            = string
         env_dns2            = string
