@@ -79,9 +79,12 @@ write_files:
 
   - content: |
       #!/bin/bash
-      export ip_net=$(echo ${master0_ip} |cut -d '.' -f1-3)
-      for (( m=0;m<=$((${masters_count}-1));m++ ));do ip=$((110+m)); echo "$ip_net.$ip  ${master_pref}-$m" >> /etc/hosts; done
-      for (( w=0;w<=$((${workers_count}-1));w++ ));do ip=$((114+w)); echo "$ip_net.$ip  ${worker_pref}-$w" >> /etc/hosts; done      
+      export ip_net=$(echo ${master0_ip} | cut -d '.' -f1-3)
+      export master0_ip_4=$(echo ${master0_ip} | cut -d '.' -f4)
+      export worker0_ip_4=$(($(echo ${master0_ip} | cut -d '.' -f4)+3))
+      
+      for (( m=1;m<=$((${masters_count}));m++ ));do ip=$((master0_ip_4 + m - 1)); echo "$ip_net.$ip  ${master_pref}-0$m" >> /etc/hosts; done
+      for (( w=1;w<=$((${workers_count}));w++ ));do ip=$((worker0_ip_4 + w - 1)); echo "$ip_net.$ip  ${worker_pref}-$(echo 0$w| rev | cut -c 1-2| rev)"  >> /etc/hosts; done    
     path:  /add_hosts_records.sh
     permissions: "0744"
 
@@ -89,6 +92,8 @@ runcmd:
 #  - add-apt-repository --yes --update ppa:ansible/ansible
   - /add_hosts_records.sh
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
+  - sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+  - \[ -e /etc/ssh/sshd_config.d/*.conf \] && grep -ilr PasswordAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/"
   - [ systemctl, daemon-reload ]
   - [ systemctl, restart, --no-block, ssh.service ]
   - [ ansible-galaxy, collection, install, kubernetes.core ]
