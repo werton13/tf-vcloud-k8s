@@ -60,12 +60,12 @@ variable "os_config" {
 #System disk vars
 variable "system_disk_bus" {
   description = ""
-  default     = "default"
+  default     = "paravirtual"
 }
 
 variable "system_disk_size" {
   description = ""
-  default     = "default"
+  default     = "20"
 }
 
 variable "system_disk_storage_profile" {
@@ -172,7 +172,7 @@ variable "versions" {
             cni = object({
               calico_version = string  #calico_version
               tigera_version = string 
-              calicoctl_url  = string
+#              calicoctl_url  = string
              }        
             )
 
