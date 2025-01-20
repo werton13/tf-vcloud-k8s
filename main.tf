@@ -19,7 +19,7 @@ resource "vcd_vm_internal_disk" "mst_data1_disk" {
                       vcd_vapp_vm.k8s_masters_vms]
   count           = var.vms.masters.vm_count
   #count = 2
-  vapp_name       = var.vapp_name
+  vapp_name       = var.vcloud.vapp_name
   bus_type        = var.add_disks.diskm1.bus_type
   size_in_mb      = var.add_disks.diskm1.sizegb * 1024
   bus_number      = var.add_disks.diskm1.bus_num
@@ -34,7 +34,7 @@ resource "vcd_vm_internal_disk" "mst_data2_disk" {
                       vcd_vapp_vm.k8s_masters_vms]
   count           = var.vms.masters.vm_count
   #count = 2
-  vapp_name       = var.vapp_name
+  vapp_name       = var.vcloud.vapp_name
   bus_type        = var.add_disks.diskm2.bus_type
   size_in_mb      = var.add_disks.diskm2.sizegb * 1024
   bus_number      = var.add_disks.diskm2.bus_num
@@ -49,7 +49,7 @@ resource "vcd_vm_internal_disk" "wrk_data1_disk" {
                       vcd_vapp_vm.k8s_masters_vms]
   count           = var.vms.masters.vm_count
   #count = 2
-  vapp_name       = var.vapp_name
+  vapp_name       = var.vcloud.vapp_name
   bus_type        = var.add_disks.diskw1.bus_type
   size_in_mb      = var.add_disks.diskw1.sizegb * 1024
   bus_number      = var.add_disks.diskw1.bus_num
@@ -64,7 +64,7 @@ resource "vcd_vm_internal_disk" "wrk_data2_disk" {
                       vcd_vapp_vm.k8s_masters_vms]
   count           = var.vms.masters.vm_count
   #count = 2
-  vapp_name       = var.vapp_name
+  vapp_name       = var.vcloud.vapp_name
   bus_type        = var.add_disks.diskw2.bus_type
   size_in_mb      = var.add_disks.diskw2.sizegb * 1024
   bus_number      = var.add_disks.diskw2.bus_num

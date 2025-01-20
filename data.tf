@@ -39,10 +39,10 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     env_dns1            =  var.os_config.env_dns1
     env_dns2            =  var.os_config.env_dns2
 
-    ansible_repo_url    = var.ansible.repo_url
-    ansible_repo_name   = var.ansible.repo_name
-    ansible_repo_branch = var.ansible.repo_branch
-    ansible_playbook    = var.ansible.playbook_name
+    ansible_repo_url    = var.ansible.git_repo.repo_url
+    ansible_repo_name   = var.ansible.git_repo.repo_name
+    ansible_repo_branch = var.ansible.git_repo.repo_branch
+    ansible_playbook    = var.ansible.git_repo.playbook_name
     
     os_admin_username   = var.os_config.vm_user_name
     os_nic1_name        = var.os_config.os_nic1_name
@@ -89,7 +89,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
 
     #hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
     hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
-    hosts_entry1       = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
+    hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,-3)}  ${var.vms.dvm.pref}"
     
     dvm_name            = "${var.vms.dvm.pref}"
     worker0_name        = "${var.vms.workers.pref}-0" # to deprecate?
