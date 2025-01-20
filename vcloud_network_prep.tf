@@ -1,6 +1,6 @@
 resource "vcd_vapp" "k8s_mgmt_vapp" {
   name = var.vcloud.vapp_name
-  metadata_entry = {
+  metadata = {
     tag = "MGMT K8s"
    }   
 }
