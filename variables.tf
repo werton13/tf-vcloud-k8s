@@ -153,6 +153,7 @@ variable "kubernetes" {
           controller_nodeport_http  = string 
           controller_nodeport_https = string
           ext_fqdn                  = string #ingress_ext_fqdn
+          lb_ip             = string
          }        
         )
 

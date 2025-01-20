@@ -27,17 +27,17 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     vcloud_catalogname = var.vcloud.catalogname
     vcloud_vmtmplname  = var.vcloud.vm_template_name
     vcloud_orgvnet     = var.vcloud.orgvnet_name
-    vapp_name          = var.vapp_name
+    vapp_name          = var.vcloud.vapp_name
 
     vm_user_name        = var.os_config.vm_user_name
     vm_user_password    = var.os_config.vm_user_password
     vm_user_displayname = var.os_config.vm_user_displayname     
     vm_user_ssh_key     = var.os_config.vm_user_ssh_key
     #vm_user_ssh_pk      = var.os_config.vm_user_ssh_pk
-    ansible_ssh_pass    = var.ansible_ssh_pass
-    def_dns             =  var.def_dns
-    env_dns1            =  var.env_dns1
-    env_dns2            =  var.env_dns2
+    ansible_ssh_pass    = var.os_config.ansible_ssh_pass
+    def_dns             =  var.os_config.def_dns
+    env_dns1            =  var.os_config.env_dns1
+    env_dns2            =  var.os_config.env_dns2
 
     ansible_repo_url    = var.ansible.repo_url
     ansible_repo_name   = var.ansible.repo_name
@@ -87,7 +87,8 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     master_pref = "${var.vms.masters.pref}"
     worker_pref = "${var.vms.workers.pref}"
 
-    hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
+    #hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
+    hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
     hosts_entry1       = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
     
     dvm_name            = "${var.vms.dvm.pref}"

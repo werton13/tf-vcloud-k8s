@@ -100,7 +100,7 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
   count            = var.vms.masters.vm_count
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
-  template_name    = var.vcloud_vmtmplname 
+  template_name    = var.vcloud.vm_template_name
   hardware_version = "vmx-15"
   cpus             = var.vms.masters.vm_cpu_count
   memory           = var.vms.masters.vm_ram_size
@@ -108,10 +108,10 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
 
   network {
     type               = "org"
-    name               = var.vcloud_orgvnet
+    name               = var.vcloud.orgvnet_name
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
-    ip                 = "${var.vms.masters.ip_pool[count.index]}"
+    ip                 =  "${cidrhost(var.os_config.vm_ip_cidr, (count.index+4))}" #"${var.vms.masters.ip_pool[count.index]}"
   }
   override_template_disk {
     size_in_mb      = var.system_disk_size * 1024
@@ -139,7 +139,7 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   count            = var.vms.workers.vm_count
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
-  template_name    = var.vcloud_vmtmplname
+  template_name    = var.vcloud.vm_template_name
   hardware_version = "vmx-15" #Test version    
   cpus             = var.vms.workers.vm_cpu_count
   memory           = var.vms.workers.vm_ram_size
@@ -147,10 +147,10 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
 
   network {
     type               = "org"
-    name               = var.vcloud_orgvnet
+    name               = var.vcloud.orgvnet_name
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
-    ip                 = "${var.vms.workers.ip_pool[count.index]}"
+    ip                 = "${cidrhost(var.os_config.vm_ip_cidr, (count.index+7))}" #"${var.vms.workers.ip_pool[count.index]}"
   }
   override_template_disk {
     size_in_mb      = var.system_disk_size * 1024
@@ -178,7 +178,7 @@ resource "vcd_vapp_vm" "dvm" {
   
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
-  template_name    = var.vcloud_vmtmplname 
+  template_name    = var.vcloud.vm_template_name
   hardware_version = "vmx-15"
   cpus             = var.vms.dvm.vm_cpu_count
   memory           = var.vms.dvm.vm_ram_size
@@ -186,10 +186,10 @@ resource "vcd_vapp_vm" "dvm" {
 
   network {
     type               = "org"
-    name               = var.vcloud_orgvnet
+    name               = var.vcloud.orgvnet_name
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
-    ip                 = "${var.vms.dvm.ip_pool[0]}"
+    ip                 = "${cidrhost(var.os_config.vm_ip_cidr,-3)}" #${var.vms.dvm.ip_pool[0]}"
   }
   override_template_disk {
     size_in_mb      = var.system_disk_size * 1024

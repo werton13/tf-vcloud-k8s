@@ -1,5 +1,5 @@
 resource "vcd_vapp" "k8s_mgmt_vapp" {
-  name = var.vapp_name
+  name = var.vcloud.vapp_name
   metadata = {
     tag = "MGMT K8s"
    }   
@@ -7,10 +7,10 @@ resource "vcd_vapp" "k8s_mgmt_vapp" {
 
 resource "vcd_vapp_org_network" "vappOrgNet" {
   depends_on  = [vcd_vapp.k8s_mgmt_vapp]
-  org = var.vcloud_orgname
-  vdc = var.vcloud_vdc
-  vapp_name = var.vapp_name
-  org_network_name = var.vcloud_orgvnet 
+  org = var.vcloud.orgname
+  vdc = var.vcloud.vdc
+  vapp_name = var.vcloud.vapp_name
+  org_network_name = var.vcloud.orgvnet_name
 }
 
 ###----- configure load balancer for a Kubernetes API-server---------------------------------------------------------------
@@ -21,9 +21,9 @@ resource "vcd_edgegateway_settings" "egw-settings" {
 }
 
 resource "vcd_lb_app_profile" "kube_api" {
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
+  org          = var.vcloud.orgname
+  vdc          = var.vcloud.vdc
+  edge_gateway = var.vcloud.edgegw
   enable_ssl_passthrough  = "true"
   persistence_mechanism   = "ssl-sessionid"
 
@@ -32,9 +32,9 @@ resource "vcd_lb_app_profile" "kube_api" {
 }
 
 resource "vcd_lb_app_profile" "ingress_http" {
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
+  org          = var.vcloud.orgname
+  vdc          = var.vcloud.vdc
+  edge_gateway = var.vcloud.edgegw
   enable_ssl_passthrough  = "false"
   persistence_mechanism   = "sourceip"
 
@@ -43,9 +43,9 @@ resource "vcd_lb_app_profile" "ingress_http" {
 }
 
 resource "vcd_lb_service_monitor" "kube_api" {
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
+  org          = var.vcloud.orgname
+  vdc          = var.vcloud.vdc
+  edge_gateway = var.vcloud.edgegw
 
   name        = "kube_api"
   interval    = "10"
@@ -64,9 +64,9 @@ resource "vcd_lb_service_monitor" "kube_api" {
   #}
 }
 resource "vcd_lb_service_monitor" "ingress_http" {
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
+  org          = var.vcloud.orgname
+  vdc          = var.vcloud.vdc
+  edge_gateway = var.vcloud.edgegw
 
   name        = "ingress_http"
   interval    = "10"
@@ -82,9 +82,9 @@ resource "vcd_lb_service_monitor" "ingress_http" {
 }
 
 resource "vcd_lb_server_pool" "kube_api_lb_pool" {
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
+  org          = var.vcloud.orgname
+  vdc          = var.vcloud.vdc
+  edge_gateway = var.vcloud.edgegw
   depends_on  = [vcd_vapp.k8s_mgmt_vapp,
                  vcd_lb_service_monitor.kube_api]
 
@@ -96,8 +96,8 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
 
     member {
     condition       = "enabled"
-    name            = "${var.vms.masters.pref}-0"
-    ip_address      = "${split("/", var.vms.masters.ip_pool[0])[0]}"
+    name            = "${var.vms.masters.pref}-01"  
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,4)}" #"${split("/", var.vms.masters.ip_pool[0])[0]}"
     port            = 6443
     monitor_port    = 6443
     weight          = 1
@@ -106,8 +106,8 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
    }
     member {
     condition       = "drain"
-    name            = "${var.vms.masters.pref}-1"
-    ip_address      = "${split("/", var.vms.masters.ip_pool[1])[0]}"
+    name            = "${var.vms.masters.pref}-02"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,5)}" #"${split("/", var.vms.masters.ip_pool[1])[0]}"
     port            = 6443
     monitor_port    = 6443
     weight          = 1
@@ -116,8 +116,8 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
    }
     member {
     condition       = "drain"
-    name            = "${var.vms.masters.pref}-2"
-    ip_address      = "${split("/", var.vms.masters.ip_pool[2])[0]}"
+    name            = "${var.vms.masters.pref}-03"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,6)}" #"${split("/", var.vms.masters.ip_pool[2])[0]}"
     port            = 6443
     monitor_port    = 6443
     weight          = 1
@@ -128,9 +128,9 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
 
 }
 resource "vcd_lb_server_pool" "ingress_http_pool" {
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
+  org          = var.vcloud.orgname
+  vdc          = var.vcloud.vdc
+  edge_gateway = var.vcloud.edgegw
   depends_on  = [vcd_vapp.k8s_mgmt_vapp,
                  vcd_lb_service_monitor.kube_api]
 
@@ -144,8 +144,8 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
     condition       = "enabled"
     name            = "${var.vms.workers.pref}-0"
     ip_address      = "${split("/", var.vms.workers.ip_pool[0])[0]}"
-    port            = var.ingress_controller_nodeport_http
-    monitor_port    = var.ingress_controller_nodeport_http
+    port            = var.kubernetes.ingress.controller_nodeport_http
+    monitor_port    = var.kubernetes.ingress.controller_nodeport_http
     weight          = 1
     min_connections = 0
     max_connections = 100
@@ -154,9 +154,9 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
     member {
     condition       = "enabled"
     name            = "${var.vms.workers.pref}-1"
-    ip_address      = "${split("/", var.vms.workers.ip_pool[1])[0]}"
-    port            = var.ingress_controller_nodeport_http
-    monitor_port    = var.ingress_controller_nodeport_http
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 7)}" #"${split("/", var.vms.workers.ip_pool[1])[0]}"
+    port            = var.kubernetes.ingress.controller_nodeport_http
+    monitor_port    = var.kubernetes.ingress.controller_nodeport_http
     weight          = 1
     min_connections = 0
     max_connections = 100
@@ -165,9 +165,9 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
     member {
     condition       = "enabled"
     name            = "${var.vms.workers.pref}-2"
-    ip_address      = "${split("/", var.vms.workers.ip_pool[2])[0]}"
-    port            = var.ingress_controller_nodeport_http
-    monitor_port    = var.ingress_controller_nodeport_http
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 8)}" #"${split("/", var.vms.workers.ip_pool[2])[0]}"
+    port            = var.kubernetes.ingress.controller_nodeport_http
+    monitor_port    = var.kubernetes.ingress.controller_nodeport_http
     weight          = 1
     min_connections = 0
     max_connections = 100
@@ -175,55 +175,24 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
     member {
     condition       = "enabled"
     name            = "${var.vms.workers.pref}-3"
-    ip_address      = "${split("/", var.vms.workers.ip_pool[3])[0]}"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 9)}" #"${split("/", var.vms.workers.ip_pool[3])[0]}"
     port            = var.ingress_controller_nodeport_http
     monitor_port    = var.ingress_controller_nodeport_http
     weight          = 1
     min_connections = 0
     max_connections = 100
-   }
-    member {
-    condition       = "enabled"
-    name            = "${var.vms.workers.pref}-4"
-    ip_address      = "${split("/", var.vms.workers.ip_pool[4])[0]}"
-    port            = var.ingress_controller_nodeport_http
-    monitor_port    = var.ingress_controller_nodeport_http
-    weight          = 1
-    min_connections = 0
-    max_connections = 100
-   }
-    member {
-    condition       = "enabled"
-    name            = "${var.vms.workers.pref}-5"
-    ip_address      = "${split("/", var.vms.workers.ip_pool[5])[0]}"
-    port            = var.ingress_controller_nodeport_http
-    monitor_port    = var.ingress_controller_nodeport_http
-    weight          = 1
-    min_connections = 0
-    max_connections = 100
-   }
-    member {
-    condition       = "enabled"
-    name            = "${var.vms.workers.pref}-6"
-    ip_address      = "${split("/", var.vms.workers.ip_pool[6])[0]}"
-    port            = var.ingress_controller_nodeport_http
-    monitor_port    = var.ingress_controller_nodeport_http
-    weight          = 1
-    min_connections = 0
-    max_connections = 100
-   }
- 
+   } 
 }
 
 resource "vcd_lb_virtual_server" "kube_api_lb_vs" {
   depends_on    = [vcd_lb_server_pool.kube_api_lb_pool]
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
+  org          = var.vcloud.orgname
+  vdc          = var.vcloud.vdc
+  edge_gateway = var.vcloud.edgegw
 
   name       = "kube_api"
   #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
-  ip_address = var.k8s_controlPlane_Endpoint
+  ip_address = var.kubernetes.cluster.controlPlane_Endpoint
   #protocol   = var.protocol
   protocol   = "https"
   port       = 6443
@@ -234,13 +203,13 @@ resource "vcd_lb_virtual_server" "kube_api_lb_vs" {
 }
 resource "vcd_lb_virtual_server" "ingress_http" {
   depends_on    = [vcd_lb_server_pool.kube_api_lb_pool]
-  org          = var.vcloud_orgname
-  vdc          = var.vcloud_vdc
-  edge_gateway = var.vcloud_edgegw
+  org          = var.vcloud.orgname
+  vdc          = var.vcloud.vdc
+  edge_gateway = var.vcloud.edgegw
 
   name       = "ingress_http"
   #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
-  ip_address = var.ingress_lb_ip
+  ip_address = var.kubernetes.ingress.lb_ip#!!!
   #protocol   = var.protocol
   protocol   = "http"
   port       = 80
