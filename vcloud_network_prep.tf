@@ -143,7 +143,7 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
     member {
     condition       = "enabled"
     name            = "${var.vms.workers.pref}-0"
-    ip_address      = "${split("/", var.vms.workers.ip_pool[0])[0]}"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 7)}" #"${split("/", var.vms.workers.ip_pool[0])[0]}"
     port            = var.kubernetes.ingress.controller_nodeport_http
     monitor_port    = var.kubernetes.ingress.controller_nodeport_http
     weight          = 1
@@ -154,7 +154,7 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
     member {
     condition       = "enabled"
     name            = "${var.vms.workers.pref}-1"
-    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 7)}" #"${split("/", var.vms.workers.ip_pool[1])[0]}"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 8)}" #"${split("/", var.vms.workers.ip_pool[1])[0]}"
     port            = var.kubernetes.ingress.controller_nodeport_http
     monitor_port    = var.kubernetes.ingress.controller_nodeport_http
     weight          = 1
@@ -165,23 +165,13 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
     member {
     condition       = "enabled"
     name            = "${var.vms.workers.pref}-2"
-    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 8)}" #"${split("/", var.vms.workers.ip_pool[2])[0]}"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 9)}" #"${split("/", var.vms.workers.ip_pool[2])[0]}"
     port            = var.kubernetes.ingress.controller_nodeport_http
     monitor_port    = var.kubernetes.ingress.controller_nodeport_http
     weight          = 1
     min_connections = 0
     max_connections = 100
    }
-    member {
-    condition       = "enabled"
-    name            = "${var.vms.workers.pref}-3"
-    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 9)}" #"${split("/", var.vms.workers.ip_pool[3])[0]}"
-    port            = var.kubernetes.ingress.controller_nodeport_http
-    monitor_port    = var.kubernetes.ingress.controller_nodeport_http
-    weight          = 1
-    min_connections = 0
-    max_connections = 100
-   } 
 }
 
 resource "vcd_lb_virtual_server" "kube_api_lb_vs" {
