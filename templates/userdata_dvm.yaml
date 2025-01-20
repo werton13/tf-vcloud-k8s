@@ -159,16 +159,16 @@ write_files:
            sc_storage_policy_name='${sc_storage_policy_name}'
            sc_name='${sc_name}'
            ingress_ext_fqdn='${ingress_ext_fqdn}'
-           alertmgr_telegram_receiver_name='${alertmgr_telegram_receiver_name}'
-           alertmgr_telegram_bot_token='${alertmgr_telegram_bot_token}'
-           alertmgr_telegram_chatid='${alertmgr_telegram_chatid}'
-           tenant_cluster_ro_rolename='${tenant_cluster_ro_rolename}'
-           tenant_ns_default='${tenant_ns_default}'
-           tenant_k8s_admin_username='${tenant_k8s_admin_username}'
-           tenant_orgname='${tenant_orgname}'
-           tenant_orgname_orgunit='${tenant_orgname_orgunit}'
-           tenant_emailaddress='${tenant_emailaddress}'
-           certificate_validity='${certificate_validity}'"
+#           alertmgr_telegram_receiver_name='${alertmgr_telegram_receiver_name}'
+#           alertmgr_telegram_bot_token='${alertmgr_telegram_bot_token}'
+#           alertmgr_telegram_chatid='${alertmgr_telegram_chatid}'
+#           tenant_cluster_ro_rolename='${tenant_cluster_ro_rolename}'
+#           tenant_ns_default='${tenant_ns_default}'
+#           tenant_k8s_admin_username='${tenant_k8s_admin_username}'
+#           tenant_orgname='${tenant_orgname}'
+#           tenant_orgname_orgunit='${tenant_orgname_orgunit}'
+#           tenant_emailaddress='${tenant_emailaddress}'
+#           certificate_validity='${certificate_validity}'"
           # crontab -r
     path: /ansible_starter.sh
   - content: |                                                                                                                                                           
@@ -233,17 +233,18 @@ runcmd:
        k8s_cluster_id=${k8s_cluster_id}
        sc_storage_policy_name=${sc_storage_policy_name}
        sc_name=${sc_name}
-       ingress_ext_fqdn=${ingress_ext_fqdn}
-       alertmgr_telegram_receiver_name=${alertmgr_telegram_receiver_name}
-       alertmgr_telegram_bot_token=${alertmgr_telegram_bot_token}
-       alertmgr_telegram_chatid=${alertmgr_telegram_chatid}
-       tenant_cluster_ro_rolename=${tenant_cluster_ro_rolename}
-       tenant_ns_default=${tenant_ns_default}
-       tenant_k8s_admin_username=${tenant_k8s_admin_username}
-       tenant_orgname=${tenant_orgname}
-       tenant_orgname_orgunit=${tenant_orgname_orgunit}
-       tenant_emailaddress=${tenant_emailaddress}
-       certificate_validity=${certificate_validity}"
+       ingress_ext_fqdn=${ingress_ext_fqdn}"
+#       alertmgr_telegram_receiver_name=${alertmgr_telegram_receiver_name}
+#       alertmgr_telegram_bot_token=${alertmgr_telegram_bot_token}
+#       alertmgr_telegram_chatid=${alertmgr_telegram_chatid}
+#       tenant_cluster_ro_rolename=${tenant_cluster_ro_rolename}
+#       tenant_ns_default=${tenant_ns_default}
+#       tenant_k8s_admin_username=${tenant_k8s_admin_username}
+#       tenant_orgname=${tenant_orgname}
+#       tenant_orgname_orgunit=${tenant_orgname_orgunit}
+#       tenant_emailaddress=${tenant_emailaddress}
+#       certificate_validity=${certificate_validity}
+#      "
   #- ansible-playbook reboot_hosts_before_disks_remap.yaml
   #- ansible-playbook prepare_hosts_disks.yaml
 

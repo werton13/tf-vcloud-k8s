@@ -46,8 +46,8 @@ resource "vcd_vm_internal_disk" "mst_data2_disk" {
 resource "vcd_vm_internal_disk" "wrk_data1_disk" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_org_network.vappOrgNet,
-                      vcd_vapp_vm.k8s_masters_vms]
-  count           = var.vms.masters.vm_count
+                      vcd_vapp_vm.k8s_workers_vms]
+  count           = var.vms.workers.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
   bus_type        = var.add_disks.diskw1.bus_type
@@ -61,8 +61,8 @@ resource "vcd_vm_internal_disk" "wrk_data1_disk" {
 resource "vcd_vm_internal_disk" "wrk_data2_disk" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_org_network.vappOrgNet,
-                      vcd_vapp_vm.k8s_masters_vms]
-  count           = var.vms.masters.vm_count
+                      vcd_vapp_vm.k8s_workers_vms]
+  count           = var.vms.workers.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
   bus_type        = var.add_disks.diskw2.bus_type
