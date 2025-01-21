@@ -1,26 +1,28 @@
-variable env_type {
-  type        = string
-  default     = "public"
-  description = "can be private or public"
-}
+#variable env_type {
+#  type        = string
+#  default     = "public"
+#  description = "can be private or public"
+#}
 
 variable "vcloud" {
     type = object({
         server_fqdn          = string # vcloud_url
         server_ip            = string # vcloud_ip
-        allow_unverified_ssl = string #vcloud_allow_unverified_ssl default     = "true"
-        max_retry_timeout    = string #vcloud_max_retry_timeout    default     = "240"
-        vdc           = string #vcloud_vdc 
-        orgname       = string #vcloud_orgname
+        allow_unverified_ssl = optional(string,"true")  #vcloud_allow_unverified_ssl default     = "true"
+        max_retry_timeout    = optional(string,"240") #vcloud_max_retry_timeout    default     = "240"
+        vdc                  = string #vcloud_vdc 
+        orgname              = string #vcloud_orgname
         admin                = string #vcloud_user 
         admin_pwd            = string #vcloud_password 
         csi_svc              = string #vcloud_csiadmin_username        
         csi_svc_pwd          = string #vcloud_csiadmin_password
         vapp_name            = string
-        catalogname   = string #vcloud_catalogname 
+        catalogname          = string #vcloud_catalogname 
         vm_template_name     = string #vcloud_vmtmplname 
         orgvnet_name         = string #vcloud_orgvnet
         edgegw               = string #vcloud_edgegw
+        env_type             = optional(string,"public") # default     = "public"
+        lbvm_count           = optional(string,"0") 
     })
 }
 
@@ -57,24 +59,25 @@ variable "os_config" {
     })
 }
 
-#System disk vars
-variable "system_disk_bus" {
-  description = ""
-  default     = "paravirtual"
-}
-
-variable "system_disk_size" {
-  description = ""
-  default     = "20"
-}
-
-variable "system_disk_storage_profile" {
-  description = ""
-  default     = "default"
-}
+##System disk vars
+#variable "system_disk_bus" {
+#  description = ""
+#  default     = "paravirtual"
+#}
+#
+#variable "system_disk_size" {
+#  description = ""
+#  default     = "20"
+#}
+#
+#variable "system_disk_storage_profile" {
+#  description = ""
+#  default     = "default"
+#}
 
 #Additional disks vars
-variable "add_disks" {
+# add_disks
+variable "disks_config" {
   type = map(object({
     sizegb          = string
     bus_num         = string
@@ -83,6 +86,14 @@ variable "add_disks" {
     bus_type        = string
   }))
   default = {
+          osdisk = {
+            sizegb = "10"  #system_disk_size
+            bus_num  = "0"  #system_disk_bus
+            unit_num = "0"
+            storage_profile = "" #system_disk_storage_profile
+            bus_type = "paravirtual" 
+
+          }
           diskm1 = {
             sizegb = "10"
             bus_num = "1"
@@ -113,6 +124,12 @@ variable "add_disks" {
           }
  }
 }
+
+#variable lbvm_count {
+#  type        = string
+#  default     = "0"
+#  description = "this variable passed into ansible playbook to ensure LB vm's waiting block will be skipped"
+#}
 
 variable "ansible" {
     type = object({
@@ -172,7 +189,7 @@ variable "versions" {
             cni = object({
               calico_version = string  #calico_version
               tigera_version = string 
-#              calicoctl_url  = string
+  #              calicoctl_url  = string
              }        
             )
 

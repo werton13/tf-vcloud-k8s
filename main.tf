@@ -20,10 +20,10 @@ resource "vcd_vm_internal_disk" "mst_data1_disk" {
   count           = var.vms.masters.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
-  bus_type        = var.add_disks.diskm1.bus_type
-  size_in_mb      = var.add_disks.diskm1.sizegb * 1024
-  bus_number      = var.add_disks.diskm1.bus_num
-  unit_number     = var.add_disks.diskm1.unit_num
+  bus_type        = var.disks_config.diskm1.bus_type
+  size_in_mb      = var.disks_config.diskm1.sizegb * 1024
+  bus_number      = var.disks_config.diskm1.bus_num
+  unit_number     = var.disks_config.diskm1.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
   vm_name = "${var.vms.masters.pref}-0${count.index + 1}"  
 }
@@ -35,10 +35,10 @@ resource "vcd_vm_internal_disk" "mst_data2_disk" {
   count           = var.vms.masters.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
-  bus_type        = var.add_disks.diskm2.bus_type
-  size_in_mb      = var.add_disks.diskm2.sizegb * 1024
-  bus_number      = var.add_disks.diskm2.bus_num
-  unit_number     = var.add_disks.diskm2.unit_num
+  bus_type        = var.disks_config.diskm2.bus_type
+  size_in_mb      = var.disks_config.diskm2.sizegb * 1024
+  bus_number      = var.disks_config.diskm2.bus_num
+  unit_number     = var.disks_config.diskm2.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
   vm_name = "${var.vms.masters.pref}-0${count.index + 1}"  
 }
@@ -50,10 +50,10 @@ resource "vcd_vm_internal_disk" "wrk_data1_disk" {
   count           = var.vms.workers.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
-  bus_type        = var.add_disks.diskw1.bus_type
-  size_in_mb      = var.add_disks.diskw1.sizegb * 1024
-  bus_number      = var.add_disks.diskw1.bus_num
-  unit_number     = var.add_disks.diskw1.unit_num
+  bus_type        = var.disks_config.diskw1.bus_type
+  size_in_mb      = var.disks_config.diskw1.sizegb * 1024
+  bus_number      = var.disks_config.diskw1.bus_num
+  unit_number     = var.disks_config.diskw1.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
   vm_name = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"             
 }
@@ -65,10 +65,10 @@ resource "vcd_vm_internal_disk" "wrk_data2_disk" {
   count           = var.vms.workers.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
-  bus_type        = var.add_disks.diskw2.bus_type
-  size_in_mb      = var.add_disks.diskw2.sizegb * 1024
-  bus_number      = var.add_disks.diskw2.bus_num
-  unit_number     = var.add_disks.diskw2.unit_num
+  bus_type        = var.disks_config.diskw2.bus_type
+  size_in_mb      = var.disks_config.diskw2.sizegb * 1024
+  bus_number      = var.disks_config.diskw2.bus_num
+  unit_number     = var.disks_config.diskw2.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
   vm_name = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"             
 }
@@ -114,11 +114,11 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
     ip                 =  "${cidrhost(var.os_config.vm_ip_cidr, (count.index+4))}" #"${var.vms.masters.ip_pool[count.index]}"
   }
   override_template_disk {
-    size_in_mb      = var.system_disk_size * 1024
-    bus_type        = var.system_disk_bus
-  #  storage_profile = var.mod_system_disk_storage_profile
-    bus_number      = 0
-    unit_number     = 0
+    size_in_mb      = var.disks_config.osdisk.sizegb * 1024
+    bus_type        = var.disks_config.osdisk.bus_type
+    bus_number      = var.disks_config.osdisk.bus_num
+    unit_number     = var.disks_config.osdisk.unit_num
+    # storage_profile = var.mod_system_disk_storage_profile
   }
 
   guest_properties = {
@@ -153,11 +153,11 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
     ip                 = "${cidrhost(var.os_config.vm_ip_cidr, (count.index+7))}" #"${var.vms.workers.ip_pool[count.index]}"
   }
   override_template_disk {
-    size_in_mb      = var.system_disk_size * 1024
-    bus_type        = var.system_disk_bus
-  #  storage_profile = var.mod_system_disk_storage_profile
-    bus_number      = 0
-    unit_number     = 0
+    size_in_mb      = var.disks_config.osdisk.sizegb * 1024
+    bus_type        = var.disks_config.osdisk.bus_type
+    bus_number      = var.disks_config.osdisk.bus_num
+    unit_number     = var.disks_config.osdisk.unit_num
+    # storage_profile = var.mod_system_disk_storage_profile
   }
 
   guest_properties = {
@@ -192,11 +192,12 @@ resource "vcd_vapp_vm" "dvm" {
     ip                 = "${cidrhost(var.os_config.vm_ip_cidr,-3)}" #${var.vms.dvm.ip_pool[0]}"
   }
   override_template_disk {
-    size_in_mb      = var.system_disk_size * 1024
-    bus_type        = var.system_disk_bus
-  #  storage_profile = var.mod_system_disk_storage_profile
-    bus_number      = 0
-    unit_number     = 0
+    size_in_mb      = var.disks_config.osdisk.sizegb * 1024
+    bus_type        = var.disks_config.osdisk.bus_type
+    bus_number      = var.disks_config.osdisk.bus_num
+    unit_number     = var.disks_config.osdisk.unit_num
+    # storage_profile = var.mod_system_disk_storage_profile
+
   }
 
   guest_properties = {

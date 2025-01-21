@@ -13,42 +13,48 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
 
     cloud_type         = "vcloud" #to let ansible know which csi to install
 
-    vcloud_vdc         = var.vcloud.vdc
-    vcloud_orgname     = var.vcloud.orgname
-    vcloud_user        = var.vcloud.admin
-    vcloud_password    = var.vcloud.admin_pwd
-
+    vcloud_vdc                 = var.vcloud.vdc
+    vcloud_orgname             = var.vcloud.orgname
+    vcloud_user                = var.vcloud.admin
+    vcloud_password            = var.vcloud.admin_pwd
     vcloud_csiadmin_username   = var.vcloud.csi_svc
     vcloud_csiadmin_password   = var.vcloud.csi_svc_pwd
     vcloud_url                 = var.vcloud.server_fqdn
     vcloud_ip                  = var.vcloud.server_ip
     #vcloud_fqdn        = "${substr(var.vcloud_url, 8, -4}" #2deprecate?
+    vcloud_catalogname         = var.vcloud.catalogname
+    vcloud_vmtmplname          = var.vcloud.vm_template_name
+    vcloud_orgvnet             = var.vcloud.orgvnet_name
+    vapp_name                  = var.vcloud.vapp_name
 
-    vcloud_catalogname = var.vcloud.catalogname
-    vcloud_vmtmplname  = var.vcloud.vm_template_name
-    vcloud_orgvnet     = var.vcloud.orgvnet_name
-    vapp_name          = var.vcloud.vapp_name
+    vm_user_name               = var.os_config.vm_user_name
+    vm_user_password           = var.os_config.vm_user_password
+    vm_user_displayname        = var.os_config.vm_user_displayname     
+    vm_user_ssh_key            = var.os_config.vm_user_ssh_key
+    #vm_user_ssh_pk             = var.os_config.vm_user_ssh_pk
+    ansible_ssh_pass           = var.os_config.ansible_ssh_pass
+    def_dns                    = var.os_config.def_dns
+    env_dns1                   = var.os_config.env_dns1
+    env_dns2                   = var.os_config.env_dns2
 
-    vm_user_name        = var.os_config.vm_user_name
-    vm_user_password    = var.os_config.vm_user_password
-    vm_user_displayname = var.os_config.vm_user_displayname     
-    vm_user_ssh_key     = var.os_config.vm_user_ssh_key
-    #vm_user_ssh_pk      = var.os_config.vm_user_ssh_pk
-    ansible_ssh_pass    = var.os_config.ansible_ssh_pass
-    def_dns             =  var.os_config.def_dns
-    env_dns1            =  var.os_config.env_dns1
-    env_dns2            =  var.os_config.env_dns2
-
-    ansible_repo_url    = var.ansible.git_repo.repo_url
-    ansible_repo_name   = var.ansible.git_repo.repo_name
-    ansible_repo_branch = var.ansible.git_repo.repo_branch
-    ansible_playbook    = var.ansible.git_repo.playbook_name
+    ansible_repo_url           = var.ansible.git_repo.repo_url
+    ansible_repo_name          = var.ansible.git_repo.repo_name
+    ansible_repo_branch        = var.ansible.git_repo.repo_branch
+    ansible_playbook           = var.ansible.git_repo.playbook_name
     
-    os_admin_username   = var.os_config.vm_user_name
-    os_nic1_name        = var.os_config.os_nic1_name
-    docker_mirror       = var.os_config.docker_mirror
+    os_admin_username          = var.os_config.vm_user_name
+    os_nic1_name               = var.os_config.os_nic1_name
+    docker_mirror              = var.os_config.docker_mirror
 
-    k8s_version         = var.kubernetes.cluster.version
+    k8s_cluster_name           = var.kubernetes.cluster.cluster_name
+    k8s_cluster_id             = var.kubernetes.cluster.cluster_name
+    k8s_controlPlane_Endpoint  = var.kubernetes.cluster.controlPlane_Endpoint
+    k8s_service_subnet         = var.kubernetes.cni.svc_subnet
+    k8s_pod_subnet             = var.kubernetes.cni.pod_subnet
+    calico_network_cidr_blocksize = var.kubernetes.cni.calico_network_cidr_blocksize
+    sc_storage_policy_name     = var.kubernetes.pvc.sc_storage_policy_name
+    sc_name                    = var.kubernetes.pvc.sc_name
+    k8s_version                = var.kubernetes.cluster.version
 
     k8s_ver                    = (lookup (var.versions, var.kubernetes.cluster.version)).full
     k8s_version_short          = (lookup (var.versions, var.kubernetes.cluster.version)).short
@@ -62,19 +68,8 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     etcd_ver                   = (lookup (var.versions, var.kubernetes.cluster.version)).etcd.etcd_ver
     helm_version               = (lookup (var.versions, var.kubernetes.cluster.version)).helm.helm_version
     helm_repo_path             = (lookup (var.versions, var.kubernetes.cluster.version)).helm.helm_repo_path
-
-   
-    k8s_cluster_name    = var.kubernetes.cluster.cluster_name
-    k8s_cluster_id      = var.kubernetes.cluster.cluster_name
-
-    k8s_controlPlane_Endpoint = var.kubernetes.cluster.controlPlane_Endpoint
-    k8s_service_subnet        = var.kubernetes.cni.svc_subnet
-    k8s_pod_subnet            = var.kubernetes.cni.pod_subnet
-    calico_network_cidr_blocksize = var.kubernetes.cni.calico_network_cidr_blocksize
-    
-    sc_storage_policy_name = var.kubernetes.pvc.sc_storage_policy_name
-    sc_name                = var.kubernetes.pvc.sc_name
-
+ 
+  
     ingress_ext_fqdn                  = var.kubernetes.ingress.ext_fqdn
     ingress_controller_nodeport_http  = var.kubernetes.ingress.controller_nodeport_http 
     ingress_controller_nodeport_https = var.kubernetes.ingress.controller_nodeport_https
@@ -88,7 +83,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     worker_pref = "${var.vms.workers.pref}"
 
     #hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
-    hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
+    hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
     hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,-3)}  ${var.vms.dvm.pref}"
     
     dvm_name            = "${var.vms.dvm.pref}"
@@ -101,6 +96,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
 
     workers_count       = var.vms.workers.vm_count
     masters_count       = var.vms.masters.vm_count
+    lb_count            = var.vcloud.lbvm_count
 
   }
 }
@@ -175,7 +171,8 @@ template = file("${path.module}/templates/userdata_m.yaml")
 #    hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
 #    hosts_entry1        = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
 
-    hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
+    #hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
+    hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
     hosts_entry1        =  "${cidrhost(var.os_config.vm_ip_cidr,-3)}  ${var.vms.dvm.pref}"
 
 #    master0_name        = "${var.vms.masters.pref}-0"
@@ -206,7 +203,8 @@ template = file("${path.module}/templates/userdata_w.yaml")
 
     master0_ip          = "${cidrhost(var.os_config.vm_ip_cidr,4)}"
 
-    hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
+    #hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
+    hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
     hosts_entry1        =  "${cidrhost(var.os_config.vm_ip_cidr,-3)}  ${var.vms.dvm.pref}"
   }
 }
