@@ -87,7 +87,7 @@ variable "disks_config" {
   }))
   default = {
           osdisk = {
-            sizegb = "10"  #system_disk_size
+            sizegb = "20"  #system_disk_size
             bus_num  = "0"  #system_disk_bus
             unit_num = "0"
             storage_profile = "" #system_disk_storage_profile
@@ -138,7 +138,7 @@ variable "ansible" {
           repo_name     = string 
           repo_branch   = string
           playbook_name = string  #ansible_playbook
-#          access_token  = string     
+  #       access_token  = string     
         }        
         )
     })

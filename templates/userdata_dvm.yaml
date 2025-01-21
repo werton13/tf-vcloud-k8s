@@ -194,6 +194,7 @@ runcmd:
        master2_ip=${master2_ip}
        workers_count=${workers_count}
        masters_count=${masters_count}
+       lb_count=${lb_count}
        worker0_name=${worker0_name}
        vcloud_orgname=${vcloud_orgname}
        vcloud_user=${vcloud_user}
