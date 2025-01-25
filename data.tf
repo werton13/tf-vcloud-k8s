@@ -98,19 +98,19 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     #alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
     obs_type              = var.obs_config.obs_type
 
-    telegram_rcv_name     = lookup(var.obs_config.obs_type) = "prom_stack" ? lookup(var.obs_config.prom_stack.alertmanager.telegram_receiver_name) : ""
-    telegram_bot_token    = lookup(var.obs_config.obs_type) = "prom_stack" ? lookup(var.obs_config.prom_stack.alertmanager.telegram_bot_token) : ""
-    telegram_chat_id      = lookup(var.obs_config.obs_type) = "prom_stack" ? lookup(var.obs_config.prom_stack.alertmanager.telegram_chatid) : ""
+    telegram_rcv_name     = var.obs_config.obs_type = "prom_stack" ? var.obs_config.prom_stack.alertmanager.telegram_receiver_name : ""
+    telegram_bot_token    = var.obs_config.obs_type = "prom_stack" ? var.obs_config.prom_stack.alertmanager.telegram_bot_token : ""
+    telegram_chat_id      = var.obs_config.obs_type = "prom_stack" ? var.obs_config.prom_stack.alertmanager.telegram_chatid : ""
         
-    vm_stack_type         = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.type) : ""
-    remoteWriteUrl        = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.remoteWriteUrl) : ""
-    remoteWriteUsername   = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.remoteWriteUsername) : ""
-    remoteWritePassword   = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.remoteWritePassword) : ""
-    etcdProxyMainImageURL = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.etcdProxyMainImageURL) : ""
-    etcdProxyInitImageURL = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.etcdProxyInitImageURL) : ""
-    label_env_name        = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.label_env_name) : ""
-    label_dctr_name       = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.label_dctr_name) : ""
-    label_project_name    = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.label_project_name) : ""
+    vm_stack_type         = var.obs_config.obs_type = "vm_stack"  ? var.obs_config.vm_stack.type : ""
+    remoteWriteUrl        = var.obs_config.obs_type = "vm_stack"  ? var.obs_config.vm_stack.remoteWriteUrl : ""
+    remoteWriteUsername   = var.obs_config.obs_type = "vm_stack"  ? var.obs_config.vm_stack.remoteWriteUsername : ""
+    remoteWritePassword   = var.obs_config.obs_type = "vm_stack"  ? var.obs_config.vm_stack.remoteWritePassword : ""
+    etcdProxyMainImageURL = var.obs_config.obs_type = "vm_stack"  ? var.obs_config.vm_stack.etcdProxyMainImageURL : ""
+    etcdProxyInitImageURL = var.obs_config.obs_type = "vm_stack"  ? var.obs_config.vm_stack.etcdProxyInitImageURL : ""
+    label_env_name        = var.obs_config.obs_type = "vm_stack"  ? var.obs_config.vm_stack.label_env_name : ""
+    label_dctr_name       = var.obs_config.obs_type = "vm_stack"  ? var.obs_config.vm_stack.label_dctr_name : ""
+    label_project_name    = var.obs_config.obs_type = "vm_stack"  ? var.obs_config.vm_stack.label_project_name : ""
 
 
   }

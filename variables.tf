@@ -232,7 +232,7 @@ variable obs_config {
         telegram_chatid        = optional(string,"")  # alertmgr_telegram_chatid
         })
       grafana = object({
-        param1 = = optional(string,"") # reserved
+        param1 = optional(string,"") # reserved
         })
     })
 
