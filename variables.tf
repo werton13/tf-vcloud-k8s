@@ -206,7 +206,7 @@ variable "versions" {
 # in data.tf
 variable obs_config {
   type        = object({
-    base = object({
+    common = object({
       obs_type = string # prom_stack/vm_stack/none
     })
     
