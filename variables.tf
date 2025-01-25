@@ -1,9 +1,3 @@
-#variable env_type {
-#  type        = string
-#  default     = "public"
-#  description = "can be private or public"
-#}
-
 variable "vcloud" {
     type = object({
         server_fqdn          = string # vcloud_url
@@ -44,9 +38,8 @@ variable "os_config" {
         ansible_ssh_pass    = string  # ansible_ssh_pass
         vm_user_displayname = string  #vm_user_displayname
         vm_user_ssh_key     = string  #vm_user_ssh_key"
- #      vm_ipv4_gw          = string # to deprecate
         vm_ip_cidr          = string
- #       vm_dns_server       = string #not used
+     #  vm_dns_server       = string #not used
         def_dns             = string
         env_dns1            = string
         env_dns2            = string
@@ -54,26 +47,10 @@ variable "os_config" {
         ntp_srv2            = string        
         ubuntu_animal_code  = string
         docker_mirror       = string
-#        containerd_mirror   = string
+      # containerd_mirror   = string
         os_nic1_name        = string
     })
 }
-
-##System disk vars
-#variable "system_disk_bus" {
-#  description = ""
-#  default     = "paravirtual"
-#}
-#
-#variable "system_disk_size" {
-#  description = ""
-#  default     = "20"
-#}
-#
-#variable "system_disk_storage_profile" {
-#  description = ""
-#  default     = "default"
-#}
 
 #Additional disks vars
 # add_disks
@@ -124,12 +101,6 @@ variable "disks_config" {
           }
  }
 }
-
-#variable lbvm_count {
-#  type        = string
-#  default     = "0"
-#  description = "this variable passed into ansible playbook to ensure LB vm's waiting block will be skipped"
-#}
 
 variable "ansible" {
     type = object({
@@ -216,17 +187,57 @@ variable "versions" {
     })
 }
 
-variable "vmagent_config" {
-    type = object({
+#variable "vmagent_config" {
+#    type = object({
+#
+#        remoteWriteUrl        = string
+#        remoteWriteUsername   = string
+#        remoteWritePassword   = string
+#        etcdProxyMainImageURL = string
+#        etcdProxyInitImageURL = string
+#        env_name              = string
+#        dctr_name             = string
+#        project_name          = string
+#
+#    })
+#}
 
-        remoteWriteUrl        = string
-        remoteWriteUsername   = string
-        remoteWritePassword   = string
-        etcdProxyMainImageURL = string
-        etcdProxyInitImageURL = string
-        env_name              = string
-        dctr_name             = string
-        project_name          = string
-
+#what if somewhere defined "obs_stack" - victoria/prometheus
+# in data.tf
+variable obs_config {
+  type        = object({
+    base = object({
+      obs_type = string # prom_stack/vm_stack/none
     })
+    
+    vm_stack = object({
+        type                  = string #standalone/operator
+        remoteWriteUrl        = optional(string,"")
+        remoteWriteUsername   = optional(string,"")
+        remoteWritePassword   = optional(string,"")
+        etcdProxyMainImageURL = optional(string,"")
+        etcdProxyInitImageURL = optional(string,"")
+        label_env_name        = optional(string,"")
+        label_dctr_name       = optional(string,"")
+        label_project_name    = optional(string,"")
+    })
+
+    prom_stack = object({
+      prometheus = object({
+        param1 = optional(string,"")  # prometheus_community/vmagent
+        })
+      alertmanager = object({
+        telegram_receiver_name = optional(string,"")  # alertmgr_telegram_receiver_name
+        telegram_bot_token     = optional(string,"")  # alertmgr_telegram_bot_token
+        telegram_chatid        = optional(string,"")  # alertmgr_telegram_chatid
+        })
+      grafana = object({
+        param1 = = optional(string,"") # reserved
+        })
+    })
+
+  })
 }
+
+# vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
+#  k8s_ver                    = (lookup (var.versions, var.kubernetes.cluster.version)).full

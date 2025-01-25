@@ -72,12 +72,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
   
     ingress_ext_fqdn                  = var.kubernetes.ingress.ext_fqdn
     ingress_controller_nodeport_http  = var.kubernetes.ingress.controller_nodeport_http 
-    ingress_controller_nodeport_https = var.kubernetes.ingress.controller_nodeport_https
-    
-    #alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
-    #alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
-    #alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
-    
+    ingress_controller_nodeport_https = var.kubernetes.ingress.controller_nodeport_https  
         
     master_pref = "${var.vms.masters.pref}"
     worker_pref = "${var.vms.workers.pref}"
@@ -97,6 +92,26 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     workers_count       = var.vms.workers.vm_count
     masters_count       = var.vms.masters.vm_count
     lb_count            = var.vcloud.lbvm_count
+
+    #alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
+    #alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
+    #alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
+    obs_type              = var.obs_config.obs_type
+
+    telegram_rcv_name     = lookup(var.obs_config.obs_type) = "prom_stack" ? lookup(var.obs_config.prom_stack.alertmanager.telegram_receiver_name) : ""
+    telegram_bot_token    = lookup(var.obs_config.obs_type) = "prom_stack" ? lookup(var.obs_config.prom_stack.alertmanager.telegram_bot_token) : ""
+    telegram_chat_id      = lookup(var.obs_config.obs_type) = "prom_stack" ? lookup(var.obs_config.prom_stack.alertmanager.telegram_chatid) : ""
+        
+    vm_stack_type         = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.type) : ""
+    remoteWriteUrl        = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.remoteWriteUrl) : ""
+    remoteWriteUsername   = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.remoteWriteUsername) : ""
+    remoteWritePassword   = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.remoteWritePassword) : ""
+    etcdProxyMainImageURL = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.etcdProxyMainImageURL) : ""
+    etcdProxyInitImageURL = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.etcdProxyInitImageURL) : ""
+    label_env_name        = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.label_env_name) : ""
+    label_dctr_name       = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.label_dctr_name) : ""
+    label_project_name    = lookup(var.obs_config.obs_type) = "vm_stack"  ? lookup(var.obs_config.vm_stack.label_project_name) : ""
+
 
   }
 }
@@ -130,32 +145,9 @@ template = file("${path.module}/templates/userdata_m.yaml")
     
     #vm_user_ssh_pk      = var.vm_user_ssh_pk
 
-#    ansible_repo_url    = var.ansible_repo_url
-#    ansible_repo_name   = var.ansible_repo_name
-#    ansible_repo_branch = var.ansible_repo_branch
-#    ansible_playbook    = var.ansible_playbook
-    
- #   os_admin_username   = var.os_admin_username
- #   os_nic1_name        = var.os_nic1_name
-
-  #  k8s_ver             = var.k8s_ver
-  #  k8s_version_short   = var.k8s_version_short
-  #  calico_version      = var.calico_version
-    
-  #  k8s_controlPlane_Endpoint = var.k8s_controlPlane_Endpoint
-  #  k8s_service_subnet  = var.k8s_service_subnet
-  #  k8s_pod_subnet      = var.k8s_pod_subnet
-  #  calico_network_cidr_blocksize = var.calico_network_cidr_blocksize
-  #  k8s_cluster_id      = var.k8s_cluster_id
-  #  sc_storage_policy_name = var.sc_storage_policy_name
-  #  sc_name             = var.sc_name
-
- #    ingress_ext_fqdn    = var.ingress_ext_fqdn
- #    
- #
- #    alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
- #    alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
- #    alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
+    #alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
+    #alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
+    #alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
     
     #vcloud_fqdn        = "${substr(var.vcloud_url, 8, -4}"
     #vcloud_ip          = var.vcloud_ip
@@ -174,14 +166,7 @@ template = file("${path.module}/templates/userdata_m.yaml")
     #hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
     hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
     hosts_entry1        =  "${cidrhost(var.os_config.vm_ip_cidr,-3)}  ${var.vms.dvm.pref}"
-
-#    master0_name        = "${var.vms.masters.pref}-0"
-#    worker0_name        = "${var.vms.workers.pref}-0"
-       
-
     
-    
-   
   }
 }
 

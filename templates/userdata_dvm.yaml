@@ -224,7 +224,20 @@ runcmd:
        k8s_cluster_id=${k8s_cluster_id}
        sc_storage_policy_name=${sc_storage_policy_name}
        sc_name=${sc_name}
-       ingress_ext_fqdn=${ingress_ext_fqdn}"
+       ingress_ext_fqdn=${ingress_ext_fqdn}
+       obs_type=${obs_type}
+       alertmgr_telegram_receiver_name=${telegram_rcv_name}
+       alertmgr_telegram_bot_token=${telegram_bot_token}
+       alertmgr_telegram_chatid=${telegram_chat_id}
+       vm_stack_type=${vm_stack_type}
+       remoteWriteUrl=${remoteWriteUrl} 
+       remoteWriteUsername=${remoteWriteUsername} 
+       remoteWritePassword=${remoteWritePassword} 
+       etcdProxyMainImageURL=${etcdProxyMainImageURL} 
+       etcdProxyInitImageURL=${etcdProxyInitImageURL} 
+       label_env_name=${label_env_name} 
+       label_dctr_name=${label_dctr_name} 
+       label_project_name=${label_project_name}"
 
 
 
