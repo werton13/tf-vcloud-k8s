@@ -98,7 +98,7 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     #alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
     obs_type              = var.obs_config.obs_type
 
-    telegram_rcv_name     = "${var.obs_config.obs_type}" = "prom_stack" ? "${var.obs_config.prom_stack.alertmanager.telegram_receiver_name}" : ""
+    telegram_rcv_name     = "${var.obs_config.obs_type}" == "prom_stack" ? "${var.obs_config.prom_stack.alertmanager.telegram_receiver_name}" : ""
     #telegram_bot_token    = var.obs_config.obs_type = "prom_stack" ? "${var.obs_config.prom_stack.alertmanager.telegram_bot_token}" : ""
     #telegram_chat_id      = var.obs_config.obs_type = "prom_stack" ? "${var.obs_config.prom_stack.alertmanager.telegram_chatid}" : ""
     #    
