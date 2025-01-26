@@ -187,23 +187,7 @@ variable "versions" {
     })
 }
 
-#variable "vmagent_config" {
-#    type = object({
-#
-#        remoteWriteUrl        = string
-#        remoteWriteUsername   = string
-#        remoteWritePassword   = string
-#        etcdProxyMainImageURL = string
-#        etcdProxyInitImageURL = string
-#        env_name              = string
-#        dctr_name             = string
-#        project_name          = string
-#
-#    })
-#}
 
-#what if somewhere defined "obs_stack" - victoria/prometheus
-# in data.tf
 variable obs_config {
   type        = object({
     common = object({
@@ -238,6 +222,3 @@ variable obs_config {
 
   })
 }
-
-# vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
-#  k8s_ver                    = (lookup (var.versions, var.kubernetes.cluster.version)).full

@@ -1,18 +1,3 @@
-#resource "vcd_vm_internal_disk" "data1_disk" {
-#  depends_on       = [vcd_vapp.k8s_mgmt_vapp,
-#                      vcd_vapp_org_network.vappOrgNet,
-#                      vcd_vapp_vm.k8s_masters_vms]
-#  count           = var.vms.masters.vm_count + var.vms.workers.vm_count
-#  #count = 2
-#  vapp_name       = var.vapp_name
-#  bus_type        = var.add_disks.disk1.bus_type
-#  size_in_mb      = var.add_disks.disk1.sizegb * 1024
-#  bus_number      = var.add_disks.disk1.bus_num
-#  unit_number     = var.add_disks.disk1.unit_num
-#  vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
-#   
-#}
-
 resource "vcd_vm_internal_disk" "mst_data1_disk" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_org_network.vappOrgNet,
@@ -72,23 +57,6 @@ resource "vcd_vm_internal_disk" "wrk_data2_disk" {
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
   vm_name = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"             
 }
-
-
-
-#resource "vcd_vm_internal_disk" "data2_disk" {
-#  depends_on       = [vcd_vapp.k8s_mgmt_vapp,
-#                      vcd_vapp_org_network.vappOrgNet,
-#                      vcd_vapp_vm.k8s_masters_vms]
-#  count           = var.vms.masters.vm_count + var.vms.workers.vm_count
-#  #count = 2
-#  vapp_name       = var.vapp_name
-#  bus_type        = var.add_disks.disk2.bus_type
-#  size_in_mb      = var.add_disks.disk2.sizegb * 1024
-#  bus_number      = var.add_disks.disk2.bus_num
-#  unit_number     = var.add_disks.disk2.unit_num
-#  vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
-#  
-#}
 
 
 resource "vcd_vapp_vm" "k8s_masters_vms" {

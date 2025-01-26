@@ -77,7 +77,6 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     master_pref = "${var.vms.masters.pref}"
     worker_pref = "${var.vms.workers.pref}"
 
-    #hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
     hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
     hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,-3)}  ${var.vms.dvm.pref}"
     
@@ -93,9 +92,6 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     masters_count       = var.vms.masters.vm_count
     lb_count            = var.vcloud.lbvm_count
 
-    #alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
-    #alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
-    #alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
     obs_type              = var.obs_config.common.obs_type
 
     telegram_rcv_name     = "${var.obs_config.common.obs_type}" == "prom_stack" ? "${var.obs_config.prom_stack.alertmanager.telegram_receiver_name}" : ""
@@ -123,47 +119,20 @@ template = file("${path.module}/templates/userdata_m.yaml")
   vars = {
 
     cloud_type         = "vcloud" #to let ansible know which csi to install
- # commented out to delete
- #    vcloud_vdc         = var.vcloud_vdc
- #    vcloud_orgname     = var.vcloud_orgname
- #    vcloud_user        = var.vcloud_user
- #    vcloud_password    = var.vcloud_password
- #    vcloud_csiadmin_username   = var.vcloud_csiadmin_username
- #    vcloud_csiadmin_password   = var.vcloud_csiadmin_password
- #    vcloud_url         = var.vcloud_url
- #
- #    vcloud_catalogname = var.vcloud_catalogname
- #    vcloud_vmtmplname  = var.vcloud_vmtmplname
- #    vcloud_orgvnet     = var.vcloud_orgvnet
- #    vapp_name          = var.vapp_name
 
     vm_user_name        = var.os_config.vm_user_name
     vm_user_password    = var.os_config.vm_user_password
     vm_user_displayname = var.os_config.vm_user_displayname     
     vm_user_ssh_key     = var.os_config.vm_user_ssh_key
-    ansible_ssh_pass    = var.os_config.ansible_ssh_pass
-    
-    #vm_user_ssh_pk      = var.vm_user_ssh_pk
-
-    #alertmgr_telegram_receiver_name = var.alertmgr_telegram_receiver_name
-    #alertmgr_telegram_bot_token     = var.alertmgr_telegram_bot_token
-    #alertmgr_telegram_chatid        = var.alertmgr_telegram_chatid
-    
-    #vcloud_fqdn        = "${substr(var.vcloud_url, 8, -4}"
-    #vcloud_ip          = var.vcloud_ip
+    ansible_ssh_pass    = var.os_config.ansible_ssh_pass  
 
     master_pref = "${var.vms.masters.pref}"
     worker_pref = "${var.vms.workers.pref}"
     workers_count       = var.vms.workers.vm_count
     masters_count       = var.vms.masters.vm_count
 
-    #master0_ip          = "${split("/", var.vms.masters.ip_pool[0])[0]}"
     master0_ip          = "${cidrhost(var.os_config.vm_ip_cidr,4)}"
 
-#    hosts_entry0        = "${var.vcloud_ip}  ${split("/", var.vcloud_url)[2]}"
-#    hosts_entry1        = "${split("/", var.vms.dvm.ip_pool[0])[0]}  ${var.vms.dvm.pref}"
-
-    #hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
     hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
     hosts_entry1        =  "${cidrhost(var.os_config.vm_ip_cidr,-3)}  ${var.vms.dvm.pref}"
     
@@ -188,7 +157,6 @@ template = file("${path.module}/templates/userdata_w.yaml")
 
     master0_ip          = "${cidrhost(var.os_config.vm_ip_cidr,4)}"
 
-    #hosts_entry0        = "${var.vcloud.server_ip}  ${var.vcloud.server_fqdn}"
     hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
     hosts_entry1        =  "${cidrhost(var.os_config.vm_ip_cidr,-3)}  ${var.vms.dvm.pref}"
   }
