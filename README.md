@@ -83,6 +83,7 @@ module "vcloud-k8s-cluster" {
   source = "github.com/werton13/tf-vcloud-k8s?ref=dev-r2"
 
   vcloud       = var.vcloud
+  ip_plan      = var.ip_plan
   vms          = var.vms
   disks_config = var.disks_config
   os_config    = var.os_config

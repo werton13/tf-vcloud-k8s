@@ -1,3 +1,11 @@
+variable "project" {
+  type        = object({
+    owner_org     =  string  
+    name          =  string  
+    env_name      =  string 
+  })
+  description = "here we define project information to simplify and organize objects naming"
+}
 variable "vcloud" {
     type = object({
         server_fqdn          = string # vcloud_url
@@ -19,6 +27,25 @@ variable "vcloud" {
         lbvm_count           = optional(string,"0") 
     })
 }
+
+variable "ip_plan" {
+  type        = object({
+    m_node     =  string  
+    w_node     =  string  
+    dvm        =  string 
+    kubeapi_lb =  string  
+    ingress_lb =  string
+  })
+  default      = {
+    m_node     = "4"  # first master node IP will be x.x.x.4
+    w_node     = "7"  # first worker node IP will be x.x.x.7
+    dvm        = "-3" # DVM IP will be -3 from the end of subnet - i.e. 192.168.0.253 for 192.168.0.0/24
+    kubeapi_lb = "2"  #  will be x.x.x.2
+    ingress_lb = "3"  #  will be x.x.x.3
+  }
+  description = "here we define how to distribute IP addresses for VMs and virtual services from IP range, corresponding provided CIDR"
+}
+
 
 variable "vms" {
     type = map(object({

@@ -96,8 +96,9 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
 
     member {
     condition       = "enabled"
-    name            = "${var.vms.masters.pref}-01"  
-    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,4)}" #"${split("/", var.vms.masters.ip_pool[0])[0]}"
+    #name            = "${var.vms.masters.pref}-01"  
+    name            = "${var.project.owner_org-var.project.name-var.project.env_name}-mst-01"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.m_node))}" #"${split("/", var.vms.masters.ip_pool[0])[0]}"
     port            = 6443
     monitor_port    = 6443
     weight          = 1
@@ -106,8 +107,9 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
    }
     member {
     condition       = "drain"
-    name            = "${var.vms.masters.pref}-02"
-    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,5)}" #"${split("/", var.vms.masters.ip_pool[1])[0]}"
+    #name            = "${var.vms.masters.pref}-02"
+    name            = "${var.project.owner_org-var.project.name-var.project.env_name}-mst-02"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,(tonumber(var.ip_plan.m_node)+1))}" #"${split("/", var.vms.masters.ip_pool[1])[0]}"
     port            = 6443
     monitor_port    = 6443
     weight          = 1
@@ -116,8 +118,9 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
    }
     member {
     condition       = "drain"
-    name            = "${var.vms.masters.pref}-03"
-    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,6)}" #"${split("/", var.vms.masters.ip_pool[2])[0]}"
+    #name            = "${var.vms.masters.pref}-03"
+    name            = "${var.project.owner_org-var.project.name-var.project.env_name}-mst-03"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,(tonumber(var.ip_plan.m_node)+2))}" #"${split("/", var.vms.masters.ip_pool[2])[0]}"
     port            = 6443
     monitor_port    = 6443
     weight          = 1
@@ -139,11 +142,12 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
   algorithm            = "round-robin"
   enable_transparency  = false
   monitor_id = vcd_lb_service_monitor.ingress_http.id
-
+  
     member {
     condition       = "enabled"
-    name            = "${var.vms.workers.pref}-0"
-    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 7)}" #"${split("/", var.vms.workers.ip_pool[0])[0]}"
+    #name            = "${var.vms.workers.pref}-0"
+    name            = "${var.project.owner_org-var.project.name-var.project.env_name}-wrk-01"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.w_node) )}" #"${split("/", var.vms.workers.ip_pool[0])[0]}"
     port            = var.kubernetes.ingress.controller_nodeport_http
     monitor_port    = var.kubernetes.ingress.controller_nodeport_http
     weight          = 1
@@ -153,8 +157,9 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
    
     member {
     condition       = "enabled"
-    name            = "${var.vms.workers.pref}-1"
-    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 8)}" #"${split("/", var.vms.workers.ip_pool[1])[0]}"
+    #name            = "${var.vms.workers.pref}-1"
+    name            = "${var.project.owner_org-var.project.name-var.project.env_name}-wrk-02"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, (tonumber(var.ip_plan.w_node)+1) )}" #"${split("/", var.vms.workers.ip_pool[1])[0]}"
     port            = var.kubernetes.ingress.controller_nodeport_http
     monitor_port    = var.kubernetes.ingress.controller_nodeport_http
     weight          = 1
@@ -164,8 +169,9 @@ resource "vcd_lb_server_pool" "ingress_http_pool" {
    
     member {
     condition       = "enabled"
-    name            = "${var.vms.workers.pref}-2"
-    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, 9)}" #"${split("/", var.vms.workers.ip_pool[2])[0]}"
+    #name            = "${var.vms.workers.pref}-2"
+    name            = "${var.project.owner_org-var.project.name-var.project.env_name}-wrk-03"
+    ip_address      = "${cidrhost(var.os_config.vm_ip_cidr, (tonumber(var.ip_plan.w_node)+2))}" #"${split("/", var.vms.workers.ip_pool[2])[0]}"
     port            = var.kubernetes.ingress.controller_nodeport_http
     monitor_port    = var.kubernetes.ingress.controller_nodeport_http
     weight          = 1
@@ -182,7 +188,8 @@ resource "vcd_lb_virtual_server" "kube_api_lb_vs" {
 
   name       = "kube_api"
   #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
-  ip_address = var.kubernetes.cluster.controlPlane_Endpoint
+  #ip_address = var.kubernetes.cluster.controlPlane_Endpoint
+  ip_address = "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb) )}"
   #protocol   = var.protocol
   protocol   = "https"
   port       = 6443
@@ -199,7 +206,9 @@ resource "vcd_lb_virtual_server" "ingress_http" {
 
   name       = "ingress_http"
   #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
-  ip_address = var.kubernetes.ingress.lb_ip#!!!
+  #ip_address = var.kubernetes.ingress.lb_ip#!!!
+  ip_address = "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.ingress_lb) )}"
+  
   #protocol   = var.protocol
   protocol   = "http"
   port       = 80

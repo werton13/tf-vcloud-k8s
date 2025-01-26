@@ -1,4 +1,10 @@
 
+project = {
+  owner_org = "" # myorg
+  name      = "" # xapi
+  env_name  = "" # dev/stage/prod
+}
+
 vcloud = {
     server_fqdn          = "https://my_vcloud_web_portal_url/api"
     server_ip            = "my_vcloud_web_portal IP address" #just get this from reverse DNS lookup
@@ -15,7 +21,16 @@ vcloud = {
     vm_template_name     = "ubuntu22.04-uuid-enabled-v1" #shoud be precreated and preconfigured
     orgvnet_name         = "my_vcloud_org_vnet_name" #shoud be precreated and configured according desired IP plan
     edgegw               = "my_vcloud_edgegw"        #should be provided by vcloud provider
-} 
+}
+
+# do not add this into yor tfvars file untill yuou want to change default IP distribution
+ip_plan = {
+  m_node     = "4"  # first master node IP will be x.x.x.4
+  w_node     = "7"  # first worker node IP will be x.x.x.7
+  dvm        = "-3" # DVM IP will be -3 from the end of subnet - i.e. 192.168.0.253 for 192.168.0.0/24
+  kubeapi_lb = "2"  #  will be x.x.x.2
+  ingress_lb = "3"  #  will be x.x.x.3
+}
 
 vms = {
     dvm = {
@@ -27,14 +42,14 @@ vms = {
       vm_count = "1"
     }
     masters = {
-      pref = "k8s-m"
+      #pref = "k8s-m"
       vm_cpu_count = "2"
       vm_ram_size  = "4096"
       vm_disk_size = "20"
       vm_count = "3"
     },
     workers = {
-      pref = "k8s-w"
+      #pref = "k8s-w"
       vm_cpu_count = "2"
       vm_ram_size  = "8192"
       vm_disk_size = "20"
@@ -113,7 +128,7 @@ kubernetes = {
 
   cluster = {
       version      = "v1_28"   #kubernetes version tag to choose  components versions set from the 'versions' variable --> defined below this block
-      cluster_name = "k8s-lab" #cluster name will diaplay in kubernetes context and kubectl shell when using https://github.com/jonmosco/kube-ps1
+      #cluster_name = "k8s-lab" #cluster name will diaplay in kubernetes context and kubectl shell when using https://github.com/jonmosco/kube-ps1
       #  cluster_id = "your-K8s-cluster id" #The unique cluster identifier. DISPLAYED IN VSPHERE CONSOLE(CONTAINER VOLUMES DETAILS) k8s_cluster_id
       controlPlane_Endpoint = "192.168.100.200" # this IP will be assigned for the KubeAPI load balancer virtual server in the vcloud edge server configuration
     }
@@ -134,7 +149,7 @@ kubernetes = {
       controller_nodeport_https = "30443" #ingress_controller_nodeport_https
       ext_fqdn = ""
       lb_ip = "192.168.100.210" # this IP will be assigned for the ingress controller load balancer virtual server in the vcloud edge server configuration
-
+      #^ to deprecate
   }
 
 }
