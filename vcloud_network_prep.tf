@@ -98,7 +98,6 @@ resource "vcd_lb_server_pool" "kube_api_lb_pool" {
     condition       = "enabled"
     #name            = "${var.vms.masters.pref}-01"  
     name            = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-01"
-    worker_pref         =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk"  #"${var.vms.workers.pref}"
     ip_address      = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.m_node))}" #"${split("/", var.vms.masters.ip_pool[0])[0]}"
     port            = 6443
     monitor_port    = 6443

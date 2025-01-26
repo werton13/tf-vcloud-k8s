@@ -10,7 +10,8 @@ resource "vcd_vm_internal_disk" "mst_data1_disk" {
   bus_number      = var.disks_config.diskm1.bus_num
   unit_number     = var.disks_config.diskm1.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
-  vm_name = "${var.vms.masters.pref}-0${count.index + 1}"  
+  #vm_name = "${var.vms.masters.pref}-0${count.index + 1}"
+  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"  
 }
 
 resource "vcd_vm_internal_disk" "mst_data2_disk" {
@@ -25,7 +26,8 @@ resource "vcd_vm_internal_disk" "mst_data2_disk" {
   bus_number      = var.disks_config.diskm2.bus_num
   unit_number     = var.disks_config.diskm2.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
-  vm_name = "${var.vms.masters.pref}-0${count.index + 1}"  
+  #vm_name = "${var.vms.masters.pref}-0${count.index + 1}"  
+  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"  
 }
 
 resource "vcd_vm_internal_disk" "wrk_data1_disk" {
@@ -40,7 +42,8 @@ resource "vcd_vm_internal_disk" "wrk_data1_disk" {
   bus_number      = var.disks_config.diskw1.bus_num
   unit_number     = var.disks_config.diskw1.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
-  vm_name = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"             
+  #vm_name = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"             
+  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"  
 }
 
 resource "vcd_vm_internal_disk" "wrk_data2_disk" {
@@ -55,7 +58,8 @@ resource "vcd_vm_internal_disk" "wrk_data2_disk" {
   bus_number      = var.disks_config.diskw2.bus_num
   unit_number     = var.disks_config.diskw2.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
-  vm_name = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"             
+  #vm_name = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"             
+  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"  
 }
 
 
