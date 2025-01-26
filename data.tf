@@ -52,7 +52,8 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     k8s_cluster_name           = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}"
     k8s_cluster_id             = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}"
 
-    k8s_controlPlane_Endpoint  = var.kubernetes.cluster.controlPlane_Endpoint
+    #k8s_controlPlane_Endpoint  = var.kubernetes.cluster.controlPlane_Endpoint #!
+    k8s_controlPlane_Endpoint  = "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb) )}"
     k8s_service_subnet         = var.kubernetes.cni.svc_subnet
     k8s_pod_subnet             = var.kubernetes.cni.pod_subnet
     calico_network_cidr_blocksize = var.kubernetes.cni.calico_network_cidr_blocksize
