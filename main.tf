@@ -65,7 +65,7 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
                       vcd_vapp_vm.k8s_workers_vms]
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
   #name             = "${var.vms.masters.pref}-0${count.index + 1}"
-  name             =  "${var.project.owner_org-var.project.name-var.project.env_name}-wrk-0${count.index + 1}"
+  name             =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
   count            = var.vms.masters.vm_count
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
@@ -94,8 +94,8 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
   guest_properties = {
     #"instance-id" = "${var.vms.masters.pref}-0${count.index + 1}"
     #"hostname"    = "${var.vms.masters.pref}-0${count.index + 1}"
-    "instance-id" = "${var.project.owner_org-var.project.name-var.project.env_name}-mst-0${count.index + 1}"
-    "hostname"    = "${var.project.owner_org-var.project.name-var.project.env_name}-mst-0${count.index + 1}"
+    "instance-id" = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
+    "hostname"    = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
     "user-data"   = "${base64encode(data.template_file.cloudinit_master_node.rendered)}"
   }
 
@@ -108,7 +108,7 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
   #name             = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"
-  name             = "${var.project.owner_org-var.project.name-var.project.env_name}-wrk-0${count.index + 1}"
+  name             = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
   count            = var.vms.workers.vm_count
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
@@ -137,8 +137,8 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   guest_properties = {
     #"instance-id" = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"
     #"hostname"    = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"
-    "instance-id" = "${var.project.owner_org-var.project.name-var.project.env_name}-wrk-0${count.index + 1}"
-    "hostname"    = "${var.project.owner_org-var.project.name-var.project.env_name}-wrk-0${count.index + 1}"
+    "instance-id" = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
+    "hostname"    = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
     "user-data"   = "${base64encode(data.template_file.cloudinit_worker_node.rendered)}"
   }
 
