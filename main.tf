@@ -166,7 +166,7 @@ resource "vcd_vapp_vm" "dvm" {
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
     #ip                 = "${cidrhost(var.os_config.vm_ip_cidr,-3)}" #${var.vms.dvm.ip_pool[0]}"
-    ip                 =  "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm,"{#T-}") )}"
+    ip                 =  "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm) )}"
   }
   override_template_disk {
     size_in_mb      = var.disks_config.osdisk.sizegb * 1024
