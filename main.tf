@@ -2,7 +2,7 @@ resource "vcd_vm_internal_disk" "mst_data1_disk" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_org_network.vappOrgNet,
                       vcd_vapp_vm.k8s_masters_vms]
-  count           = var.vms.masters.vm_count
+  count           = var.vms_config.masters.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
   bus_type        = var.disks_config.diskm1.bus_type
@@ -19,7 +19,7 @@ resource "vcd_vm_internal_disk" "mst_data2_disk" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_org_network.vappOrgNet,
                       vcd_vapp_vm.k8s_masters_vms]
-  count           = var.vms.masters.vm_count
+  count           = var.vms_config.masters.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
   bus_type        = var.disks_config.diskm2.bus_type
@@ -36,7 +36,7 @@ resource "vcd_vm_internal_disk" "wrk_data1_disk" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_org_network.vappOrgNet,
                       vcd_vapp_vm.k8s_workers_vms]
-  count           = var.vms.workers.vm_count
+  count           = var.vms_config.workers.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
   bus_type        = var.disks_config.diskw1.bus_type
@@ -53,7 +53,7 @@ resource "vcd_vm_internal_disk" "wrk_data2_disk" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_org_network.vappOrgNet,
                       vcd_vapp_vm.k8s_workers_vms]
-  count           = var.vms.workers.vm_count
+  count           = var.vms_config.workers.vm_count
   #count = 2
   vapp_name       = var.vcloud.vapp_name
   bus_type        = var.disks_config.diskw2.bus_type
@@ -74,13 +74,13 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
   #name             =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
   name             = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-${format("%02s", (count.index + 1))}"
-  count            = var.vms.masters.vm_count
+  count            = var.vms_config.masters.vm_count
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
   template_name    = var.vcloud.vm_template_name
   hardware_version = "vmx-15"
-  cpus             = var.vms.masters.vm_cpu_count
-  memory           = var.vms.masters.vm_ram_size
+  cpus             = var.vms_config.masters.vm_cpu_count
+  memory           = var.vms_config.masters.vm_ram_size
   cpu_cores        = 1
 
   network {
@@ -117,13 +117,13 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   #name             = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"
   #name             = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
   name             = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-${format("%02s", (count.index + 1))}"
-  count            = var.vms.workers.vm_count
+  count            = var.vms_config.workers.vm_count
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
   template_name    = var.vcloud.vm_template_name
   hardware_version = "vmx-15" #Test version    
-  cpus             = var.vms.workers.vm_cpu_count
-  memory           = var.vms.workers.vm_ram_size
+  cpus             = var.vms_config.workers.vm_cpu_count
+  memory           = var.vms_config.workers.vm_ram_size
   cpu_cores        = 1
 
   network {
@@ -167,8 +167,8 @@ resource "vcd_vapp_vm" "dvm" {
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
   template_name    = var.vcloud.vm_template_name
   hardware_version = "vmx-15"
-  cpus             = var.vms.dvm.vm_cpu_count
-  memory           = var.vms.dvm.vm_ram_size
+  cpus             = var.vms_config.dvm.vm_cpu_count
+  memory           = var.vms_config.dvm.vm_ram_size
   cpu_cores        = 1
 
   network {
@@ -188,8 +188,10 @@ resource "vcd_vapp_vm" "dvm" {
   }
 
   guest_properties = {
-    "instance-id" = "${var.vms.dvm.pref}"
-    "hostname"    = "${var.vms.dvm.pref}"
+    #"instance-id" = "${var.vms.dvm.pref}"
+    #"hostname"    = "${var.vms.dvm.pref}"
+    "instance-id" = "dvm"
+    "hostname"    = "dvm"
     "user-data"   = "${base64encode(data.template_file.cloudinit_dvm.rendered)}"
   }
 

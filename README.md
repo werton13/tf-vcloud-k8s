@@ -84,7 +84,7 @@ module "vcloud-k8s-cluster" {
   project      = var.project
   vcloud       = var.vcloud
   ip_plan      = var.ip_plan
-  vms          = var.vms
+  vms_config   = var.vms_config
   disks_config = var.disks_config
   os_config    = var.os_config
   ansible      = var.ansible

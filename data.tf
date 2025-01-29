@@ -80,18 +80,21 @@ template = file("${path.module}/templates/userdata_dvm.yaml")
     worker_pref         =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk"
 
     hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
-    hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm))}  ${var.vms.dvm.pref}"
+    #hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm))}  ${var.vms.dvm.pref}"
+    hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm))}  dvm"
     
-    dvm_name            = "${var.vms.dvm.pref}"
-    worker0_name        = "${var.vms.workers.pref}-0" # to deprecate?
+    #dvm_name            = "${var.vms.dvm.pref}"
+    dvm_name            = "dvm"
+    #worker0_name        = "${var.vms.workers.pref}-0" # to deprecate?
+    worker0_name        = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-${format("%02s",  1)}"
      
     #lb0_ip              = "${cidrhost(var.os_config.vm_ip_cidr,2)}" # dont need here?
     master0_ip          = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.m_node))}"
     master1_ip          = "${cidrhost(var.os_config.vm_ip_cidr,(tonumber(var.ip_plan.m_node)+1) )}"
     master2_ip          = "${cidrhost(var.os_config.vm_ip_cidr,(tonumber(var.ip_plan.m_node)+2) )}"
 
-    workers_count       = var.vms.workers.vm_count
-    masters_count       = var.vms.masters.vm_count
+    workers_count       = var.vms_config.workers.vm_count
+    masters_count       = var.vms_config.masters.vm_count
     lb_count            = var.vcloud.lbvm_count
 
     obs_type              = var.obs_config.common.obs_type
@@ -131,13 +134,14 @@ template = file("${path.module}/templates/userdata_m.yaml")
     master_pref         =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst" 
     worker_pref         =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk"
 
-    workers_count       = var.vms.workers.vm_count
-    masters_count       = var.vms.masters.vm_count
+    workers_count       = var.vms_config.workers.vm_count
+    masters_count       = var.vms_config.masters.vm_count
 
     master0_ip          = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.m_node))}"
 
     hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
-    hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm))}  ${var.vms.dvm.pref}"
+    #hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm))}  ${var.vms.dvm.pref}"
+    hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm))}  dvm"
     
   }
 }
@@ -155,12 +159,13 @@ template = file("${path.module}/templates/userdata_w.yaml")
     master_pref         =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst" 
     worker_pref         =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk"
 
-    workers_count       = var.vms.workers.vm_count
-    masters_count       = var.vms.masters.vm_count
+    workers_count       = var.vms_config.workers.vm_count
+    masters_count       = var.vms_config.masters.vm_count
 
     master0_ip          = "${cidrhost(var.os_config.vm_ip_cidr,4)}"
 
     hosts_entry0        = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
-    hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm))}  ${var.vms.dvm.pref}"
+    #hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm))}  ${var.vms.dvm.pref}"
+    hosts_entry1        = "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm))}  dvm"
   }
 }

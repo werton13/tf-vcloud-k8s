@@ -47,7 +47,7 @@ variable "ip_plan" {
 }
 
 
-variable "vms" {
+variable "vms_config" {
     type = map(object({
   #     pref = string
         vm_cpu_count = string

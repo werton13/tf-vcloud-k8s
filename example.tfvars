@@ -32,7 +32,7 @@ ip_plan = {
   ingress_lb = "3"  #  will be x.x.x.3
 }
 
-vms = {
+vms_config = {
     dvm = {
       vm_cpu_count = "2"
       vm_ram_size  = "4096"
