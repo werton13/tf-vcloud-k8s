@@ -11,7 +11,8 @@ resource "vcd_vm_internal_disk" "mst_data1_disk" {
   unit_number     = var.disks_config.diskm1.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
   #vm_name = "${var.vms.masters.pref}-0${count.index + 1}"
-  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"  
+  #vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
+  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-${format("%02s", (count.index + 1))}"
 }
 
 resource "vcd_vm_internal_disk" "mst_data2_disk" {
@@ -27,7 +28,8 @@ resource "vcd_vm_internal_disk" "mst_data2_disk" {
   unit_number     = var.disks_config.diskm2.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
   #vm_name = "${var.vms.masters.pref}-0${count.index + 1}"  
-  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"  
+  #vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
+  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-${format("%02s", (count.index + 1))}"
 }
 
 resource "vcd_vm_internal_disk" "wrk_data1_disk" {
@@ -43,7 +45,8 @@ resource "vcd_vm_internal_disk" "wrk_data1_disk" {
   unit_number     = var.disks_config.diskw1.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
   #vm_name = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"             
-  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"  
+  #vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
+  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-${format("%02s", (count.index + 1))}"
 }
 
 resource "vcd_vm_internal_disk" "wrk_data2_disk" {
@@ -59,7 +62,8 @@ resource "vcd_vm_internal_disk" "wrk_data2_disk" {
   unit_number     = var.disks_config.diskw2.unit_num
   #vm_name = count.index <= (var.vms.masters.vm_count -1) ? "${var.vms.masters.pref}-${count.index}" : "${var.vms.workers.pref}-${count.index -(var.vms.masters.vm_count) }"
   #vm_name = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"             
-  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"  
+  #vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
+  vm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-${format("%02s", (count.index + 1))}"
 }
 
 
@@ -68,8 +72,8 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_vm.k8s_workers_vms]
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
-  #name             = "${var.vms.masters.pref}-0${count.index + 1}"
-  name             =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
+  #name             =  "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
+  name             = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-${format("%02s", (count.index + 1))}"
   count            = var.vms.masters.vm_count
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
@@ -84,7 +88,6 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
     name               = var.vcloud.orgvnet_name
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
-    #ip                 =  "${cidrhost(var.os_config.vm_ip_cidr, (count.index+4))}" #"${var.vms.masters.ip_pool[count.index]}"
     ip                 =  "${cidrhost(var.os_config.vm_ip_cidr, (count.index+tonumber(var.ip_plan.m_node)))}"
   }
   override_template_disk {
@@ -96,10 +99,10 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
   }
 
   guest_properties = {
-    #"instance-id" = "${var.vms.masters.pref}-0${count.index + 1}"
-    #"hostname"    = "${var.vms.masters.pref}-0${count.index + 1}"
-    "instance-id" = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
-    "hostname"    = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
+    #"instance-id" = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
+    #"hostname"    = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-0${count.index + 1}"
+    "instance-id" = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-${format("%02s", (count.index + 1))}"
+    "hostname"    = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-${format("%02s", (count.index + 1))}"
     "user-data"   = "${base64encode(data.template_file.cloudinit_master_node.rendered)}"
   }
 
@@ -112,7 +115,8 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
   #name             = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"
-  name             = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
+  #name             = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
+  name             = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-${format("%02s", (count.index + 1))}"
   count            = var.vms.workers.vm_count
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
@@ -141,8 +145,10 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   guest_properties = {
     #"instance-id" = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"
     #"hostname"    = "${var.vms.workers.pref}-${format("%02s", (count.index + 1))}"
-    "instance-id" = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
-    "hostname"    = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
+    #"instance-id" = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
+    # "hostname"    = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-0${count.index + 1}"
+    "instance-id" = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-${format("%02s", (count.index + 1))}"
+    "hostname"    = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-${format("%02s", (count.index + 1))}"
     "user-data"   = "${base64encode(data.template_file.cloudinit_worker_node.rendered)}"
   }
 
@@ -154,7 +160,8 @@ resource "vcd_vapp_vm" "dvm" {
   depends_on       = [vcd_vapp.k8s_mgmt_vapp,
                       vcd_vapp_vm.k8s_masters_vms]
   vapp_name        = vcd_vapp.k8s_mgmt_vapp.name
-  name             = "${var.vms.dvm.pref}"
+  #name             = "${var.vms.dvm.pref}"
+  name             = "dvm"
   
 
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
@@ -169,7 +176,6 @@ resource "vcd_vapp_vm" "dvm" {
     name               = var.vcloud.orgvnet_name
     ip_allocation_mode = "MANUAL"
     adapter_type       = "VMXNET3"
-    #ip                 = "${cidrhost(var.os_config.vm_ip_cidr,-3)}" #${var.vms.dvm.ip_pool[0]}"
     ip                 =  "${cidrhost(var.os_config.vm_ip_cidr,tonumber(var.ip_plan.dvm) )}"
   }
   override_template_disk {

@@ -49,10 +49,10 @@ variable "ip_plan" {
 
 variable "vms" {
     type = map(object({
-        pref = string
+  #     pref = string
         vm_cpu_count = string
         vm_ram_size  = string
-        vm_disk_size = string
+        vm_disk_size = optional(string,"20")
         vm_count = string
   #     ip_pool = list(string)
     }))
@@ -132,11 +132,10 @@ variable "disks_config" {
 variable "ansible" {
     type = object({
         git_repo = object({
-          repo_url      = string
-          repo_name     = string 
-          repo_branch   = string
-          playbook_name = string  #ansible_playbook
-  #       access_token  = string     
+          repo_url      = optional(string,"https://github.com/werton13/k8s-kubeadm-r2.git")
+          repo_name     = optional(string,"k8s-kubeadm-r2") 
+          repo_branch   = optional(string,"dev-r2")
+          playbook_name = optional(string,"main.yaml")  #ansible_playbook  
         }        
         )
     })
@@ -147,8 +146,6 @@ variable "kubernetes" {
 
         cluster = object({
           version                       = string
-          cluster_name                  = string #same as cluster_id
-          controlPlane_Endpoint         = string #k8s_controlPlane_Endpoint
         })
 
         cni = object({
@@ -168,7 +165,6 @@ variable "kubernetes" {
           controller_nodeport_http  = string 
           controller_nodeport_https = string
           ext_fqdn                  = string #ingress_ext_fqdn
-          lb_ip             = string
          }        
         )
 
@@ -187,7 +183,7 @@ variable "versions" {
             cni = object({
               calico_version = string  #calico_version
               tigera_version = string 
-  #              calicoctl_url  = string
+    #         calicoctl_url  = string
              }        
             )
 

@@ -188,7 +188,6 @@ resource "vcd_lb_virtual_server" "kube_api_lb_vs" {
 
   name       = "kube_api"
   #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
-  #ip_address = var.kubernetes.cluster.controlPlane_Endpoint
   ip_address = "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb) )}"
   #protocol   = var.protocol
   protocol   = "https"
@@ -206,7 +205,6 @@ resource "vcd_lb_virtual_server" "ingress_http" {
 
   name       = "ingress_http"
   #ip_address = data.vcd_edgegateway.mygw.default_external_network_ip
-  #ip_address = var.kubernetes.ingress.lb_ip#!!!
   ip_address = "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.ingress_lb) )}"
   
   #protocol   = var.protocol

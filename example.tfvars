@@ -1,8 +1,8 @@
 
 project = {
-  owner_org = "" # myorg
-  name      = "" # xapi
-  env_name  = "" # dev/stage/prod
+  owner_org = "" # or example myorg
+  name      = "" # or example xapi
+  env_name  = "" # for example one of the: dev/stage/prod
 }
 
 vcloud = {
@@ -28,31 +28,24 @@ ip_plan = {
   m_node     = "4"  # first master node IP will be x.x.x.4
   w_node     = "7"  # first worker node IP will be x.x.x.7
   dvm        = "-3" # DVM IP will be -3 from the end of subnet - i.e. 192.168.0.253 for 192.168.0.0/24
-  kubeapi_lb = "2"  #  will be x.x.x.2
+  kubeapi_lb = "2"  #  will be x.x.x.2 # this IP will be assigned for the KubeAPI load balancer virtual server in the vcloud edge server configuration
   ingress_lb = "3"  #  will be x.x.x.3
 }
 
 vms = {
     dvm = {
-      pref = "dvm" # dont change this name, cause it is hardcoded in the Ansible code, 
-                   # this VM is used for coordination Ansible procedures during cluster buildng
       vm_cpu_count = "2"
       vm_ram_size  = "4096"
-      vm_disk_size = "20"
       vm_count = "1"
     }
     masters = {
-      #pref = "k8s-m"
       vm_cpu_count = "2"
       vm_ram_size  = "4096"
-      vm_disk_size = "20"
       vm_count = "3"
     },
     workers = {
-      #pref = "k8s-w"
       vm_cpu_count = "2"
       vm_ram_size  = "8192"
-      vm_disk_size = "20"
       vm_count = "2"
     }
 }
@@ -119,8 +112,6 @@ ansible = {
     repo_name =  "k8s-kubeadm-r2"                               # public ansible repository name on the gihub - created to run from the DVM vm to coordinate cluster building
     repo_branch = "dev-r2"                                      # public ansible repository branch on the gihub - created to run from the DVM vm to coordinate cluster building
     playbook_name = "main.yaml"                                 # ansible playbook name to run  from the public ansible repository - created to run from the DVM vm to coordinate cluster building
-    access_token = "your personal gitlab_access_token" #gitlab_access_token - https://docs.gitlab.com/ee/user/profile/personal_access_tokens.html#create-a-personal-access-token 
-    # currently access_token not using in this project, you can skip it
   }
 }
 
@@ -128,9 +119,6 @@ kubernetes = {
 
   cluster = {
       version      = "v1_28"   #kubernetes version tag to choose  components versions set from the 'versions' variable --> defined below this block
-      #cluster_name = "k8s-lab" #cluster name will diaplay in kubernetes context and kubectl shell when using https://github.com/jonmosco/kube-ps1
-      #  cluster_id = "your-K8s-cluster id" #The unique cluster identifier. DISPLAYED IN VSPHERE CONSOLE(CONTAINER VOLUMES DETAILS) k8s_cluster_id
-      controlPlane_Endpoint = "192.168.100.200" # this IP will be assigned for the KubeAPI load balancer virtual server in the vcloud edge server configuration
     }
 
   cni = {
@@ -148,8 +136,6 @@ kubernetes = {
       controller_nodeport_http  = "30888" #ingress_controller_nodeport_http
       controller_nodeport_https = "30443" #ingress_controller_nodeport_https
       ext_fqdn = ""
-      lb_ip = "192.168.100.210" # this IP will be assigned for the ingress controller load balancer virtual server in the vcloud edge server configuration
-      #^ to deprecate
   }
 
 }
