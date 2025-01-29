@@ -80,7 +80,7 @@ provider "vcd" {
 }
 
 module "vcloud-k8s-cluster" {
-  source = "github.com/werton13/tf-vcloud-k8s?ref=dev-r2"
+  source = "github.com/werton13/tf-vcloud-k8s?ref=main"
   project      = var.project
   vcloud       = var.vcloud
   ip_plan      = var.ip_plan

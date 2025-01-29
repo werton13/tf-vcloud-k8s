@@ -23,7 +23,7 @@ vcloud = {
     edgegw               = "my_vcloud_edgegw"        #should be provided by vcloud provider
 }
 
-# do not add this into yor tfvars file untill yuou want to change default IP distribution
+# do not add this into yor tfvars file until you want to change default IP distribution
 ip_plan = {
   m_node     = "4"  # first master node IP will be x.x.x.4
   w_node     = "7"  # first worker node IP will be x.x.x.7
@@ -149,7 +149,6 @@ versions = {
       cni = {
         calico_version = "v3.27.3"
         tigera_version = "v1.32.5" 
-        #calicoctl_url = "https://nexus-cache.services.mts.ru/repository/github-raw-proxy/projectcalico/calico/releases/download/"
       }
       csi = {
         driver_version = "v3.0.2"
@@ -174,14 +173,14 @@ obs_config = {
     
     vm_stack = {              # reserved for the victoria metrics values
         type                  = "" #could be standalone/operator
-        remoteWriteUrl        = ""
-        remoteWriteUsername   = ""
-        remoteWritePassword   = ""
-        etcdProxyMainImageURL = ""
-        etcdProxyInitImageURL = ""
-        label_env_name        = ""
-        label_dctr_name       = ""
-        label_project_name    = ""
+        remoteWriteUrl        = "" #leave empty if obs_type = "none" or "prom_stack"  
+        remoteWriteUsername   = "" #leave empty if obs_type = "none" or "prom_stack" 
+        remoteWritePassword   = "" #leave empty if obs_type = "none" or "prom_stack" 
+        etcdProxyMainImageURL = "" #leave empty if obs_type = "none" or "prom_stack" 
+        etcdProxyInitImageURL = "" #leave empty if obs_type = "none" or "prom_stack" 
+        label_env_name        = "" #leave empty if obs_type = "none" or "prom_stack" 
+        label_dctr_name       = "" #leave empty if obs_type = "none" or "prom_stack" 
+        label_project_name    = "" #leave empty if obs_type = "none" or "prom_stack" 
     }
 
     prom_stack = {
