@@ -131,18 +131,18 @@ variable "disks_config" {
 variable "ansible" {
   type = object({
     git_repo = object({
-      repo_url      = optional(string, "https://github.com/werton13/k8s-kubeadm-ansible.git")
-      repo_name     = optional(string, "k8s-kubeadm-ansible")
-      repo_branch   = optional(string, "main")
+      repo_url      = optional(string, "https://github.com/werton13/k8s-kubeadm-r2.git")
+      repo_name     = optional(string, "k8s-kubeadm-r2")
+      repo_branch   = optional(string, "dev-r3")
       playbook_name = optional(string, "main.yaml")
     })
     vault_secret = optional(string, "vault_k8s_super_secret_password")
   })
   default = {
     git_repo = {
-      repo_url      = "https://github.com/werton13/k8s-kubeadm-ansible.git"
-      repo_name     = "k8s-kubeadm-ansible"
-      repo_branch   = "dev-r2"
+      repo_url      = "https://github.com/werton13/k8s-kubeadm-r2.git"
+      repo_name     = "k8s-kubeadm-r2"
+      repo_branch   = "dev-r3"
       playbook_name = "main.yaml"
     }
     vault_secret = "vault_k8s_super_secret_password"
