@@ -50,7 +50,14 @@ ${hosts_content}
     path: /etc/ssh/sshd_config.d/60-k8s-auth.conf
     permissions: "0600"
 
+  - content: |
+      [Resolve]
+      DNS=${dns_servers}
+    path: /etc/systemd/resolved.conf.d/dns.conf
+    permissions: "0644"
+
 runcmd:
+  - systemctl restart systemd-resolved 2>/dev/null || true
   - systemctl stop apt-daily.timer apt-daily-upgrade.timer apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
   - systemctl disable apt-daily.timer apt-daily-upgrade.timer 2>/dev/null || true
   - systemctl mask apt-daily.service apt-daily-upgrade.service 2>/dev/null || true

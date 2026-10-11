@@ -72,6 +72,7 @@ variable "os_config" {
     def_dns             = string
     env_dns1            = string
     env_dns2            = string
+    env_dns3            = optional(string, "")
     ntp_srv1            = optional(string, "")
     ntp_srv2            = optional(string, "")
     ubuntu_animal_code  = optional(string, "noble") # noble for Ubuntu 24.04, jammy for 22.04

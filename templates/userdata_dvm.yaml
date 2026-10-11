@@ -57,6 +57,12 @@ ${hosts_content}
     permissions: "0600"
 
   - content: |
+      [Resolve]
+      DNS=${dns_servers}
+    path: /etc/systemd/resolved.conf.d/dns.conf
+    permissions: "0644"
+
+  - content: |
 ${inventory_content}
     path: /K8s-inventory
     permissions: "0600"
@@ -102,6 +108,7 @@ ${cluster_vars_content}
     permissions: "0755"
 
 runcmd:
+  - systemctl restart systemd-resolved 2>/dev/null || true
   - systemctl stop apt-daily.timer apt-daily-upgrade.timer apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
   - systemctl disable apt-daily.timer apt-daily-upgrade.timer 2>/dev/null || true
   - systemctl mask apt-daily.service apt-daily-upgrade.service 2>/dev/null || true

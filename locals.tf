@@ -88,8 +88,8 @@ locals {
     k8s_service_subnet: "${var.kubernetes.cni.svc_subnet}"
     k8s_pod_subnet: "${var.kubernetes.cni.pod_subnet}"
     calico_network_cidr_blocksize: "${var.kubernetes.cni.calico_network_cidr_blocksize}"
-    calico_version: "${try(local.target_version.cni.calico_version, "v3.29.1")}"
-    tigera_version: "${try(local.target_version.cni.tigera_version, "v1.36.2")}"
+    calico_version: "${try(local.target_version.cni.calico_version, "v3.31.5")}"
+    tigera_version: "${try(local.target_version.cni.tigera_version, "v1.40.8")}"
 
     # Storage / CSI
     cloud_type: "vcloud"
@@ -112,6 +112,7 @@ locals {
     def_dns: "${var.os_config.def_dns}"
     env_dns1: "${var.os_config.env_dns1}"
     env_dns2: "${var.os_config.env_dns2}"
+    env_dns3: "${try(var.os_config.env_dns3, "")}"
 
     # Ingress Controller
     ingress_controller_nodeport_http: "${var.kubernetes.ingress.controller_nodeport_http}"
@@ -141,12 +142,15 @@ locals {
   EOT
 
   # Rendered cloud-init files
+  dns_servers_list = join(" ", compact([var.os_config.env_dns1, var.os_config.env_dns2, try(var.os_config.env_dns3, "")]))
+
   cloudinit_master_rendered = templatefile("${path.module}/templates/userdata_m.yaml", {
     vm_user_name        = var.os_config.vm_user_name
     vm_user_displayname = var.os_config.vm_user_displayname
     vm_user_password    = var.os_config.vm_user_password
     vm_user_ssh_key     = var.os_config.vm_user_ssh_key
     hosts_content       = local.hosts_content
+    dns_servers         = local.dns_servers_list
   })
 
   cloudinit_worker_rendered = templatefile("${path.module}/templates/userdata_w.yaml", {
@@ -155,6 +159,7 @@ locals {
     vm_user_password    = var.os_config.vm_user_password
     vm_user_ssh_key     = var.os_config.vm_user_ssh_key
     hosts_content       = local.hosts_content
+    dns_servers         = local.dns_servers_list
   })
 
   cloudinit_dvm_rendered = templatefile("${path.module}/templates/userdata_dvm.yaml", {
@@ -163,6 +168,7 @@ locals {
     vm_user_password     = var.os_config.vm_user_password
     vm_user_ssh_key      = var.os_config.vm_user_ssh_key
     hosts_content        = local.hosts_content
+    dns_servers          = local.dns_servers_list
     inventory_content    = local.inventory_content
     cluster_vars_content = local.cluster_vars_content
     ansible_repo_url     = var.ansible.git_repo.repo_url

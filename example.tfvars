@@ -100,6 +100,7 @@ os_config = {
   def_dns             = "8.8.8.8"
   env_dns1            = "8.8.8.8"
   env_dns2            = "1.1.1.1"
+  env_dns3            = "1.0.0.1"
   ubuntu_animal_code  = "noble" # Ubuntu 24.04 LTS Noble Numbat
   os_nic1_name        = "ens192"
 }
@@ -141,8 +142,8 @@ versions = {
     containerd = "1.7.20"
     cri-tools  = "1.35.0"
     cni = {
-      calico_version = "v3.29.1"
-      tigera_version = "v1.36.2"
+      calico_version = "v3.31.5"
+      tigera_version = "v1.40.8"
     }
     csi = {
       driver_version = "v1.5.0"
