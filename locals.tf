@@ -148,7 +148,7 @@ locals {
     vm_user_name        = var.os_config.vm_user_name
     vm_user_displayname = var.os_config.vm_user_displayname
     vm_user_password    = var.os_config.vm_user_password
-    vm_user_ssh_key     = var.os_config.vm_user_ssh_key
+    vm_user_ssh_key     = try(var.os_config.vm_user_ssh_key, "")
     hosts_content       = local.hosts_content
     dns_servers         = local.dns_servers_list
   })
@@ -157,7 +157,7 @@ locals {
     vm_user_name        = var.os_config.vm_user_name
     vm_user_displayname = var.os_config.vm_user_displayname
     vm_user_password    = var.os_config.vm_user_password
-    vm_user_ssh_key     = var.os_config.vm_user_ssh_key
+    vm_user_ssh_key     = try(var.os_config.vm_user_ssh_key, "")
     hosts_content       = local.hosts_content
     dns_servers         = local.dns_servers_list
   })
@@ -166,7 +166,7 @@ locals {
     vm_user_name         = var.os_config.vm_user_name
     vm_user_displayname  = var.os_config.vm_user_displayname
     vm_user_password     = var.os_config.vm_user_password
-    vm_user_ssh_key      = var.os_config.vm_user_ssh_key
+    vm_user_ssh_key      = try(var.os_config.vm_user_ssh_key, "")
     hosts_content        = local.hosts_content
     dns_servers          = local.dns_servers_list
     inventory_content    = local.inventory_content

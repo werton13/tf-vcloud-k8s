@@ -95,7 +95,7 @@ os_config = {
   vm_user_displayname = "Kubernetes Administrator"
   vm_user_password    = "$6$rounds=4096$rounds...hash" # mkpasswd --method=SHA-512 somesecret
   ansible_ssh_pass    = "somesecretpasswordhere"
-  vm_user_ssh_key     = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAI... user@example.com"
+  vm_user_ssh_key     = "" # Optional: paste public SSH key here (e.g. "ssh-ed25519 AAA...") or leave empty
   vm_ip_cidr          = "192.168.100.0/24"
   def_dns             = "8.8.8.8"
   env_dns1            = "8.8.8.8"

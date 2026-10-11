@@ -67,7 +67,7 @@ variable "os_config" {
     vm_user_password    = string
     ansible_ssh_pass    = string
     vm_user_displayname = string
-    vm_user_ssh_key     = string
+    vm_user_ssh_key     = optional(string, "")
     vm_ip_cidr          = string
     def_dns             = string
     env_dns1            = string

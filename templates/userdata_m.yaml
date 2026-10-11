@@ -8,9 +8,10 @@ users:
     groups: sudo
     lock_passwd: false
     shell: /bin/bash
+%{ if vm_user_ssh_key != "" ~}
     ssh_authorized_keys:
       - ${vm_user_ssh_key}
-
+%{ endif ~}
 apt:
   conf: |
     Acquire {
