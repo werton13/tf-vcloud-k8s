@@ -1,7 +1,6 @@
 #cloud-config
-version: v1
+ssh_pwauth: true
 users:
-  - name: local
   - name: ${vm_user_name}
     gecos: ${vm_user_displayname}
     passwd: ${vm_user_password}
@@ -48,7 +47,9 @@ ${hosts_content}
   - content: |
       PubkeyAuthentication yes
       PasswordAuthentication yes
-    path: /etc/ssh/sshd_config.d/60-k8s-auth.conf
+      KbdInteractiveAuthentication yes
+      PermitRootLogin no
+    path: /etc/ssh/sshd_config.d/01-k8s-auth.conf
     permissions: "0600"
 
   - content: |
@@ -72,4 +73,4 @@ runcmd:
   - "[ -e /etc/ssh/sshd_config.d/*.conf ] && grep -ilr PasswordAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' || true"
   - "[ -e /etc/ssh/sshd_config.d/*.conf ] && grep -ilr PubkeyAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' || true"
   - systemctl daemon-reload
-  - systemctl restart ssh.service
+  - systemctl restart ssh ssh.socket ssh.service 2>/dev/null || true

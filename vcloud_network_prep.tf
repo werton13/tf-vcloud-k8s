@@ -1,22 +1,3 @@
-resource "vcd_vapp" "k8s_mgmt_vapp" {
-  name = var.vcloud.vapp_name
-  metadata_entry {
-    key         = "tag"
-    value       = "MGMT K8s"
-    type        = "MetadataStringValue"
-    user_access = "READWRITE"
-    is_system   = false
-  }
-}
-
-resource "vcd_vapp_org_network" "vappOrgNet" {
-  depends_on       = [vcd_vapp.k8s_mgmt_vapp]
-  org              = var.vcloud.orgname
-  vdc              = var.vcloud.vdc
-  vapp_name        = var.vcloud.vapp_name
-  org_network_name = var.vcloud.orgvnet_name
-}
-
 # ==============================================================================
 # NSX-V Load Balancer Resources (applied when var.vcloud.network_type == "nsx-v")
 # ==============================================================================

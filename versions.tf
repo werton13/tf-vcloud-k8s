@@ -6,6 +6,10 @@ terraform {
       source  = "vmware/vcd"
       version = ">= 3.8.0, < 4.0.0"
     }
+    time = {
+      source  = "hashicorp/time"
+      version = "0.9.1"
+    }
   }
 }
 

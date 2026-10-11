@@ -1,7 +1,6 @@
 #cloud-config
-version: v1
+ssh_pwauth: true
 users:
-  - name: local
   - name: ${vm_user_name}
     gecos: ${vm_user_displayname}
     passwd: ${vm_user_password}
@@ -36,6 +35,7 @@ packages:
   - python3-pip
   - software-properties-common
   - ansible
+  - netcat-openbsd
 
 write_files:
   - content: |
@@ -54,7 +54,9 @@ ${hosts_content}
   - content: |
       PubkeyAuthentication yes
       PasswordAuthentication yes
-    path: /etc/ssh/sshd_config.d/60-k8s-auth.conf
+      KbdInteractiveAuthentication yes
+      PermitRootLogin no
+    path: /etc/ssh/sshd_config.d/01-k8s-auth.conf
     permissions: "0600"
 
   - content: |
@@ -102,6 +104,23 @@ ${cluster_vars_content}
         ansible-galaxy install -r requirements.yml -p roles/ || true
       fi
 
+      echo "=== [$(date)] Waiting for all cluster nodes to be online and accessible via SSH ==="
+      CLUSTER_NODES="${cluster_node_ips}"
+      for node_ip in $CLUSTER_NODES; do
+        echo "Checking port 22 on $node_ip..."
+        until (echo > /dev/tcp/$node_ip/22) 2>/dev/null || nc -z -w 3 "$node_ip" 22 2>/dev/null; do
+          echo "Node $node_ip is not listening on port 22 yet, retrying in 5 seconds..."
+          sleep 5
+        done
+        echo "Port 22 on $node_ip is open! Verifying SSH authentication for ${os_admin_username}..."
+        until sshpass -p "${ansible_ssh_pass}" ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -o BatchMode=no "${os_admin_username}@$node_ip" "echo ready" 2>/dev/null | grep -q "ready"; do
+          echo "Waiting for successful SSH authentication on $node_ip..."
+          sleep 5
+        done
+        echo "Node $node_ip is FULLY READY and authenticated!"
+      done
+      echo "=== [$(date)] All cluster nodes are ready and authenticated! Starting Ansible ==="
+
       echo "Executing Ansible playbook ${ansible_playbook}..."
       ansible-playbook -i /${ansible_repo_name}/K8s-inventory "${ansible_playbook}" -e @vars/cluster_vars.yaml --vault-password-file /root/.vault_pass
       echo "=== [$(date)] Kubernetes Cluster Automation Completed Successfully ==="
@@ -123,8 +142,8 @@ runcmd:
   - "[ -e /etc/ssh/sshd_config.d/*.conf ] && grep -ilr PasswordAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' || true"
   - "[ -e /etc/ssh/sshd_config.d/*.conf ] && grep -ilr PubkeyAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' || true"
   - systemctl daemon-reload
-  - systemctl restart ssh.service
+  - systemctl restart ssh ssh.socket ssh.service 2>/dev/null || true
   - apt-get update && apt-get install -y python3-kubernetes || pip3 install kubernetes --break-system-packages || true
   - ansible-galaxy collection install kubernetes.core ansible.posix community.general || true
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" /${ansible_repo_name}
-  - /ansible_starter.sh > /var/log/ansible-bootstrap.log 2>&1
+  - nohup /ansible_starter.sh > /var/log/ansible-bootstrap.log 2>&1 &

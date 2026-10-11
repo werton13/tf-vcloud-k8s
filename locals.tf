@@ -17,7 +17,7 @@ locals {
 
   # DVM host metadata
   dvm_ip   = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.dvm))
-  dvm_name = "dvm"
+  dvm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-dvm"
 
   # vCloud API host entry
   vcloud_fqdn_entry = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
@@ -173,6 +173,9 @@ locals {
     dns_servers         = local.dns_servers_list
   })
 
+  # Cluster node IPs list for health-check / polling
+  cluster_node_ips = join(" ", [for node in concat(local.master_nodes, local.worker_nodes) : node.ip])
+
   cloudinit_dvm_rendered = templatefile("${path.module}/templates/userdata_dvm.yaml", {
     vm_user_name         = var.os_config.vm_user_name
     vm_user_displayname  = var.os_config.vm_user_displayname
@@ -180,6 +183,7 @@ locals {
     vm_user_ssh_key      = try(var.os_config.vm_user_ssh_key, "")
     hosts_content        = local.hosts_content
     dns_servers          = local.dns_servers_list
+    cluster_node_ips     = local.cluster_node_ips
     inventory_content    = local.inventory_content
     cluster_vars_content = local.cluster_vars_content
     ansible_repo_url     = var.ansible.git_repo.repo_url
@@ -189,5 +193,25 @@ locals {
     os_admin_username    = var.os_config.vm_user_name
     ansible_ssh_pass     = var.os_config.ansible_ssh_pass
     vault_secret         = var.ansible.vault_secret
+  })
+
+  # vCD Guest Customization scripts (initscript) for each VM type
+  customization_master_script = [
+    for i, node in local.master_nodes : templatefile("${path.module}/templates/customization_node.sh", {
+      node_name           = node.name
+      cloudinit_base64_gz = base64gzip(local.cloudinit_master_rendered)
+    })
+  ]
+
+  customization_worker_script = [
+    for i, node in local.worker_nodes : templatefile("${path.module}/templates/customization_node.sh", {
+      node_name           = node.name
+      cloudinit_base64_gz = base64gzip(local.cloudinit_worker_rendered)
+    })
+  ]
+
+  customization_dvm_script = templatefile("${path.module}/templates/customization_node.sh", {
+    node_name           = local.dvm_name
+    cloudinit_base64_gz = base64gzip(local.cloudinit_dvm_rendered)
   })
 }
