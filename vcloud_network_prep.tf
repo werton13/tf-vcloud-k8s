@@ -1,9 +1,11 @@
 resource "vcd_vapp" "k8s_mgmt_vapp" {
   name = var.vcloud.vapp_name
   metadata_entry {
-    key   = "tag"
-    value = "MGMT K8s"
-    type  = "MetadataStringValue"
+    key         = "tag"
+    value       = "MGMT K8s"
+    type        = "MetadataStringValue"
+    user_access = "READWRITE"
+    is_system   = false
   }
 }
 
