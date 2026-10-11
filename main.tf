@@ -71,7 +71,6 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
   count            = var.vms_config.masters.vm_count
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
   template_name    = var.vcloud.vm_template_name
-  hardware_version = "vmx-15"
   cpus             = var.vms_config.masters.vm_cpu_count
   memory           = var.vms_config.masters.vm_ram_size
   cpu_cores        = 1
@@ -109,7 +108,6 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   count            = var.vms_config.workers.vm_count
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
   template_name    = var.vcloud.vm_template_name
-  hardware_version = "vmx-15"
   cpus             = var.vms_config.workers.vm_cpu_count
   memory           = var.vms_config.workers.vm_ram_size
   cpu_cores        = 1
@@ -147,7 +145,6 @@ resource "vcd_vapp_vm" "dvm" {
   name             = local.dvm_name
   catalog_name     = data.vcd_catalog.vcd_dp_linux.name
   template_name    = var.vcloud.vm_template_name
-  hardware_version = "vmx-15"
   cpus             = var.vms_config.dvm.vm_cpu_count
   memory           = var.vms_config.dvm.vm_ram_size
   cpu_cores        = 1
