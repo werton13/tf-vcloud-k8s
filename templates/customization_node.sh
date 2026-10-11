@@ -2,6 +2,11 @@
 exec > /var/log/vcd-customization.log 2>&1
 echo "=== [$(date)] Handing over initialization to Cloud-init for ${node_name} ==="
 
+# 0. Configure network interface immediately so cloud-init and APT have connectivity
+ip addr add ${node_ip}/${cidr_prefix} dev ${os_nic1_name} 2>/dev/null || true
+ip link set ${os_nic1_name} up 2>/dev/null || true
+ip route add default via ${gateway_ip} dev ${os_nic1_name} 2>/dev/null || true
+
 # 1. Prepare local NoCloud seed datasource for Cloud-init
 mkdir -p /var/lib/cloud/seed/nocloud
 
@@ -22,3 +27,4 @@ cloud-init modules --mode final
 
 echo "=== [$(date)] Cloud-init initialization completed for ${node_name} ==="
 exit 0
+

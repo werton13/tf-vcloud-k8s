@@ -22,7 +22,7 @@ apt:
       }
     }
 
-package_update: false
+package_update: true
 package_upgrade: false
 packages:
   - openssh-server
@@ -166,7 +166,7 @@ runcmd:
   - "[ -e /etc/ssh/sshd_config.d/*.conf ] && grep -ilr PubkeyAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' || true"
   - systemctl daemon-reload
   - systemctl restart ssh ssh.socket ssh.service 2>/dev/null || true
-  - apt-get update && apt-get install -y python3-kubernetes || pip3 install kubernetes --break-system-packages || true
+  - apt-get update && apt-get install -y ansible sshpass python3-kubernetes || pip3 install kubernetes --break-system-packages || true
   - ansible-galaxy collection install kubernetes.core ansible.posix community.general || true
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" /${ansible_repo_name}
-  - nohup /ansible_starter.sh > /var/log/ansible-bootstrap.log 2>&1 &
+  - /ansible_starter.sh 2>&1 | tee /var/log/ansible-bootstrap.log

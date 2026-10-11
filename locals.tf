@@ -50,107 +50,113 @@ locals {
   ))
 
   # Inventory file content for DVM (credentials use Ansible Vault placeholders)
-  inventory_content = <<-EOT
-    [dvm]
-    ${local.dvm_name}
+  inventory_content = join("\n", [
+    for line in split("\n", <<-EOT
+[dvm]
+${local.dvm_name}
 
-    [masters]
-    %{for node in local.master_nodes~}
-    ${node.name} ansible_host=${node.ip}
-    %{endfor~}
+[masters]
+%{for node in local.master_nodes~}
+${node.name} ansible_host=${node.ip}
+%{endfor~}
 
-    [workers]
-    %{for node in local.worker_nodes~}
-    ${node.name} ansible_host=${node.ip}
-    %{endfor~}
+[workers]
+%{for node in local.worker_nodes~}
+${node.name} ansible_host=${node.ip}
+%{endfor~}
 
-    [k8s-nodes:children]
-    masters
-    workers
+[k8s-nodes:children]
+masters
+workers
 
-    [k8s-nodes:vars]
-    ansible_connection=ssh
-    ansible_user="__VAULT_OS_ADMIN__"
-    ansible_ssh_pass="__VAULT_OS_PASSWORD__"
-    ansible_sudo_pass="__VAULT_OS_PASSWORD__"
-    ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+[k8s-nodes:vars]
+ansible_connection=ssh
+ansible_user="__VAULT_OS_ADMIN__"
+ansible_ssh_pass="__VAULT_OS_PASSWORD__"
+ansible_sudo_pass="__VAULT_OS_PASSWORD__"
+ansible_ssh_common_args='-o StrictHostKeyChecking=no'
 
-    [dvm:vars]
-    ansible_connection=local
-    ansible_user="__VAULT_OS_ADMIN__"
-    ansible_sudo_pass="__VAULT_OS_PASSWORD__"
-  EOT
+[dvm:vars]
+ansible_connection=local
+ansible_user="__VAULT_OS_ADMIN__"
+ansible_sudo_pass="__VAULT_OS_PASSWORD__"
+EOT
+    ) : "      ${line}"
+  ])
 
   # Target K8s version details from matrix
   target_version = lookup(var.versions, var.kubernetes.cluster.version)
 
   # Cluster variables content (YAML)
-  cluster_vars_content = <<-EOT
-    ---
-    # Kubernetes Cluster Identity
-    k8s_cluster_name: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}"
-    k8s_cluster_id: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}"
-    k8s_version: "${var.kubernetes.cluster.version}"
-    k8s_version_short: "${local.target_version.short}"
-    k8s_ver: "${local.target_version.full}"
-    k8s_controlPlane_Endpoint: "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))}"
+  cluster_vars_content = join("\n", [
+    for line in split("\n", <<-EOT
+---
+# Kubernetes Cluster Identity
+k8s_cluster_name: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}"
+k8s_cluster_id: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}"
+k8s_version: "${var.kubernetes.cluster.version}"
+k8s_version_short: "${local.target_version.short}"
+k8s_ver: "${local.target_version.full}"
+k8s_controlPlane_Endpoint: "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))}"
 
-    # Networking / CNI
-    k8s_service_subnet: "${var.kubernetes.cni.svc_subnet}"
-    k8s_pod_subnet: "${var.kubernetes.cni.pod_subnet}"
-    calico_network_cidr_blocksize: "${var.kubernetes.cni.calico_network_cidr_blocksize}"
-    calico_version: "${try(local.target_version.cni.calico_version, "v3.31.5")}"
-    tigera_version: "${try(local.target_version.cni.tigera_version, "v1.40.8")}"
+# Networking / CNI
+k8s_service_subnet: "${var.kubernetes.cni.svc_subnet}"
+k8s_pod_subnet: "${var.kubernetes.cni.pod_subnet}"
+calico_network_cidr_blocksize: "${var.kubernetes.cni.calico_network_cidr_blocksize}"
+calico_version: "${try(local.target_version.cni.calico_version, "v3.31.5")}"
+tigera_version: "${try(local.target_version.cni.tigera_version, "v1.40.8")}"
 
-    # Storage / CSI
-    cloud_type: "vcloud"
-    vcloud_vdc: "${var.vcloud.vdc}"
-    vcloud_orgname: "${var.vcloud.orgname}"
-    vcloud_url: "${var.vcloud.server_fqdn}"
-    vcloud_ip: "${var.vcloud.server_ip}"
-    vcloud_csiadmin_username: "${var.vcloud.csi_svc}"
-    vcloud_csiadmin_password: "${var.vcloud.csi_svc_pwd}"
-    vcloud_catalogname: "${var.vcloud.catalogname}"
-    vcloud_vmtmplname: "${var.vcloud.vm_template_name}"
-    vcloud_orgvnet: "${var.vcloud.orgvnet_name}"
-    vapp_name: "${var.vcloud.vapp_name}"
-    sc_storage_policy_name: "${var.kubernetes.pvc.sc_storage_policy_name}"
-    sc_name: "${var.kubernetes.pvc.sc_name}"
+# Storage / CSI
+cloud_type: "vcloud"
+vcloud_vdc: "${var.vcloud.vdc}"
+vcloud_orgname: "${var.vcloud.orgname}"
+vcloud_url: "${var.vcloud.server_fqdn}"
+vcloud_ip: "${var.vcloud.server_ip}"
+vcloud_csiadmin_username: "${var.vcloud.csi_svc}"
+vcloud_csiadmin_password: "${var.vcloud.csi_svc_pwd}"
+vcloud_catalogname: "${var.vcloud.catalogname}"
+vcloud_vmtmplname: "${var.vcloud.vm_template_name}"
+vcloud_orgvnet: "${var.vcloud.orgvnet_name}"
+vapp_name: "${var.vcloud.vapp_name}"
+sc_storage_policy_name: "${var.kubernetes.pvc.sc_storage_policy_name}"
+sc_name: "${var.kubernetes.pvc.sc_name}"
 
-    # OS and System Configuration
-    os_admin_username: "${var.os_config.vm_user_name}"
-    os_nic1_name: "${var.os_config.os_nic1_name}"
-    def_dns: "${var.os_config.def_dns}"
-    env_dns1: "${var.os_config.env_dns1}"
-    env_dns2: "${var.os_config.env_dns2}"
-    env_dns3: "${try(var.os_config.env_dns3, "")}"
+# OS and System Configuration
+os_admin_username: "${var.os_config.vm_user_name}"
+os_nic1_name: "${var.os_config.os_nic1_name}"
+def_dns: "${var.os_config.def_dns}"
+env_dns1: "${var.os_config.env_dns1}"
+env_dns2: "${var.os_config.env_dns2}"
+env_dns3: "${try(var.os_config.env_dns3, "")}"
 
-    # Ingress Controller
-    ingress_controller_nodeport_http: "${var.kubernetes.ingress.controller_nodeport_http}"
-    ingress_controller_nodeport_https: "${var.kubernetes.ingress.controller_nodeport_https}"
-    ingress_ext_fqdn: "${var.kubernetes.ingress.ext_fqdn}"
+# Ingress Controller
+ingress_controller_nodeport_http: "${var.kubernetes.ingress.controller_nodeport_http}"
+ingress_controller_nodeport_https: "${var.kubernetes.ingress.controller_nodeport_https}"
+ingress_ext_fqdn: "${var.kubernetes.ingress.ext_fqdn}"
 
-    # Observability / Monitoring
-    obs_type: "${var.obs_config.common.obs_type}"
-    vm_stack_type: "${try(var.obs_config.vm_stack.type, "operator")}"
-    remoteWriteUrl: "${try(var.obs_config.vm_stack.remoteWriteUrl, "")}"
-    remoteWriteUsername: "${try(var.obs_config.vm_stack.remoteWriteUsername, "")}"
-    remoteWritePassword: "${try(var.obs_config.vm_stack.remoteWritePassword, "")}"
-    label_env_name: "${try(var.obs_config.vm_stack.label_env_name, var.project.env_name)}"
-    label_project_name: "${try(var.obs_config.vm_stack.label_project_name, var.project.name)}"
-    env_name: "${try(var.obs_config.vm_stack.label_env_name, var.project.env_name)}"
-    project_name: "${try(var.obs_config.vm_stack.label_project_name, var.project.name)}"
-    k8s_type: "${try(var.obs_config.vm_stack.k8s_type, "vcloud")}"
-    dctr_name: "${try(var.obs_config.vm_stack.dctr_name, var.vcloud.vdc)}"
+# Observability / Monitoring
+obs_type: "${var.obs_config.common.obs_type}"
+vm_stack_type: "${try(var.obs_config.vm_stack.type, "operator")}"
+remoteWriteUrl: "${try(var.obs_config.vm_stack.remoteWriteUrl, "")}"
+remoteWriteUsername: "${try(var.obs_config.vm_stack.remoteWriteUsername, "")}"
+remoteWritePassword: "${try(var.obs_config.vm_stack.remoteWritePassword, "")}"
+label_env_name: "${try(var.obs_config.vm_stack.label_env_name, var.project.env_name)}"
+label_project_name: "${try(var.obs_config.vm_stack.label_project_name, var.project.name)}"
+env_name: "${try(var.obs_config.vm_stack.label_env_name, var.project.env_name)}"
+project_name: "${try(var.obs_config.vm_stack.label_project_name, var.project.name)}"
+k8s_type: "${try(var.obs_config.vm_stack.k8s_type, "vcloud")}"
+dctr_name: "${try(var.obs_config.vm_stack.dctr_name, var.vcloud.vdc)}"
 
-    # Node Topology
-    masters_count: ${var.vms_config.masters.vm_count}
-    workers_count: ${var.vms_config.workers.vm_count}
-    master_pref: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst"
-    worker_pref: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk"
-    master0_ip: "${local.master_nodes[0].ip}"
-    worker0_name: "${local.worker_nodes[0].name}"
-  EOT
+# Node Topology
+masters_count: ${var.vms_config.masters.vm_count}
+workers_count: ${var.vms_config.workers.vm_count}
+master_pref: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst"
+worker_pref: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk"
+master0_ip: "${local.master_nodes[0].ip}"
+worker0_name: "${local.worker_nodes[0].name}"
+EOT
+    ) : "      ${line}"
+  ])
 
   # Rendered cloud-init files
   dns_servers_list = join(" ", compact([var.os_config.env_dns1, var.os_config.env_dns2, try(var.os_config.env_dns3, "")]))
@@ -222,6 +228,10 @@ locals {
     for i, node in local.master_nodes : templatefile("${path.module}/templates/customization_node.sh", {
       node_name           = node.name
       cloudinit_base64_gz = base64gzip(local.cloudinit_master_rendered[i])
+      node_ip             = node.ip
+      cidr_prefix         = local.cidr_prefix
+      gateway_ip          = local.gateway_ip
+      os_nic1_name        = var.os_config.os_nic1_name
     })
   ]
 
@@ -229,11 +239,19 @@ locals {
     for i, node in local.worker_nodes : templatefile("${path.module}/templates/customization_node.sh", {
       node_name           = node.name
       cloudinit_base64_gz = base64gzip(local.cloudinit_worker_rendered[i])
+      node_ip             = node.ip
+      cidr_prefix         = local.cidr_prefix
+      gateway_ip          = local.gateway_ip
+      os_nic1_name        = var.os_config.os_nic1_name
     })
   ]
 
   customization_dvm_script = templatefile("${path.module}/templates/customization_node.sh", {
     node_name           = local.dvm_name
     cloudinit_base64_gz = base64gzip(local.cloudinit_dvm_rendered)
+    node_ip             = local.dvm_ip
+    cidr_prefix         = local.cidr_prefix
+    gateway_ip          = local.gateway_ip
+    os_nic1_name        = var.os_config.os_nic1_name
   })
 }
