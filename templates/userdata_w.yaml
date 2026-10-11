@@ -5,10 +5,11 @@ users:
   - name: ${vm_user_name}
     gecos: ${vm_user_displayname}
     passwd: ${vm_user_password}
-    groups: sudo 
+    groups: sudo
     lock_passwd: false
     shell: /bin/bash
-    ssh_authorized_keys: ${vm_user_ssh_key}
+    ssh_authorized_keys:
+      - ${vm_user_ssh_key}
 
 apt:
   conf: |
@@ -22,39 +23,22 @@ apt:
     }
 
 package_update: true
-packages_upgrade: true
+package_upgrade: false
 packages:
-  - net-tools
-  - nmap
-  - git
-  - tree
   - openssh-server
-  - sshpass
- # - ansible
- # - ansible-core
+  - curl
+  - ca-certificates
+  - python3
 
 write_files:
   - content: |
-      # first hosts_entry - always vcloud hostname/ip
-      ${hosts_entry0}
-      ${hosts_entry1} 
+${hosts_content}
     path: /etc/hosts
     append: true
-  - content: |
-      #!/bin/bash
-      export ip_net=$(echo ${master0_ip} | cut -d '.' -f1-3)
-      export master0_ip_4=$(echo ${master0_ip} | cut -d '.' -f4)
-      export worker0_ip_4=$(($(echo ${master0_ip} | cut -d '.' -f4)+3))
-      
-      for (( m=1;m<=$((${masters_count}));m++ ));do ip=$((master0_ip_4 + m - 1)); echo "$ip_net.$ip  ${master_pref}-0$m" >> /etc/hosts; done
-      for (( w=1;w<=$((${workers_count}));w++ ));do ip=$((worker0_ip_4 + w - 1)); echo "$ip_net.$ip  ${worker_pref}-$(echo 0$w| rev | cut -c 1-2| rev)"  >> /etc/hosts; done     
-    path:  /add_hosts_records.sh
-    permissions: "0744"
 
 runcmd:
-  - /add_hosts_records.sh
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
   - sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
-  - \[ -e /etc/ssh/sshd_config.d/*.conf \] && grep -ilr PasswordAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/"
-  - [ systemctl, daemon-reload ]
-  - [ systemctl, restart, --no-block, ssh.service ]
+  - "[ -e /etc/ssh/sshd_config.d/*.conf ] && grep -ilr PasswordAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' || true"
+  - systemctl daemon-reload
+  - systemctl restart ssh.service

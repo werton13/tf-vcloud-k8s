@@ -8,43 +8,10 @@ users:
     groups: sudo
     lock_passwd: false
     shell: /bin/bash
-    ssh_authorized_keys: ${vm_user_ssh_key}
+    ssh_authorized_keys:
+      - ${vm_user_ssh_key}
+
 apt:
-  sources:
-    ansible:
-      source: deb https://ppa.launchpadcontent.net/ansible/ansible/ubuntu/ jammy main
-      key: |
-         -----BEGIN PGP PUBLIC KEY BLOCK-----
-         Comment: Hostname: 
-         Version: Hockeypuck 2.1.0-189-g15ebf24
-         
-         xsFNBFOXbTABEADKLcY3MYZyHIiCEu8cQ+0UzxZolTYZf8xZ06/d8xzUW/UBPTLV
-         x/40IzWJEZU87GCYVXUhdYXECrFQKQOOEWQswBxOt26/g0nIrU0edZ9cCZ9o9+ZO
-         sKDcScWNxWeclLr2+YHdmX9eph+2p+zIPmhNJaaWV6/bSo1fBi7ganZFRAc13zO8
-         jtQsYyIeoAFwjt1vbk9CifdFhEchRVbwvZYhZDWfBZjhZ15UOunjo47gEkpK0PsW
-         HY5N3/c75pGMwMTCjHMKno6KFzhdKLaz/QgbNnpy1aMkA/LITeU6Pgg6iqofrSY3
-         Fx73MCAb8EEytvSV/65wztKzexHjGYxhm5ygoET5tPyXciX0+XzojkZAHzUEeT5z
-         4kgL6OLyn+JQAyRDNnOJEkYmvwQveZuUjsYUkgc5DJdg6w7lTgQHWObOENpXls3B
-         DnphA4DJyc0PQODCxdSZo4ZXMLn5lE/0qvAJ6g/wntY/ee/vRKwy9iDMOWQvihTI
-         Y/L70/TnE4qZdaNbOJEvW59LT6GBTrcU1MX2fS5hU/mQa2CNixSVZG98rba3tfNa
-         LDDNqivkcxtWryEWd0giBzzUS+MhtxhHm77YgxNVyyFn8bXb25/W+Jq+VvWWx2KD
-         3ZwVD37X8wIBRLVozoH0jHVW7jKTnf2z+D6FCM+pVlm8zV1upXbHbdaRqwARAQAB
-         zR9MYXVuY2hwYWQgUFBBIGZvciBBbnNpYmxlLCBJbmMuwsF4BBMBAgAiBQJTl20w
-         AhsDBgsJCAcDAgYVCAIJCgsEFgIDAQIeAQIXgAAKCRCTxKP9e7nDZwzdD/9yFq+3
-         ptLyWP1JN3RXsvTIJLhhjOqMMJCOocV0G3slHeUtdIDmvd2RaS8PeFNSd9QFbUzk
-         a7pBXec3a7kgEVorty2/+cZSpEVHT26oAbJnoH7E1YGii8bbnk9LqOCF/nLpasEq
-         PKqtVzXz+vGB7G0ox8qmRm6JynrMeLBftYemxJ8e4fii6APJxE6FPz/AvgcN3BtB
-         guseFwcga6lGcmp0JLofGhTbejfS9dW9bnCFJBtRfzUVd+Cb8aYuzV5zgCJgqOBJ
-         Hf0L6xDwn8UuzRfi0MWzEskuC/KxUJqVHMuTaLdrSeP1/czompetbsSHTfDklf/p
-         4EbSM9VqZFiKr17we0LdigAEv2JnL2Qj0oN3eRNU0sDJ3kZvh5qhnteNgSRM/el0
-         Sly+34CRZzX25vd+pOTgwK6VFx3wvWfqn3pVNT9ASNalhogFXuBY2ukYJaiUTPsS
-         R4+KHiD3eIhWyayBGP+GRvGb5dVC29k4CjLvQM9lISmZrrxGmMGoV9S1dh7siZYE
-         CaVW0nKI95d6bBHaKH1g5HJ7NEsVTwf8LRY/FFpLsEPVw4HNVqqqwhuJnSW70WQ3
-         blh0RIX/+z9hAla+M0kix7r0lS89ZBdTgwPuiCrkPRpoxi06ah/Q62uP3ZN4+dew
-         1sBZdaC9kaKdOOWTqArVnaPObQgUUJFhY9wUsA==
-         =uKv4
-         -----END PGP PUBLIC KEY BLOCK-----
-        
   conf: |
     Acquire {
       Retries "60"
@@ -56,189 +23,77 @@ apt:
     }
 
 package_update: true
-packages_upgrade: true
+package_upgrade: false
 packages:
-  - net-tools
-  - nmap
-  - git
-  - tree
   - openssh-server
   - sshpass
+  - git
+  - curl
+  - ca-certificates
+  - jq
+  - python3
+  - python3-pip
   - software-properties-common
   - ansible
-#  - ansible-core
 
 write_files:
   - content: |
-      # first hosts_entry - always vcloud hostname/ip
-      ${hosts_entry0}
-      ${hosts_entry1} 
-
+${hosts_content}
     path: /etc/hosts
     append: true
+
   - content: |
-      [dvm]
-      ${dvm_name}
-
-      [masters]
-
-      [workers]   
-
-      [k8s-nodes:children]
-      masters
-      workers
-
-      [k8s-nodes:vars]
-      ansible_connection=ssh
-      ansible_user=${os_admin_username}
-      ansible_ssh_pass=${ansible_ssh_pass}
-      ansible_sudo_pass=${ansible_ssh_pass}
-
-      [dvm:vars]
-      ansible_connection=local
-      ansible_user=${os_admin_username}
-      ansible_sudo_pass=${ansible_ssh_pass}
-
+${inventory_content}
     path: /K8s-inventory
+    permissions: "0600"
+
+  - content: |
+${cluster_vars_content}
+    path: /etc/k8s_cluster_vars.yaml
+    permissions: "0600"
+
   - content: |
       #!/bin/bash
-      export ip_net=$(echo ${master0_ip} | cut -d '.' -f1-3)
-      export master0_ip_4=$(echo ${master0_ip} | cut -d '.' -f4)
-      export worker0_ip_4=$(($(echo ${master0_ip} | cut -d '.' -f4)+3))    
-      
-      for (( m=1;m<=$((${masters_count}));m++ ));do ip=$((master0_ip_4 + m - 1)); echo "$ip_net.$ip  ${master_pref}-0$m" >> /etc/hosts; done
-      for (( w=1;w<=$((${workers_count}));w++ ));do ip=$((worker0_ip_4 + w - 1)); echo "$ip_net.$ip  ${worker_pref}-$(echo 0$w| rev | cut -c 1-2| rev)"  >> /etc/hosts; done
-    
-    path:  /add_hosts_records.sh
-    permissions: "0744"
-  - content: |
-      #!/bin/bash
-      for (( i=$((${masters_count}));i>=1;i-- ));do sed -i "/\[masters\]/a ${master_pref}-0$i" /K8s-inventory ;done
-      for (( i=$((${workers_count}));i>=1;i-- ));do index=$(echo  0$i | rev | cut -c 1-2 |rev); sed -i "/\[workers\]/a ${worker_pref}-$index" /K8s-inventory ;done
-    path: /add_inventory_records.sh
-    permissions: "0744"
-  - content: |
-      #!/bin/bash
-      ansible-playbook /${ansible_repo_name}/${ansible_playbook} -e "vcloud_vdc='${vcloud_vdc}' \
-           docker_mirror='${docker_mirror}'
-           def_dns='${def_dns}'
-           env_dns1='${env_dns1}'
-           env_dns2='${env_dns2}'
-           master0_ip='${master0_ip}'
-           master1_ip='${master1_ip}'
-           master2_ip='${master2_ip}'
-           workers_count='${workers_count}'
-           masters_count='${masters_count}'
-           worker0_name='${worker0_name}' 
-           vcloud_orgname='${vcloud_orgname}'
-           vcloud_user='${vcloud_user}'
-           vcloud_password='${vcloud_password}'
-           vcloud_csiadmin_username='${vcloud_csiadmin_username}'
-           vcloud_csiadmin_password='${vcloud_csiadmin_password}'
-           vcloud_url='${vcloud_url}'
-           vcloud_ip='${vcloud_ip}'
-           vcloud_catalogname='${vcloud_catalogname}'
-           vcloud_vmtmplname='${vcloud_vmtmplname}'
-           vcloud_orgvnet='${vcloud_orgvnet}'
-           vapp_name='${vapp_name}'
-           cloud_type='${cloud_type}'
-           os_admin_username='${os_admin_username}'
-           os_nic1_name='${os_nic1_name}'
-           k8s_ver='${k8s_ver}'
-           k8s_version_short='${k8s_version_short}'
-           calico_version='${calico_version}'
-           k8s_cluster_name='${k8s_cluster_name}'
-           helm_version='${helm_version}'
-           ingress_controller_nodeport_http='${ingress_controller_nodeport_http}'
-           ingress_controller_nodeport_https='${ingress_controller_nodeport_https}'
-           k8s_controlPlane_Endpoint='${k8s_controlPlane_Endpoint}'
-           k8s_service_subnet='${k8s_service_subnet}'
-           k8s_pod_subnet='${k8s_pod_subnet}'
-           calico_network_cidr_blocksize='${calico_network_cidr_blocksize}'
-           k8s_cluster_id='${k8s_cluster_id}'
-           sc_storage_policy_name='${sc_storage_policy_name}'
-           sc_name='${sc_name}'
-           ingress_ext_fqdn='${ingress_ext_fqdn}'"
-          # crontab -r
+      set -e
+      echo "=== [$(date)] Starting Kubernetes Cluster Automation ==="
+      cd /${ansible_repo_name}
+      mkdir -p vars group_vars/all
+      cp /etc/k8s_cluster_vars.yaml vars/cluster_vars.yaml
+
+      # Store vault secret securely on DVM
+      echo -n "${vault_secret}" > /root/.vault_pass
+      chmod 0600 /root/.vault_pass
+
+      # Encrypt OS credentials into group_vars/all/vault.yaml
+      echo "---" > group_vars/all/vault.yaml
+      echo -n "${os_admin_username}" | ansible-vault encrypt_string --stdin-name "vault_os_admin" --vault-password-file /root/.vault_pass >> group_vars/all/vault.yaml
+      echo "" >> group_vars/all/vault.yaml
+      echo -n "${ansible_ssh_pass}" | ansible-vault encrypt_string --stdin-name "vault_os_password" --vault-password-file /root/.vault_pass >> group_vars/all/vault.yaml
+      echo "" >> group_vars/all/vault.yaml
+
+      # Move inventory to repository and replace placeholders with encrypted vault variables
+      mv /K8s-inventory /${ansible_repo_name}/K8s-inventory
+      sed -i 's|__VAULT_OS_ADMIN__|{{ vault_os_admin }}|g; s|__VAULT_OS_PASSWORD__|{{ vault_os_password }}|g' /${ansible_repo_name}/K8s-inventory
+      chmod 0600 /${ansible_repo_name}/K8s-inventory group_vars/all/vault.yaml
+
+      if [ -f requirements.yml ]; then
+        echo "Installing Galaxy requirements..."
+        ansible-galaxy install -r requirements.yml -p roles/ || true
+      fi
+
+      echo "Executing Ansible playbook ${ansible_playbook}..."
+      ansible-playbook -i /${ansible_repo_name}/K8s-inventory "${ansible_playbook}" -e @vars/cluster_vars.yaml --vault-password-file /root/.vault_pass
+      echo "=== [$(date)] Kubernetes Cluster Automation Completed Successfully ==="
     path: /ansible_starter.sh
-  - content: |                                                                                                                                                           
-      @reboot /k8s-kubeadm-ansible/ansible_starter.sh
-    path: /var/spool/cron/root  
+    permissions: "0755"
 
 runcmd:
-#  - add-apt-repository --yes --update ppa:ansible/ansible
-  - /add_hosts_records.sh
-  - /add_inventory_records.sh
-  - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" -v
-  - git clone https://github.com/nokogerra/ubuntu-ansible-basic-roles.git
-  - cp -r /ubuntu-ansible-basic-roles/*  ${ansible_repo_name}/roles/
-  - cp /ansible_starter.sh  ${ansible_repo_name}
   - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
   - sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
-  - \[ -e /etc/ssh/sshd_config.d/*.conf \] && grep -ilr PasswordAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i "s/PasswordAuthentication no/PasswordAuthentication yes/"
-  - [ systemctl, daemon-reload ]
-  - [ systemctl, restart, --no-block, ssh.service ]
-  - [ ansible-galaxy, collection, install, kubernetes.core ]
-#  - chmod u+x /k8s-kubeadm-ansible/ansible_starter.sh
-#  - /usr/bin/crontab /var/spool/cron/root
-  - cd ${ansible_repo_name}
-  - ansible-galaxy install -r requirements.yml -p roles/
-  - ansible-playbook "/${ansible_repo_name}/${ansible_playbook}"
-     -e "vcloud_vdc=${vcloud_vdc} 
-       docker_mirror=${docker_mirror}
-       def_dns=${def_dns}
-       env_dns1=${env_dns1}
-       env_dns2=${env_dns2}
-       master0_ip=${master0_ip}
-       master1_ip=${master1_ip}
-       master2_ip=${master2_ip}
-       workers_count=${workers_count}
-       masters_count=${masters_count}
-       lb_count=${lb_count}
-       worker0_name=${worker0_name}
-       vcloud_orgname=${vcloud_orgname}
-       vcloud_user=${vcloud_user}
-       vcloud_password=${vcloud_password}
-       vcloud_csiadmin_username=${vcloud_csiadmin_username}
-       vcloud_csiadmin_password=${vcloud_csiadmin_password}
-       vcloud_url=${vcloud_url}
-       vcloud_ip=${vcloud_ip}
-       vcloud_catalogname=${vcloud_catalogname}
-       vcloud_vmtmplname=${vcloud_vmtmplname}
-       vcloud_orgvnet=${vcloud_orgvnet}
-       vapp_name=${vapp_name}
-       cloud_type=${cloud_type}
-       os_admin_username=${os_admin_username}
-       os_nic1_name=${os_nic1_name}
-       k8s_cluster_name=${k8s_cluster_name}
-       helm_version=${helm_version}
-       ingress_controller_nodeport_http=${ingress_controller_nodeport_http}
-       ingress_controller_nodeport_https=${ingress_controller_nodeport_https}
-       k8s_ver=${k8s_ver}
-       k8s_version_short=${k8s_version_short}
-       calico_version=${calico_version}
-       k8s_controlPlane_Endpoint=${k8s_controlPlane_Endpoint}
-       k8s_service_subnet=${k8s_service_subnet}
-       k8s_pod_subnet=${k8s_pod_subnet}
-       calico_network_cidr_blocksize=${calico_network_cidr_blocksize}
-       k8s_cluster_id=${k8s_cluster_id}
-       sc_storage_policy_name=${sc_storage_policy_name}
-       sc_name=${sc_name}
-       ingress_ext_fqdn=${ingress_ext_fqdn}
-       obs_type=${obs_type}
-       alertmgr_telegram_receiver_name=${telegram_rcv_name}
-       alertmgr_telegram_bot_token=${telegram_bot_token}
-       alertmgr_telegram_chatid=${telegram_chat_id}
-       vm_stack_type=${vm_stack_type}
-       remoteWriteUrl=${remoteWriteUrl} 
-       remoteWriteUsername=${remoteWriteUsername} 
-       remoteWritePassword=${remoteWritePassword} 
-       etcdProxyMainImageURL=${etcdProxyMainImageURL} 
-       etcdProxyInitImageURL=${etcdProxyInitImageURL} 
-       label_env_name=${label_env_name} 
-       label_dctr_name=${label_dctr_name} 
-       label_project_name=${label_project_name}"
-
-
-
- 
+  - "[ -e /etc/ssh/sshd_config.d/*.conf ] && grep -ilr PasswordAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' || true"
+  - systemctl daemon-reload
+  - systemctl restart ssh.service
+  - apt-get update && apt-get install -y python3-kubernetes || pip3 install kubernetes --break-system-packages || true
+  - ansible-galaxy collection install kubernetes.core ansible.posix community.general || true
+  - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" /${ansible_repo_name}
+  - /ansible_starter.sh > /var/log/ansible-bootstrap.log 2>&1

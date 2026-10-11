@@ -1,107 +1,101 @@
-## Kubernetes cluster deployment on a VMware vCloud platform
+## Kubernetes Cluster Deployment on VMware Cloud Director (vCD)
 
-This module intended to deploy Kubernetes cluster inside a tenant on standard VMware vCloud platform.
-It  creates a set of virtual machines for K8s control and data plane, make their preparation, bootstrap Kubernetes cluster, add all defined members and install a set of Kubernetes addons.
+Модуль предназначен для автоматизированного развертывания отказоустойчивого кластера Kubernetes внутри тенанта VMware Cloud Director с использованием публичного доступа в интернет.
 
-All customusation and configuration performing by a dedicated Ansible playbook: https://github.com/werton13/k8s-kubeadm-ansible.git which was  created specifically for this project(and for the parallel vsphere project) and embedded into module variable.
+Проект поддерживает **Kubernetes v1.35**, базовую ОС **Ubuntu 24.04 LTS (Noble Numbat)**, а также работу с обоими типами сетевой виртуализации: **NSX-V** и современным **NSX-T ALB (Avi)**.
 
-Ansible playbook runs from the dedicated DVM virtual machine, deployed as part of thic code execution.
+---
 
-Currently the following list of Kubernetes addons installing:
+### Архитектура и возможности
 
+- **Узлы кластера:**
+  - Control Plane (Master-ноды): от 1 до $N$ узлов (по умолчанию 3).
+  - Data Plane (Worker-ноды): от 1 до $N$ узлов.
+  - Deployment Workstation (DVM): служебная ВМ для оркестрации и выполнения Ansible.
+- **Балансировка нагрузки (KubeAPI & Ingress):**
+  - **NSX-V:** Нативный Edge Gateway Load Balancer (`vcd_lb_*`) с динамическими пулами участников.
+  - **NSX-T:** Нативный NSX-T Advanced Load Balancer (Avi ALB) через ресурсы `vcd_nsxt_alb_pool` и `vcd_nsxt_alb_virtual_service`.
+- **Конфигурация дисков:**
+  - Системный диск OS Disk (paravirtual).
+  - Опциональные дополнительные диски LVM под `/var` и `/var/lib` (containerd, etcd, kubelet) с автоматическим graceful fallback при их отсутствии.
+- **Kubernetes 1.35 Стек:**
+  - Официальный публичный репозиторий: `pkgs.k8s.io`.
+  - Спецификация Kubeadm: `kubeadm.k8s.io/v1beta4`.
+  - Container Runtime: `containerd` с `SystemdCgroup = true` и `registry.k8s.io/pause:3.10`.
+  - Режим KubeProxy: `ipvs`.
+  - Надежный нативный join через `kubeadm token create --print-join-command` и `--certificate-key`.
+- **Addons & Observability:**
+  - **CNI:** Calico Tigera Operator (`v1.36` / Calico `v3.29+`).
+  - **CSI:** VMware Cloud Director Named Disk CSI Driver (`v1.5.0+`) с автоматическим CoreDNS hosts patch для vCloud API.
+  - **Ingress:** NGINX Ingress Controller (публичный Helm-чарт).
+  - **Metrics:** Kubernetes Metrics Server (публичный Helm-чарт).
+  - **Monitoring:** Стек VictoriaMetrics (`vmoperator`, `vmagent` с поддержкой `remoteWrite`, `node-exporter`, `x509-certificate-exporter`, `vmservicescrapes`).
+  - **Backup:** Автоматическое резервное копирование etcd-снимков на DVM-хост.
 
-  - Tigera operator for Calico CNI: https://docs.tigera.io/calico/3.25/about
-  - vCloud CSI driver: https://github.com/vmware/cloud-director-named-disk-csi-driver
-  - Kubernetes metrics server: https://github.com/kubernetes-sigs/metrics-server
-  - Ingress NGINX Controller:  https://kubernetes.github.io/ingress-nginx/
-  - Monitoring stack - allow to chose from 2 options - none/Prometheus stack/(third option victoria monitoring - under construction)
-    - Prometheus Monitoring Community: https://github.com/prometheus-community
-    * Prometheus alerting rules defined (under construction)
-    * Alert Manager config with Telegram integration
-    - Grafana Labs Grafana: https://github.com/grafana
-      * Preconfigured for Prometheus source
-      * Preinstalled the following dashboards:
-        + Node Exporter Full: https://grafana.com/grafana/dashboards/1860-node-exporter-full/
-        + kube-state-metrics-v2: https://grafana.com/grafana/dashboards/13332-kube-state-metrics-v2/
-        + Prometheus Stats: https://grafana.com/grafana/dashboards/358-prometheus-stats/
+---
 
+### Требования к окружению vCloud
 
-#### WHAT IT WILL DO:
+1. **Routed Network (Org VDC Network):**
+   - Тип: Routed (подключена к Edge Gateway).
+   - Подсеть CIDR (например, `192.168.100.0/24`).
+   - Настроен SNAT для исходящего доступа нод в интернет.
+   - Настроен Firewall (разрешен исходящий трафик в интернет и входящий трафик к VIP KubeAPI и Ingress).
+2. **Шаблон ВМ в каталоге:**
+   - Образ `Ubuntu 24.04 LTS` (или `22.04 LTS`) с установленным `cloud-init` и включенным UUID (`disk.EnableUUID = TRUE`).
+3. **Сервисный аккаунт для CSI:**
+   - Пользователь vCD с правами на управление Named Disks в VDC.
+4. **Для NSX-T (при выборе network_type = "nsx-t"):**
+   - На Edge Gateway должен быть назначен Service Engine Group (например, `Default-SEG`).
 
-During this terraform code execution will be perormed:
- - creation a set of virtual machines for:
-   - 3 master nodes - default
-   - n worker nodes - as many as defined in input variables
-   - 1 DVM host - to run ansible code and coordinate it execution on master and worker nodes
- - create and assign a set of additional disks for master and worker nodes with sizes, configured in input variables
- - install all required packages and do required OS configuration in preparation for Kubernetes cluster bootstraping
- - install all required Kubernetes packajes
- - bootstrap Kubernetes cluster with network configuration defined in the input variables
- - install and configure Calico CNI in the operator approach
- - install and configure vCloud CSI from this project: https://github.com/vmware/cloud-director-named-disk-csi-driver/tree/main
- - install metrics server, ingress controller and optionally monitoring stack with Telegram integration
- - configure DVM host as cluster manager workstation with all required tools (like kubectl, helm and bash modifocations )
- - copy kubernetes kubeconfig file to the DVM host into cluster admin home catalogue
- - configure a scheduled automatic etcd backup on each master node, receiving and storing  those files on the DVM host
- 
+---
 
+### Быстрый старт
 
-#### HOW TO USE:
+1. Склонируйте репозиторий:
+   ```bash
+   git clone https://github.com/werton13/tf-vcloud-k8s.git
+   cd tf-vcloud-k8s
+   ```
 
-<b>To use this module you have to: </b>
+2. Скопируйте и настройте файл переменных:
+   ```bash
+   cp example.tfvars terraform.tfvars
+   # Отредактируйте terraform.tfvars под ваши параметры vCloud
+   ```
 
-- Prepare vCloud configuration:
-  - precreate virtual network
-    * scope: Organization Virtual Data Center
-    * type: routed
-    * gateway CIDR: - according desired IP plan
-    * DNS: - server IP with internet names resolution available
-  - create SNAT rule to allow internet outbound connections from the created virtual network
-  - create Firewall rule to allow internet outbound connections from the created virtual network
-  - create Firewall rule to allow  connections from  created virtual network to the IP of LoadBalancer VIP which will be assigned to KubeAPI LoadBalancer
-  - enable LoadBalancer in the vcloud edge Load Balancer global configuration
-  - create service account for vcloud CSI https://github.com/vmware/cloud-director-named-disk-csi-driver/tree/main
-  - create storage policy, which will be assigned for Kubernetes storage class 
-- create new terraform project
-- copy variables.tf file from this repository into your new project
-- copy example.tfvars and modify it according your environment
-- create main.tf file and fill it the following way:
+3. Инициализируйте и запустите Terraform:
+   ```bash
+   terraform init
+   terraform plan -out=tfplan
+   terraform apply tfplan
+   ```
 
+4. Отслеживание развертывания:
+   Terraform выведет удобные команды в `outputs`:
+   ```bash
+   # Подключение к DVM:
+   ssh k8sadmin@<DVM_IP>
 
-```hcl
-provider "vcd" {
-  user                 = var.vcloud.admin
-  password             = var.vcloud.admin_pwd
-  org                  = var.vcloud.orgname
-  vdc                  = var.vcloud.vdc
-  url                  = var.vcloud.server_fqdn
-  allow_unverified_ssl = var.vcloud.allow_unverified_ssl
-  max_retry_timeout    = var.vcloud.max_retry_timeout
-}
+   # Просмотр логов bootstrap кластера:
+   ssh k8sadmin@<DVM_IP> 'tail -f /var/log/ansible-bootstrap.log'
+   ```
 
-module "vcloud-k8s-cluster" {
-  source = "github.com/werton13/tf-vcloud-k8s?ref=main"
-  project      = var.project
-  vcloud       = var.vcloud
-  ip_plan      = var.ip_plan
-  vms_config   = var.vms_config
-  disks_config = var.disks_config
-  os_config    = var.os_config
-  ansible      = var.ansible
-  kubernetes   = var.kubernetes
-  versions     = var.versions
-  obs_config   = var.obs_config
+---
 
-}
+### Структура проекта
 
 ```
-<details>
-  <summary><b>Default values</b></summary>
-
-```  
-vcloud_allow_unverified_ssl = "true"
-vcloud_max_retry_timeout    = "240"
-under construction ...
+.
+├── versions.tf               # Требования к версиям Terraform и vcd провайдера
+├── variables.tf              # Входные переменные проекта
+├── main.tf                   # ВМ (DVM, Masters, Workers) и дополнительные диски
+├── vcloud_network_prep.tf    # Настройка vApp Org Network и балансировщиков (NSX-V / NSX-T)
+├── locals.tf                 # Расчет IP-плана, генерация inventory и переменных
+├── outputs.tf                # Экспорт эндпоинтов, IP и SSH-команд
+├── example.tfvars            # Пример конфигурации
+└── templates/
+    ├── userdata_dvm.yaml     # Cloud-init конфигурация DVM (генерация inventory и автостарт)
+    ├── userdata_m.yaml       # Cloud-init конфигурация Master-нод
+    └── userdata_w.yaml       # Cloud-init конфигурация Worker-нод
 ```
- 
-</details>
