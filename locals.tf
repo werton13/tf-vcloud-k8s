@@ -74,7 +74,7 @@ ansible_connection=ssh
 ansible_user="__VAULT_OS_ADMIN__"
 ansible_ssh_pass="__VAULT_OS_PASSWORD__"
 ansible_sudo_pass="__VAULT_OS_PASSWORD__"
-ansible_ssh_common_args='-o StrictHostKeyChecking=no'
+ansible_ssh_common_args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
 
 [dvm:vars]
 ansible_connection=local
@@ -232,6 +232,7 @@ EOT
       cidr_prefix         = local.cidr_prefix
       gateway_ip          = local.gateway_ip
       os_nic1_name        = var.os_config.os_nic1_name
+      dns_servers_json    = local.dns_servers_json
     })
   ]
 
@@ -243,6 +244,7 @@ EOT
       cidr_prefix         = local.cidr_prefix
       gateway_ip          = local.gateway_ip
       os_nic1_name        = var.os_config.os_nic1_name
+      dns_servers_json    = local.dns_servers_json
     })
   ]
 
@@ -253,5 +255,6 @@ EOT
     cidr_prefix         = local.cidr_prefix
     gateway_ip          = local.gateway_ip
     os_nic1_name        = var.os_config.os_nic1_name
+    dns_servers_json    = local.dns_servers_json
   })
 }
