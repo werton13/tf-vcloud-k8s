@@ -8,3 +8,13 @@ terraform {
     }
   }
 }
+
+provider "vcd" {
+  user                 = var.vcloud.admin
+  password             = var.vcloud.admin_pwd
+  org                  = var.vcloud.orgname
+  vdc                  = var.vcloud.vdc
+  url                  = var.vcloud.server_fqdn
+  max_retry_timeout    = var.vcloud.max_retry_timeout
+  allow_unverified_ssl = var.vcloud.allow_unverified_ssl
+}

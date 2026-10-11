@@ -21,6 +21,7 @@ variable "vcloud" {
     csi_svc_pwd              = string
     vapp_name                = string
     catalogname              = string
+    catalog_org              = optional(string, "")      # Organization owning the catalog (defaults to vcloud.orgname)
     vm_template_name         = string
     orgvnet_name             = string
     edgegw                   = string

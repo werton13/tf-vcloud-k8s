@@ -17,6 +17,7 @@ vcloud = {
   csi_svc_pwd              = "vcloud_csi_service_password"
   vapp_name                = "k8s-prod-vapp"
   catalogname              = "Templates"
+  catalog_org              = "" # Optional: specify if catalog belongs to another org (e.g. "MWS-Catalogs")
   vm_template_name         = "ubuntu24.04-uuid-enabled-v1"
   orgvnet_name             = "routed-k8s-net"
   edgegw                   = "edge-gw-01"

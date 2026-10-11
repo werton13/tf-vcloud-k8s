@@ -16,7 +16,6 @@ override.tf.json
 *_override.tf.json
 
 # Exclude sensitive tfvars
+*.tfvars
+!example.tfvars
 *.auto.tfvars
-terraform.tfvars
-personal.tfvars
-private.tfvars
