@@ -1,4 +1,21 @@
 # ==============================================================================
+# Shared vApp for Kubernetes nodes
+# The vCloud CSI driver looks up node VMs inside a single vApp (vcloud-csi-config: vAppName),
+# so all master and worker VMs are placed into one vApp. No vApp network is created:
+# the existing Org VDC network is only attached (bridged) to the vApp.
+# ==============================================================================
+
+resource "vcd_vapp" "k8s_vapp" {
+  name        = var.vcloud.vapp_name
+  description = "Kubernetes cluster ${var.project.owner_org}-${var.project.name}-${var.project.env_name} nodes"
+}
+
+resource "vcd_vapp_org_network" "k8s_vapp_orgnet" {
+  vapp_name        = vcd_vapp.k8s_vapp.name
+  org_network_name = var.vcloud.orgvnet_name
+}
+
+# ==============================================================================
 # NSX-V Load Balancer Resources (applied when var.vcloud.network_type == "nsx-v")
 # ==============================================================================
 

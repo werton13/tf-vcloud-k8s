@@ -97,6 +97,13 @@ k8s_cluster_id: "${var.project.owner_org}-${var.project.name}-${var.project.env_
 k8s_version: "${var.kubernetes.cluster.version}"
 k8s_version_short: "${local.target_version.short}"
 k8s_ver: "${local.target_version.full}"
+k8s_full: "${local.target_version.full}"
+k8s_containerd: "${local.target_version.containerd}"
+k8s_cri_tools: "${local.target_version["cri-tools"]}"
+helm_version: "${local.target_version.helm.helm_version}"
+etcd_ver: "${local.target_version.etcd.etcd_ver}"
+env_type: "${var.vcloud.env_type}"
+docker_mirror: ""
 k8s_controlPlane_Endpoint: "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))}"
 
 # Networking / CNI

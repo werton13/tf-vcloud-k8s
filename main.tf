@@ -1,10 +1,10 @@
 # Master node additional disks (optional based on sizegb > 0)
 resource "vcd_vm_internal_disk" "mst_data1_disk" {
   depends_on = [
-    vcd_vm.k8s_masters_vms
+    vcd_vapp_vm.k8s_masters_vms
   ]
   count           = tonumber(var.disks_config.diskm1.sizegb) > 0 ? var.vms_config.masters.vm_count : 0
-  vapp_name       = vcd_vm.k8s_masters_vms[count.index].vapp_name
+  vapp_name       = vcd_vapp.k8s_vapp.name
   vm_name         = local.master_nodes[count.index].name
   bus_type        = var.disks_config.diskm1.bus_type
   size_in_mb      = tonumber(var.disks_config.diskm1.sizegb) * 1024
@@ -15,10 +15,10 @@ resource "vcd_vm_internal_disk" "mst_data1_disk" {
 
 resource "vcd_vm_internal_disk" "mst_data2_disk" {
   depends_on = [
-    vcd_vm.k8s_masters_vms
+    vcd_vapp_vm.k8s_masters_vms
   ]
   count           = tonumber(var.disks_config.diskm2.sizegb) > 0 ? var.vms_config.masters.vm_count : 0
-  vapp_name       = vcd_vm.k8s_masters_vms[count.index].vapp_name
+  vapp_name       = vcd_vapp.k8s_vapp.name
   vm_name         = local.master_nodes[count.index].name
   bus_type        = var.disks_config.diskm2.bus_type
   size_in_mb      = tonumber(var.disks_config.diskm2.sizegb) * 1024
@@ -30,10 +30,10 @@ resource "vcd_vm_internal_disk" "mst_data2_disk" {
 # Worker node additional disks (optional based on sizegb > 0)
 resource "vcd_vm_internal_disk" "wrk_data1_disk" {
   depends_on = [
-    vcd_vm.k8s_workers_vms
+    vcd_vapp_vm.k8s_workers_vms
   ]
   count           = tonumber(var.disks_config.diskw1.sizegb) > 0 ? var.vms_config.workers.vm_count : 0
-  vapp_name       = vcd_vm.k8s_workers_vms[count.index].vapp_name
+  vapp_name       = vcd_vapp.k8s_vapp.name
   vm_name         = local.worker_nodes[count.index].name
   bus_type        = var.disks_config.diskw1.bus_type
   size_in_mb      = tonumber(var.disks_config.diskw1.sizegb) * 1024
@@ -44,10 +44,10 @@ resource "vcd_vm_internal_disk" "wrk_data1_disk" {
 
 resource "vcd_vm_internal_disk" "wrk_data2_disk" {
   depends_on = [
-    vcd_vm.k8s_workers_vms
+    vcd_vapp_vm.k8s_workers_vms
   ]
   count           = tonumber(var.disks_config.diskw2.sizegb) > 0 ? var.vms_config.workers.vm_count : 0
-  vapp_name       = vcd_vm.k8s_workers_vms[count.index].vapp_name
+  vapp_name       = vcd_vapp.k8s_vapp.name
   vm_name         = local.worker_nodes[count.index].name
   bus_type        = var.disks_config.diskw2.bus_type
   size_in_mb      = tonumber(var.disks_config.diskw2.sizegb) * 1024
@@ -56,8 +56,12 @@ resource "vcd_vm_internal_disk" "wrk_data2_disk" {
   storage_profile = var.disks_config.diskw2.storage_profile != "" ? var.disks_config.diskw2.storage_profile : null
 }
 
-# Master virtual machines (Standalone VMs in Org Network)
-resource "vcd_vm" "k8s_masters_vms" {
+# Master virtual machines (in the shared cluster vApp, attached to the Org Network)
+resource "vcd_vapp_vm" "k8s_masters_vms" {
+  depends_on = [
+    vcd_vapp_org_network.k8s_vapp_orgnet
+  ]
+  vapp_name     = vcd_vapp.k8s_vapp.name
   name          = local.master_nodes[count.index].name
   computer_name = local.master_nodes[count.index].name
   count         = var.vms_config.masters.vm_count
@@ -102,8 +106,12 @@ resource "vcd_vm" "k8s_masters_vms" {
   }
 }
 
-# Worker virtual machines (Standalone VMs in Org Network)
-resource "vcd_vm" "k8s_workers_vms" {
+# Worker virtual machines (in the shared cluster vApp, attached to the Org Network)
+resource "vcd_vapp_vm" "k8s_workers_vms" {
+  depends_on = [
+    vcd_vapp_org_network.k8s_vapp_orgnet
+  ]
+  vapp_name     = vcd_vapp.k8s_vapp.name
   name          = local.worker_nodes[count.index].name
   computer_name = local.worker_nodes[count.index].name
   count         = var.vms_config.workers.vm_count
@@ -151,8 +159,8 @@ resource "vcd_vm" "k8s_workers_vms" {
 # Wait for master and worker nodes to finish booting and guest customization before creating DVM
 resource "time_sleep" "wait_for_nodes_ready" {
   depends_on = [
-    vcd_vm.k8s_masters_vms,
-    vcd_vm.k8s_workers_vms,
+    vcd_vapp_vm.k8s_masters_vms,
+    vcd_vapp_vm.k8s_workers_vms,
     vcd_vm_internal_disk.mst_data1_disk,
     vcd_vm_internal_disk.mst_data2_disk,
     vcd_vm_internal_disk.wrk_data1_disk,
