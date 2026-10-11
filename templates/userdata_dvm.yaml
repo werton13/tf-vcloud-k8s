@@ -22,7 +22,7 @@ apt:
       }
     }
 
-package_update: true
+package_update: false
 package_upgrade: false
 packages:
   - openssh-server
@@ -41,6 +41,20 @@ write_files:
 ${hosts_content}
     path: /etc/hosts
     append: true
+
+  - content: |
+      APT::Periodic::Update-Package-Lists "0";
+      APT::Periodic::Download-Upgradeable-Packages "0";
+      APT::Periodic::AutocleanInterval "0";
+      APT::Periodic::Unattended-Upgrade "0";
+    path: /etc/apt/apt.conf.d/10periodic
+    permissions: "0644"
+
+  - content: |
+      PubkeyAuthentication yes
+      PasswordAuthentication yes
+    path: /etc/ssh/sshd_config.d/60-k8s-auth.conf
+    permissions: "0600"
 
   - content: |
 ${inventory_content}
@@ -88,8 +102,13 @@ ${cluster_vars_content}
     permissions: "0755"
 
 runcmd:
-  - systemctl stop apt-daily.timer apt-daily-upgrade.timer 2>/dev/null || true
+  - systemctl stop apt-daily.timer apt-daily-upgrade.timer apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
   - systemctl disable apt-daily.timer apt-daily-upgrade.timer 2>/dev/null || true
+  - systemctl mask apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
+  - apt-get purge --auto-remove -y unattended-upgrades ubuntu-advantage-tools ubuntu-pro-client 2>/dev/null || true
+  - rm -f /etc/apt/apt.conf.d/20apt-esm-hook.conf 2>/dev/null || true
+  - sed -i 's/^Prompt.*/Prompt=never/' /etc/update-manager/release-upgrades 2>/dev/null || true
+  - truncate -s 0 /var/lib/ubuntu-release-upgrader/release-upgrade-available 2>/dev/null || true
   - sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
   - sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
   - sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
