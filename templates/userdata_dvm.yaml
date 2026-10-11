@@ -88,9 +88,13 @@ ${cluster_vars_content}
     permissions: "0755"
 
 runcmd:
-  - sed -i 's/PasswordAuthentication no/#PasswordAuthentication no/' /etc/ssh/sshd_config
-  - sed -i 's/#PasswordAuthentication yes/PasswordAuthentication yes/' /etc/ssh/sshd_config
+  - systemctl stop apt-daily.timer apt-daily-upgrade.timer 2>/dev/null || true
+  - systemctl disable apt-daily.timer apt-daily-upgrade.timer 2>/dev/null || true
+  - sed -i 's/^#*PubkeyAuthentication.*/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+  - sed -i 's/^#*PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+  - sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' /etc/ssh/sshd_config
   - "[ -e /etc/ssh/sshd_config.d/*.conf ] && grep -ilr PasswordAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i 's/PasswordAuthentication no/PasswordAuthentication yes/' || true"
+  - "[ -e /etc/ssh/sshd_config.d/*.conf ] && grep -ilr PubkeyAuthentication /etc/ssh/sshd_config.d/ | xargs -n1 sed -i 's/PubkeyAuthentication no/PubkeyAuthentication yes/' || true"
   - systemctl daemon-reload
   - systemctl restart ssh.service
   - apt-get update && apt-get install -y python3-kubernetes || pip3 install kubernetes --break-system-packages || true
