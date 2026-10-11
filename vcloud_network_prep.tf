@@ -13,6 +13,9 @@ resource "vcd_vapp" "k8s_vapp" {
 resource "vcd_vapp_org_network" "k8s_vapp_orgnet" {
   vapp_name        = vcd_vapp.k8s_vapp.name
   org_network_name = var.vcloud.orgvnet_name
+  # VCD 10.4.1+ refuses to detach a network from a powered-on vApp (409 "Stop the vApp and try again"),
+  # which breaks `terraform destroy`; let the provider power the vApp off before removal
+  reboot_vapp_on_removal = true
 }
 
 # ==============================================================================

@@ -4,7 +4,7 @@ terraform {
   required_providers {
     vcd = {
       source  = "vmware/vcd"
-      version = ">= 3.8.0, < 4.0.0"
+      version = ">= 3.13.0, < 4.0.0" # set_extra_config (disk.EnableUUID) requires 3.13+
     }
     time = {
       source  = "hashicorp/time"

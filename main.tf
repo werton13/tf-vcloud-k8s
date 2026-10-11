@@ -87,6 +87,12 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
     unit_number = var.disks_config.osdisk.unit_num
   }
 
+  # Required by the vCloud CSI driver: it finds attached disks inside the guest by SCSI UUID
+  set_extra_config {
+    key   = "disk.EnableUUID"
+    value = "TRUE"
+  }
+
   customization {
     enabled                             = true
     auto_generate_password              = false
@@ -135,6 +141,12 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
     bus_type    = var.disks_config.osdisk.bus_type
     bus_number  = var.disks_config.osdisk.bus_num
     unit_number = var.disks_config.osdisk.unit_num
+  }
+
+  # Required by the vCloud CSI driver: it finds attached disks inside the guest by SCSI UUID
+  set_extra_config {
+    key   = "disk.EnableUUID"
+    value = "TRUE"
   }
 
   customization {
