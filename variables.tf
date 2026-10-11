@@ -28,6 +28,8 @@ variable "vcloud" {
     env_type                 = optional(string, "public")
     network_type             = optional(string, "nsx-v") # "nsx-v" or "nsx-t"
     alb_service_engine_group = optional(string, "")      # required when network_type = "nsx-t" (Avi ALB Service Engine Group name)
+    public_ip                = optional(string, "")      # Optional public IP override (auto-detected from Edge Gateway if empty)
+    external_network_name    = optional(string, "")      # Optional external network override (auto-detected from Edge Gateway if empty)
     lbvm_count               = optional(string, "0")
   })
   description = "VMware Cloud Director connection and environment configuration"

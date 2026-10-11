@@ -50,3 +50,18 @@ output "dvm_ansible_log_command" {
   description = "Command to follow Ansible bootstrap logs on the DVM"
   value       = "ssh ${var.os_config.vm_user_name}@${local.dvm_ip} 'tail -f /var/log/ansible-bootstrap.log'"
 }
+
+output "public_ip" {
+  description = "Auto-detected public IP address on Edge Gateway"
+  value       = local.egw_public_ip
+}
+
+output "public_kubeapi_endpoint" {
+  description = "Public Kubernetes API endpoint reachable from Internet"
+  value       = "https://${local.egw_public_ip}:6443"
+}
+
+output "public_ingress_endpoint" {
+  description = "Public Ingress HTTP endpoint reachable from Internet"
+  value       = "http://${local.egw_public_ip}:80"
+}

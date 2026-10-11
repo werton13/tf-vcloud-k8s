@@ -22,6 +22,17 @@ locals {
   # vCloud API host entry
   vcloud_fqdn_entry = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
 
+  # Automatic Edge Gateway Public IP and External Network discovery
+  egw_public_ip = try(var.vcloud.public_ip, "") != "" ? var.vcloud.public_ip : data.vcd_edgegateway.egw.default_external_network_ip
+
+  egw_ext_net_name = try(var.vcloud.external_network_name, "") != "" ? var.vcloud.external_network_name : coalesce(
+    try([
+      for net in data.vcd_edgegateway.egw.external_network : net.name
+      if anytrue([for s in net.subnet : s.use_for_default_route])
+    ][0], null),
+    try(tolist(data.vcd_edgegateway.egw.external_network)[0].name, "")
+  )
+
   # Hosts file content
   hosts_content = join("\n", concat(
     [

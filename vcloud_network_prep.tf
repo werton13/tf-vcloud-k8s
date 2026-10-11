@@ -162,6 +162,57 @@ resource "vcd_lb_virtual_server" "ingress_http" {
 }
 
 # ==============================================================================
+# NSX-V NAT Rules (automatically applied when var.vcloud.network_type == "nsx-v")
+# ==============================================================================
+
+# Outbound SNAT for cluster network (enables Internet access for apt, docker, git)
+resource "vcd_nsxv_snat" "k8s_outbound" {
+  count              = var.vcloud.network_type == "nsx-v" ? 1 : 0
+  org                = var.vcloud.orgname
+  vdc                = var.vcloud.vdc
+  edge_gateway       = var.vcloud.edgegw
+  network_type       = "ext"
+  network_name       = local.egw_ext_net_name
+  original_address   = var.os_config.vm_ip_cidr
+  translated_address = local.egw_public_ip
+  description        = "Outbound SNAT for K8s cluster (${var.project.owner_org}-${var.project.name}-${var.project.env_name})"
+}
+
+# Inbound DNAT for KubeAPI access from Internet/External network
+resource "vcd_nsxv_dnat" "kubeapi_inbound" {
+  count              = var.vcloud.network_type == "nsx-v" ? 1 : 0
+  depends_on         = [vcd_lb_virtual_server.kube_api_lb_vs]
+  org                = var.vcloud.orgname
+  vdc                = var.vcloud.vdc
+  edge_gateway       = var.vcloud.edgegw
+  network_type       = "ext"
+  network_name       = local.egw_ext_net_name
+  original_address   = local.egw_public_ip
+  original_port      = "6443"
+  translated_address = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))
+  translated_port    = "6443"
+  protocol           = "tcp"
+  description        = "Inbound DNAT for KubeAPI (${var.project.owner_org}-${var.project.name}-${var.project.env_name})"
+}
+
+# Inbound DNAT for Ingress HTTP access from Internet/External network
+resource "vcd_nsxv_dnat" "ingress_http_inbound" {
+  count              = var.vcloud.network_type == "nsx-v" ? 1 : 0
+  depends_on         = [vcd_lb_virtual_server.ingress_http]
+  org                = var.vcloud.orgname
+  vdc                = var.vcloud.vdc
+  edge_gateway       = var.vcloud.edgegw
+  network_type       = "ext"
+  network_name       = local.egw_ext_net_name
+  original_address   = local.egw_public_ip
+  original_port      = "80"
+  translated_address = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.ingress_lb))
+  translated_port    = "80"
+  protocol           = "tcp"
+  description        = "Inbound DNAT for Ingress HTTP (${var.project.owner_org}-${var.project.name}-${var.project.env_name})"
+}
+
+# ==============================================================================
 # NSX-T ALB (Avi) Resources (applied when var.vcloud.network_type == "nsx-t")
 # ==============================================================================
 
