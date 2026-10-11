@@ -94,8 +94,8 @@ resource "vcd_vm" "k8s_masters_vms" {
   guest_properties = {
     "hostname"                    = local.master_nodes[count.index].name
     "instance-id"                 = local.master_nodes[count.index].name
-    "user-data"                   = base64encode(local.cloudinit_master_rendered)
-    "guestinfo.userdata"          = base64encode(local.cloudinit_master_rendered)
+    "user-data"                   = base64encode(local.cloudinit_master_rendered[count.index])
+    "guestinfo.userdata"          = base64encode(local.cloudinit_master_rendered[count.index])
     "guestinfo.userdata.encoding" = "base64"
     "guestinfo.metadata"          = base64encode(jsonencode({ "instance-id" = local.master_nodes[count.index].name, "local-hostname" = local.master_nodes[count.index].name }))
     "guestinfo.metadata.encoding" = "base64"
@@ -140,8 +140,8 @@ resource "vcd_vm" "k8s_workers_vms" {
   guest_properties = {
     "hostname"                    = local.worker_nodes[count.index].name
     "instance-id"                 = local.worker_nodes[count.index].name
-    "user-data"                   = base64encode(local.cloudinit_worker_rendered)
-    "guestinfo.userdata"          = base64encode(local.cloudinit_worker_rendered)
+    "user-data"                   = base64encode(local.cloudinit_worker_rendered[count.index])
+    "guestinfo.userdata"          = base64encode(local.cloudinit_worker_rendered[count.index])
     "guestinfo.userdata.encoding" = "base64"
     "guestinfo.metadata"          = base64encode(jsonencode({ "instance-id" = local.worker_nodes[count.index].name, "local-hostname" = local.worker_nodes[count.index].name }))
     "guestinfo.metadata.encoding" = "base64"

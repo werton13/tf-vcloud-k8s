@@ -66,6 +66,24 @@ ${hosts_content}
     permissions: "0644"
 
   - content: |
+      network:
+        version: 2
+        renderer: networkd
+        ethernets:
+          ${os_nic1_name}:
+            dhcp4: false
+            dhcp6: false
+            addresses:
+              - ${node_ip}/${cidr_prefix}
+            routes:
+              - to: default
+                via: ${gateway_ip}
+            nameservers:
+              addresses: ${dns_servers_json}
+    path: /etc/netplan/01-netplan.yaml
+    permissions: "0600"
+
+  - content: |
 ${inventory_content}
     path: /K8s-inventory
     permissions: "0600"
@@ -128,6 +146,11 @@ ${cluster_vars_content}
     permissions: "0755"
 
 runcmd:
+  - rm -f /etc/netplan/50-cloud-init.yaml 2>/dev/null || true
+  - ip addr add ${node_ip}/${cidr_prefix} dev ${os_nic1_name} 2>/dev/null || true
+  - ip link set ${os_nic1_name} up 2>/dev/null || true
+  - ip route add default via ${gateway_ip} dev ${os_nic1_name} 2>/dev/null || true
+  - netplan apply 2>/dev/null || true
   - systemctl restart systemd-resolved 2>/dev/null || true
   - systemctl stop apt-daily.timer apt-daily-upgrade.timer apt-daily.service apt-daily-upgrade.service 2>/dev/null || true
   - systemctl disable apt-daily.timer apt-daily-upgrade.timer 2>/dev/null || true

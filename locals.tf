@@ -154,24 +154,41 @@ locals {
 
   # Rendered cloud-init files
   dns_servers_list = join(" ", compact([var.os_config.env_dns1, var.os_config.env_dns2, try(var.os_config.env_dns3, "")]))
+  gateway_ip       = cidrhost(var.os_config.vm_ip_cidr, 1)
+  cidr_prefix      = split("/", var.os_config.vm_ip_cidr)[1]
+  dns_servers_json = jsonencode(compact([var.os_config.env_dns1, var.os_config.env_dns2, try(var.os_config.env_dns3, "")]))
 
-  cloudinit_master_rendered = templatefile("${path.module}/templates/userdata_m.yaml", {
-    vm_user_name        = var.os_config.vm_user_name
-    vm_user_displayname = var.os_config.vm_user_displayname
-    vm_user_password    = var.os_config.vm_user_password
-    vm_user_ssh_key     = try(var.os_config.vm_user_ssh_key, "")
-    hosts_content       = local.hosts_content
-    dns_servers         = local.dns_servers_list
-  })
+  cloudinit_master_rendered = [
+    for i, node in local.master_nodes : templatefile("${path.module}/templates/userdata_m.yaml", {
+      vm_user_name        = var.os_config.vm_user_name
+      vm_user_displayname = var.os_config.vm_user_displayname
+      vm_user_password    = var.os_config.vm_user_password
+      vm_user_ssh_key     = try(var.os_config.vm_user_ssh_key, "")
+      hosts_content       = local.hosts_content
+      dns_servers         = local.dns_servers_list
+      os_nic1_name        = var.os_config.os_nic1_name
+      node_ip             = node.ip
+      cidr_prefix         = local.cidr_prefix
+      gateway_ip          = local.gateway_ip
+      dns_servers_json    = local.dns_servers_json
+    })
+  ]
 
-  cloudinit_worker_rendered = templatefile("${path.module}/templates/userdata_w.yaml", {
-    vm_user_name        = var.os_config.vm_user_name
-    vm_user_displayname = var.os_config.vm_user_displayname
-    vm_user_password    = var.os_config.vm_user_password
-    vm_user_ssh_key     = try(var.os_config.vm_user_ssh_key, "")
-    hosts_content       = local.hosts_content
-    dns_servers         = local.dns_servers_list
-  })
+  cloudinit_worker_rendered = [
+    for i, node in local.worker_nodes : templatefile("${path.module}/templates/userdata_w.yaml", {
+      vm_user_name        = var.os_config.vm_user_name
+      vm_user_displayname = var.os_config.vm_user_displayname
+      vm_user_password    = var.os_config.vm_user_password
+      vm_user_ssh_key     = try(var.os_config.vm_user_ssh_key, "")
+      hosts_content       = local.hosts_content
+      dns_servers         = local.dns_servers_list
+      os_nic1_name        = var.os_config.os_nic1_name
+      node_ip             = node.ip
+      cidr_prefix         = local.cidr_prefix
+      gateway_ip          = local.gateway_ip
+      dns_servers_json    = local.dns_servers_json
+    })
+  ]
 
   # Cluster node IPs list for health-check / polling
   cluster_node_ips = join(" ", [for node in concat(local.master_nodes, local.worker_nodes) : node.ip])
@@ -183,6 +200,11 @@ locals {
     vm_user_ssh_key      = try(var.os_config.vm_user_ssh_key, "")
     hosts_content        = local.hosts_content
     dns_servers          = local.dns_servers_list
+    os_nic1_name         = var.os_config.os_nic1_name
+    node_ip              = local.dvm_ip
+    cidr_prefix          = local.cidr_prefix
+    gateway_ip           = local.gateway_ip
+    dns_servers_json     = local.dns_servers_json
     cluster_node_ips     = local.cluster_node_ips
     inventory_content    = local.inventory_content
     cluster_vars_content = local.cluster_vars_content
@@ -199,14 +221,14 @@ locals {
   customization_master_script = [
     for i, node in local.master_nodes : templatefile("${path.module}/templates/customization_node.sh", {
       node_name           = node.name
-      cloudinit_base64_gz = base64gzip(local.cloudinit_master_rendered)
+      cloudinit_base64_gz = base64gzip(local.cloudinit_master_rendered[i])
     })
   ]
 
   customization_worker_script = [
     for i, node in local.worker_nodes : templatefile("${path.module}/templates/customization_node.sh", {
       node_name           = node.name
-      cloudinit_base64_gz = base64gzip(local.cloudinit_worker_rendered)
+      cloudinit_base64_gz = base64gzip(local.cloudinit_worker_rendered[i])
     })
   ]
 
