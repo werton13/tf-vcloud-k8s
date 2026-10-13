@@ -22,8 +22,12 @@ vcloud = {
   vapp_name                = "mts-k8s-lab"     # shared vApp for k8s nodes (required by vCloud CSI)
   edgegw                   = "edge-gw-01"
   env_type                 = "public"
-  network_type             = "nsx-v"       # "nsx-v" for Edge Gateway LB, or "nsx-t" for NSX-T ALB
-  alb_service_engine_group = "Default-SEG" # Required when network_type = "nsx-t"
+  network_type             = "nsx-v" # "nsx-v": Edge Gateway LB + NAT; "nsx-t": kube-vip VIPs + Edge NAT
+  # NSX-T only:
+  # public_ip                = "203.0.113.10" # required on NSX-T (Edge Gateway on IP Spaces)
+  # public_port_kubeapi      = "6443"         # public port -> kube-api VIP:6443
+  # public_port_ingress_http = "80"           # public port -> ingress VIP:80
+  # public_port_dvm_ssh      = "42768"        # public port -> DVM:22 (empty = no rule)
 }
 
 ip_plan = {

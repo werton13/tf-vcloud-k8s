@@ -2,7 +2,7 @@
 
 Модуль предназначен для автоматизированного развертывания отказоустойчивого кластера Kubernetes внутри тенанта VMware Cloud Director с использованием публичного доступа в интернет.
 
-Проект поддерживает **Kubernetes v1.35**, базовую ОС **Ubuntu 24.04 LTS (Noble Numbat)**, а также работу с обоими типами сетевой виртуализации: **NSX-V** и современным **NSX-T ALB (Avi)**.
+Проект поддерживает **Kubernetes v1.35**, базовую ОС **Ubuntu 24.04 LTS (Noble Numbat)**, а также работу с обоими типами сетевой виртуализации: **NSX-V** и **NSX-T**.
 
 ---
 
@@ -14,7 +14,7 @@
   - Deployment Workstation (DVM): служебная ВМ для оркестрации и выполнения Ansible.
 - **Балансировка нагрузки (KubeAPI & Ingress):**
   - **NSX-V:** Нативный Edge Gateway Load Balancer (`vcd_lb_*`) с динамическими пулами участников.
-  - **NSX-T:** Нативный NSX-T Advanced Load Balancer (Avi ALB) через ресурсы `vcd_nsxt_alb_pool` и `vcd_nsxt_alb_virtual_service`.
+  - **NSX-T:** без балансировщика на Edge (ALB не требуется). VIP kube-api и VIP ingress (Service `LoadBalancer`) анонсирует [kube-vip](https://kube-vip.io) в ARP-режиме со static pod на master-нодах. Edge Gateway выполняет только NAT: SNAT сети кластера и DNAT `public_ip:<порт>` на VIP и DVM (`vcd_nsxt_nat_rule`). Правила NAT создаются с `firewall_match = BYPASS`, поэтому список правил firewall Edge не меняется, а другие правила NAT на общем Edge не затрагиваются.
 - **Конфигурация дисков:**
   - Системный диск OS Disk (paravirtual).
   - Опциональные дополнительные диски LVM под `/var` и `/var/lib` (containerd, etcd, kubelet) с автоматическим graceful fallback при их отсутствии.
@@ -46,7 +46,10 @@
 3. **Сервисный аккаунт для CSI:**
    - Пользователь vCD с правами на управление Named Disks в VDC.
 4. **Для NSX-T (при выборе network_type = "nsx-t"):**
-   - На Edge Gateway должен быть назначен Service Engine Group (например, `Default-SEG`).
+   - Публичный IP Edge Gateway (`vcloud.public_ip`) задаётся явно: на Edge с IP Spaces адрес по умолчанию не определяется. Можно использовать IP, на котором уже есть чужие правила, если порты не пересекаются.
+   - VIP (`ip_plan.kubeapi_lb`, `ip_plan.ingress_lb`) не должны быть заняты; лучше выбрать их вне static pool сети.
+   - SNAT, DNAT и firewall вручную настраивать не нужно.
+   - Ansible-ветка с поддержкой kube-vip: `ansible.git_repo.repo_branch`.
 
 ---
 

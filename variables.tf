@@ -19,20 +19,32 @@ variable "vcloud" {
     admin_pwd                = string
     csi_svc                  = string
     csi_svc_pwd              = string
-    vapp_name                = string                    # shared vApp for k8s nodes (required by vCloud CSI)
+    vapp_name                = string # shared vApp for k8s nodes (required by vCloud CSI)
     catalogname              = string
-    catalog_org              = optional(string, "")      # Organization owning the catalog (defaults to vcloud.orgname)
+    catalog_org              = optional(string, "") # Organization owning the catalog (defaults to vcloud.orgname)
     vm_template_name         = string
     orgvnet_name             = string
     edgegw                   = string
     env_type                 = optional(string, "public")
-    network_type             = optional(string, "nsx-v") # "nsx-v" or "nsx-t"
-    alb_service_engine_group = optional(string, "")      # required when network_type = "nsx-t" (Avi ALB Service Engine Group name)
-    public_ip                = optional(string, "")      # Optional public IP override (auto-detected from Edge Gateway if empty)
+    network_type             = optional(string, "nsx-v") # "nsx-v" (Edge LB + NAT) or "nsx-t" (kube-vip VIPs + Edge NAT)
+    public_ip                = optional(string, "")      # Public IP for NAT; auto-detected on NSX-V, required on NSX-T (IP Spaces)
+    public_port_kubeapi      = optional(string, "6443")  # NSX-T: public port DNAT'ed to the kube-api VIP:6443
+    public_port_ingress_http = optional(string, "80")    # NSX-T: public port DNAT'ed to the ingress VIP:80
+    public_port_dvm_ssh      = optional(string, "")      # NSX-T: public port DNAT'ed to DVM:22 (empty = no rule)
     external_network_name    = optional(string, "")      # Optional external network override (auto-detected from Edge Gateway if empty)
     lbvm_count               = optional(string, "0")
   })
   description = "VMware Cloud Director connection and environment configuration"
+
+  validation {
+    condition     = contains(["nsx-v", "nsx-t"], var.vcloud.network_type)
+    error_message = "vcloud.network_type must be \"nsx-v\" or \"nsx-t\"."
+  }
+
+  validation {
+    condition     = var.vcloud.network_type != "nsx-t" || var.vcloud.public_ip != ""
+    error_message = "vcloud.public_ip is required when network_type = \"nsx-t\" (an Edge Gateway on IP Spaces has no default external IP)."
+  }
 }
 
 variable "ip_plan" {
@@ -173,6 +185,7 @@ variable "kubernetes" {
       controller_nodeport_https = string
       ext_fqdn                  = optional(string, "")
     })
+    kube_vip_version = optional(string, "v1.2.4") # NSX-T: kube-vip image tag for the kube-api and ingress VIPs
   })
   description = "Kubernetes cluster configuration parameters"
 }

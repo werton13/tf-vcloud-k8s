@@ -24,7 +24,7 @@ resource "vcd_vapp_org_network" "k8s_vapp_orgnet" {
 
 resource "vcd_edgegateway_settings" "egw_settings" {
   count           = var.vcloud.network_type == "nsx-v" ? 1 : 0
-  edge_gateway_id = data.vcd_edgegateway.egw.id
+  edge_gateway_id = data.vcd_edgegateway.egw[0].id
   lb_enabled      = true
 }
 
@@ -216,71 +216,53 @@ resource "vcd_nsxv_dnat" "ingress_http_inbound" {
 }
 
 # ==============================================================================
-# NSX-T ALB (Avi) Resources (applied when var.vcloud.network_type == "nsx-t")
+# NSX-T NAT Rules (applied when var.vcloud.network_type == "nsx-t")
+# No load balancer on the Edge: kube-api and ingress VIPs are announced by kube-vip (ARP) from the masters.
+# Only rules created here are managed; other rules on the shared Edge are left untouched.
+# firewall_match = BYPASS lets NAT traffic pass the Edge gateway firewall (default deny) without touching
+# its rule list: vcd_nsxt_firewall would own the whole list, including rules created outside this project.
 # ==============================================================================
 
-resource "vcd_nsxt_alb_pool" "kube_api" {
-  count           = var.vcloud.network_type == "nsx-t" ? 1 : 0
-  edge_gateway_id = data.vcd_edgegateway.egw.id
-  name            = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-kubeapi-pool"
-  algorithm       = "ROUND_ROBIN"
-  default_port    = 6443
+# Internal ports of DNAT targets (DNAT translates only the address; the internal port comes from the profile)
+resource "vcd_nsxt_app_port_profile" "nat" {
+  for_each   = var.vcloud.network_type == "nsx-t" ? local.nsxt_dnat_rules : {}
+  org        = var.vcloud.orgname
+  context_id = data.vcd_org_vdc.vdc.id
+  scope      = "TENANT"
+  name       = "${local.nsxt_rule_prefix}-${each.key}-tcp${each.value.internal_port}"
 
-  dynamic "member" {
-    for_each = local.master_nodes
-    content {
-      ip_address = member.value.ip
-      port       = 6443
-      ratio      = 1
-      enabled    = true
-    }
+  app_port {
+    protocol = "TCP"
+    port     = [each.value.internal_port]
   }
 }
 
-resource "vcd_nsxt_alb_virtual_service" "kube_api" {
-  count                    = var.vcloud.network_type == "nsx-t" ? 1 : 0
-  edge_gateway_id          = data.vcd_edgegateway.egw.id
-  name                     = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-kubeapi-vs"
-  pool_id                  = vcd_nsxt_alb_pool.kube_api[0].id
-  service_engine_group_id  = data.vcd_nsxt_alb_service_engine_group.seg[0].id
-  virtual_ip_address       = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))
-  application_profile_type = "APPLICATION_PROFILE_L4"
-
-  service_port {
-    start_port = 6443
-    type       = "TCP_PROXY"
-  }
+resource "vcd_nsxt_nat_rule" "dnat" {
+  for_each            = var.vcloud.network_type == "nsx-t" ? local.nsxt_dnat_rules : {}
+  org                 = var.vcloud.orgname
+  edge_gateway_id     = data.vcd_nsxt_edgegateway.egw[0].id
+  name                = "${local.nsxt_rule_prefix}-${each.key}-dnat"
+  description         = "Inbound DNAT ${local.egw_public_ip}:${each.value.external_port} -> ${each.value.internal_ip}:${each.value.internal_port} (managed by Terraform)"
+  rule_type           = "DNAT"
+  external_address    = local.egw_public_ip
+  dnat_external_port  = each.value.external_port
+  internal_address    = each.value.internal_ip
+  app_port_profile_id = vcd_nsxt_app_port_profile.nat[each.key].id
+  firewall_match      = "BYPASS"
+  priority            = 100
 }
 
-resource "vcd_nsxt_alb_pool" "ingress_http" {
-  count           = var.vcloud.network_type == "nsx-t" ? 1 : 0
-  edge_gateway_id = data.vcd_edgegateway.egw.id
-  name            = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-ingress-http-pool"
-  algorithm       = "ROUND_ROBIN"
-  default_port    = tonumber(var.kubernetes.ingress.controller_nodeport_http)
-
-  dynamic "member" {
-    for_each = local.worker_nodes
-    content {
-      ip_address = member.value.ip
-      port       = tonumber(var.kubernetes.ingress.controller_nodeport_http)
-      ratio      = 1
-      enabled    = true
-    }
-  }
-}
-
-resource "vcd_nsxt_alb_virtual_service" "ingress_http" {
-  count                    = var.vcloud.network_type == "nsx-t" ? 1 : 0
-  edge_gateway_id          = data.vcd_edgegateway.egw.id
-  name                     = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-ingress-http-vs"
-  pool_id                  = vcd_nsxt_alb_pool.ingress_http[0].id
-  service_engine_group_id  = data.vcd_nsxt_alb_service_engine_group.seg[0].id
-  virtual_ip_address       = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.ingress_lb))
-  application_profile_type = "APPLICATION_PROFILE_HTTP"
-
-  service_port {
-    start_port = 80
-    type       = "TCP_PROXY"
-  }
+# Outbound SNAT for the cluster network (apt, container registries, git). Lower precedence than the
+# existing NO_SNAT rules (priority 0), so traffic to private interconnects keeps its original source.
+resource "vcd_nsxt_nat_rule" "snat" {
+  count            = var.vcloud.network_type == "nsx-t" ? 1 : 0
+  org              = var.vcloud.orgname
+  edge_gateway_id  = data.vcd_nsxt_edgegateway.egw[0].id
+  name             = "${local.nsxt_rule_prefix}-snat"
+  description      = "Outbound SNAT ${var.os_config.vm_ip_cidr} -> ${local.egw_public_ip} (managed by Terraform)"
+  rule_type        = "SNAT"
+  external_address = local.egw_public_ip
+  internal_address = var.os_config.vm_ip_cidr
+  firewall_match   = "BYPASS"
+  priority         = 100
 }
