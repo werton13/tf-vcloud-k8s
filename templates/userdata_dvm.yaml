@@ -92,7 +92,16 @@ ${cluster_vars_content}
   - content: |
       #!/bin/bash
       set -e
+      # apt-daily timers are paused by runcmd for the bootstrap: unattended-upgrades restarts services
+      # after library upgrades and can kill a running playbook; resume them whatever the outcome
+      trap 'systemctl start apt-daily.timer apt-daily-upgrade.timer || true' EXIT
       echo "=== [$(date)] Starting Kubernetes Cluster Automation ==="
+
+      # an apt run started before the pause still holds the dpkg lock
+      while systemctl is-active --quiet apt-daily.service apt-daily-upgrade.service; do
+        echo "Waiting for a running apt-daily / unattended-upgrades job to finish..."
+        sleep 10
+      done
 
       cd /${ansible_repo_name}
       mkdir -p vars group_vars/all
@@ -149,5 +158,7 @@ runcmd:
   - truncate -s 0 /var/lib/ubuntu-release-upgrader/release-upgrade-available 2>/dev/null || true
   - systemctl daemon-reload
   - systemctl restart ssh ssh.socket ssh.service 2>/dev/null || true
+  - systemctl stop apt-daily.timer apt-daily-upgrade.timer || true
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" /${ansible_repo_name}
-  - /ansible_starter.sh 2>&1 | tee /var/log/ansible-bootstrap.log
+  # own transient unit: not a child of cloud-init / vCD post-customization, which systemd may restart
+  - systemd-run --unit=k8s-bootstrap --collect --setenv=HOME=/root --property=StandardOutput=append:/var/log/ansible-bootstrap.log --property=StandardError=append:/var/log/ansible-bootstrap.log /ansible_starter.sh
