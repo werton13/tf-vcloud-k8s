@@ -31,6 +31,7 @@ variable "vcloud" {
     public_port_kubeapi      = optional(string, "6443")  # NSX-T: public port DNAT'ed to the kube-api VIP:6443
     public_port_ingress_http = optional(string, "80")    # NSX-T: public port DNAT'ed to the ingress VIP:80
     public_port_dvm_ssh      = optional(string, "")      # NSX-T: public port DNAT'ed to DVM:22 (empty = no rule)
+    disk_enable_uuid         = optional(bool, true)      # disk.EnableUUID on k8s nodes (CSI); needs right "vApp: Allow All Extra Config"
     external_network_name    = optional(string, "")      # Optional external network override (auto-detected from Edge Gateway if empty)
     lbvm_count               = optional(string, "0")
   })

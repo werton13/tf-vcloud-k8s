@@ -87,10 +87,14 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
     unit_number = var.disks_config.osdisk.unit_num
   }
 
-  # Required by the vCloud CSI driver: it finds attached disks inside the guest by SCSI UUID
-  set_extra_config {
-    key   = "disk.EnableUUID"
-    value = "TRUE"
+  # Required by the vCloud CSI driver: it finds attached disks inside the guest by SCSI UUID.
+  # Needs the vCD right "vApp: Allow All Extra Config" (vcloud.disk_enable_uuid = false skips it)
+  dynamic "set_extra_config" {
+    for_each = var.vcloud.disk_enable_uuid ? ["TRUE"] : []
+    content {
+      key   = "disk.EnableUUID"
+      value = set_extra_config.value
+    }
   }
 
   customization {
@@ -143,10 +147,14 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
     unit_number = var.disks_config.osdisk.unit_num
   }
 
-  # Required by the vCloud CSI driver: it finds attached disks inside the guest by SCSI UUID
-  set_extra_config {
-    key   = "disk.EnableUUID"
-    value = "TRUE"
+  # Required by the vCloud CSI driver: it finds attached disks inside the guest by SCSI UUID.
+  # Needs the vCD right "vApp: Allow All Extra Config" (vcloud.disk_enable_uuid = false skips it)
+  dynamic "set_extra_config" {
+    for_each = var.vcloud.disk_enable_uuid ? ["TRUE"] : []
+    content {
+      key   = "disk.EnableUUID"
+      value = set_extra_config.value
+    }
   }
 
   customization {
