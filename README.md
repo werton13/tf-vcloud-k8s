@@ -6,24 +6,6 @@
 
 Проект поддерживает **Kubernetes v1.35**, базовую ОС **Ubuntu 24.04 LTS (Noble Numbat)**, а также работу с обоими типами сетевой виртуализации: **NSX-V** (Edge Gateway LB) и **NSX-T** (kube-vip + Edge NAT).
 
-> [!WARNING]
-> **Enabling `node_controller` transfers cluster ownership away from Terraform.**
-> Once `node_controller.enabled = true`, the `vcd-k8s-node-controller` owns worker
-> scaling and worker LB pool membership. Do **not** use `terraform apply` to change
-> worker count, node configuration, or LB membership afterwards. Terraform is only
-> responsible for the initial bootstrap. Use the `K8sWorkerPool` CRD (`kubectl`)
-> instead. You must also set
-> `node_controller.acknowledge_terraform_ownership_loss = true`.
->
-> **Включение `node_controller` передаёт управление кластером контроллеру.**
-> После `node_controller.enabled = true` масштабированием worker-нод и составом
-> worker LB pool управляет `vcd-k8s-node-controller`. Не используйте
-> `terraform apply` для изменения количества worker-нод, конфигурации нод или
-> состава LB pool — используйте CRD `K8sWorkerPool`. Обязательно установите
-> `node_controller.acknowledge_terraform_ownership_loss = true`.
-
----
-
 #### Структура проекта
 
 ```text
@@ -124,14 +106,25 @@ kubernetes = {
 <details>
 <summary><b>Опциональный контроллер масштабирования worker-нод (vcd-k8s-node-controller)</b></summary>
 
+> [!WARNING]
+> **Enabling `node_controller` transfers cluster ownership away from Terraform.**
+> Once `node_controller.enabled = true`, the `vcd-k8s-node-controller` owns worker
+> scaling and worker LB pool membership. Do **not** use `terraform apply` to change
+> worker count, node configuration, or LB membership afterwards. Terraform is only
+> responsible for the initial bootstrap. Use the `K8sWorkerPool` CRD (`kubectl`)
+> instead. You must also set
+> `node_controller.acknowledge_terraform_ownership_loss = true`.
+>
+> **Включение `node_controller` передаёт управление кластером контроллеру.**
+> После `node_controller.enabled = true` масштабированием worker-нод и составом
+> worker LB pool управляет `vcd-k8s-node-controller`. Не используйте
+> `terraform apply` для изменения количества worker-нод, конфигурации нод или
+> состава LB pool — используйте CRD `K8sWorkerPool`. Обязательно установите
+> `node_controller.acknowledge_terraform_ownership_loss = true`.
+
 Модуль может передать управление worker-нодами отдельному контроллеру
 [`vcd-k8s-node-controller`](https://github.com/werton13/vcd-k8s-node-controller).
 По умолчанию контроллер **выключен** (`node_controller.enabled = false`).
-
-**Важно:** после включения контроллера Terraform больше не управляет
-масштабированием worker-нод и составом worker LB pool. Не выполняйте
-`terraform apply` для изменения этих параметров — используйте CRD
-`K8sWorkerPool`. Terraform отвечает только за первоначальный bootstrap.
 
 Минимальное включение в `terraform.tfvars` (все остальные параметры имеют
 значения по умолчанию в `variables.tf`):
@@ -222,16 +215,6 @@ worker-ноды в нужное состояние и выровнять/имп�
      }
    }
 
-   provider "vcd" {
-     user                 = var.vcloud.admin
-     password             = var.vcloud.admin_pwd
-     org                  = var.vcloud.orgname
-     vdc                  = var.vcloud.vdc
-     url                  = var.vcloud.server_fqdn
-     allow_unverified_ssl = var.vcloud.allow_unverified_ssl
-     max_retry_timeout    = var.vcloud.max_retry_timeout
-   }
-
    module "vcloud-k8s-cluster" {
      source = "github.com/werton13/tf-vcloud-k8s?ref=dev" # for production, pin a tag or commit
 
@@ -249,12 +232,7 @@ worker-ноды в нужное состояние и выровнять/имп�
    }
    ```
 
-   > [!NOTE]
-   > Модуль уже содержит настройку провайдера `vcd` в `versions.tf` и использует значения `var.vcloud.*`.
-   > Блок `provider "vcd"` в корневом `main.tf` показан для наглядности; его можно удалить, чтобы не дублировать
-   > конфигурацию. Блок `required_providers` оставьте для корректного источника провайдера `vmware/vcd`.
-
-3. Отредактируйте `terraform.tfvars` под ваши параметры vCloud. Для NSX-T раскомментируйте блок `kubernetes.vip`, задайте `public_ip` и установите `ansible.git_repo.repo_branch = "dev-r3-nsxt"`.
+3. Отредактируйте `terraform.tfvars` — он создан из `example.tfvars`, который содержит пример всех доступных параметров. Для NSX-T раскомментируйте блок `kubernetes.vip`, задайте `public_ip` и установите `ansible.git_repo.repo_branch = "dev-r3-nsxt"`.
 
 4. Инициализируйте и запустите Terraform:
 
