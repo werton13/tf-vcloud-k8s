@@ -2,7 +2,7 @@
 
 Модуль предназначен для автоматизированного развертывания отказоустойчивого кластера Kubernetes внутри тенанта VMware Cloud Director с использованием публичного доступа в интернет.
 
-Проект поддерживает **Kubernetes v1.35**, базовую ОС **Ubuntu 24.04 LTS (Noble Numbat)**, а также работу с обоими типами сетевой виртуализации: **NSX-V** и современным **NSX-T ALB (Avi)**.
+Проект поддерживает **Kubernetes v1.35**, базовую ОС **Ubuntu 24.04 LTS (Noble Numbat)**, а также работу с обоими типами сетевой виртуализации: **NSX-V** (Edge Gateway LB) и **NSX-T** (kube-vip + Edge NAT).
 
 > [!WARNING]
 > **Enabling `node_controller` transfers cluster ownership away from Terraform.**
@@ -30,7 +30,7 @@
   - Deployment Workstation (DVM): служебная ВМ для оркестрации и выполнения Ansible.
 - **Балансировка нагрузки (KubeAPI & Ingress):**
   - **NSX-V:** Нативный Edge Gateway Load Balancer (`vcd_lb_*`) с динамическими пулами участников.
-  - **NSX-T:** Нативный NSX-T Advanced Load Balancer (Avi ALB) через ресурсы `vcd_nsxt_alb_pool` и `vcd_nsxt_alb_virtual_service`.
+  - **NSX-T:** без Edge Load Balancer. VIP KubeAPI и Ingress анонсирует [kube-vip](https://kube-vip.io) в ARP-режиме со static pod на master-нодах. Edge Gateway выполняет только SNAT/DNAT (`vcd_nsxt_nat_rule`); правила создаются с `firewall_match = BYPASS` и не затрагивают другие правила на общем Edge.
 - **Конфигурация дисков:**
   - Системный диск OS Disk (paravirtual).
   - Опциональные дополнительные диски LVM под `/var` и `/var/lib` (containerd, etcd, kubelet) с автоматическим graceful fallback при их отсутствии.
@@ -47,6 +47,56 @@
   - **Metrics:** Kubernetes Metrics Server (публичный Helm-чарт).
   - **Monitoring:** Стек VictoriaMetrics (`vmoperator`, `vmagent` с поддержкой `remoteWrite`, `node-exporter`, `x509-certificate-exporter`, `vmservicescrapes`).
   - **Backup:** Автоматическое резервное копирование etcd-снимков на DVM-хост.
+
+---
+
+### VIP и публичные порты (NSX-T)
+
+Для `network_type = "nsx-t"` модуль **не создаёт Edge Load Balancer**. VIP KubeAPI
+и Ingress анонсируются kube-vip со static pod на master-нодах, а Edge Gateway
+выполняет только SNAT/DNAT. Все параметры находятся в `kubernetes.vip`:
+
+| Параметр | По умолчанию | Обязателен | Описание |
+|---|---:|---:|---|
+| `kubernetes.vip.public_ip` | — | да (NSX-T) | Публичный IP Edge Gateway для DNAT. На Edge с IP Spaces адрес не определяется автоматически. |
+| `kubernetes.vip.public_port_kubeapi` | `"6443"` | нет | Публичный порт DNAT на KubeAPI VIP:6443. |
+| `kubernetes.vip.public_port_ingress_http` | `"80"` | нет | Публичный порт DNAT на Ingress VIP:80. |
+| `kubernetes.vip.public_port_dvm_ssh` | `""` | нет | Публичный порт DNAT на DVM:22. Пустое значение = правило не создаётся. |
+| `kubernetes.vip.kube_vip_enabled` | `true` | нет | Включает kube-vip для KubeAPI и Ingress VIP. Для NSX-T должен быть `true`, если не используется внешний LB. |
+| `kubernetes.vip.kube_vip_version` | `"v0.8.10"` | нет | Тег образа kube-vip. |
+| `kubernetes.vip.kube_vip_address` | `""` | нет | По умолчанию вычисляется из `ip_plan.kubeapi_lb` (`cidrhost`) и равен `k8s_controlPlane_Endpoint`. Если задан, должен совпадать. |
+| `kubernetes.vip.ingress_lb_ip` | `""` | нет | По умолчанию вычисляется из `ip_plan.ingress_lb` (`cidrhost`). Если задан, должен совпадать. |
+| `kubernetes.vip.k8s_api_extra_sans` | `[]` | нет | Дополнительные SAN для API-сертификата. `public_ip` добавляется автоматически. |
+
+Пример для NSX-T:
+
+```hcl
+vcloud = {
+  # ...
+  network_type = "nsx-t"
+}
+
+kubernetes = {
+  # ...
+  vip = {
+    public_ip                = "203.0.113.10"
+    public_port_kubeapi      = "6443"
+    public_port_ingress_http = "80"
+    public_port_dvm_ssh      = "42768" # или "" — без правила
+    kube_vip_version         = "v0.8.10"
+    k8s_api_extra_sans       = ["k8s.example.com"]
+  }
+}
+```
+
+Для NSX-T Ansible-ветка должна поддерживать kube-vip:
+`ansible.git_repo.repo_branch = "dev-r3-nsxt"` (до merge в `dev-r3`).
+
+> [!NOTE]
+> **NSX-T: ALB больше не используется.**
+> Параметр `vcloud.alb_service_engine_group` удалён. Для `network_type = "nsx-t"`
+> задайте `kubernetes.vip.public_ip`; VIP KubeAPI и Ingress будут подняты kube-vip.
+> Для NSX-V поведение не изменилось: используется Edge Gateway LB.
 
 ---
 
@@ -116,7 +166,11 @@ worker-ноды в нужное состояние и выровнять/имп�
 3. **Сервисный аккаунт для CSI:**
    - Пользователь vCD с правами на управление Named Disks в VDC.
 4. **Для NSX-T (при выборе network_type = "nsx-t"):**
-   - На Edge Gateway должен быть назначен Service Engine Group (например, `Default-SEG`).
+   - Публичный IP Edge Gateway задаётся в `kubernetes.vip.public_ip`: на Edge с IP Spaces адрес по умолчанию не определяется.
+   - VIP `ip_plan.kubeapi_lb` и `ip_plan.ingress_lb` должны быть свободны и находиться в подсети кластера.
+   - kube-vip работает в ARP-режиме: master-ноды и VIP должны быть в одном L2-сегменте.
+   - Ansible-ветка с kube-vip: `ansible.git_repo.repo_branch = "dev-r3-nsxt"`.
+   - SNAT/DNAT и firewall вручную настраивать не нужно; модуль создаёт NAT-правила с `firewall_match = BYPASS`.
 
 ---
 
@@ -160,7 +214,7 @@ worker-ноды в нужное состояние и выровнять/имп�
 ├── versions.tf               # Требования к версиям Terraform и vcd провайдера
 ├── variables.tf              # Входные переменные проекта
 ├── main.tf                   # ВМ (DVM, Masters, Workers) и дополнительные диски
-├── vcloud_network_prep.tf    # Настройка vApp Org Network и балансировщиков (NSX-V / NSX-T)
+├── vcloud_network_prep.tf    # vApp Org Network, NSX-V Edge LB, NSX-T SNAT/DNAT
 ├── locals.tf                 # Расчет IP-плана, генерация inventory и переменных
 ├── outputs.tf                # Экспорт эндпоинтов, IP и SSH-команд
 ├── example.tfvars            # Пример конфигурации

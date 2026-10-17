@@ -39,29 +39,29 @@ packages:
   - python3-kubernetes
 
 write_files:
-  - content: |
+  - path: /etc/hosts
+    content: |
 ${hosts_content}
-    path: /etc/hosts
     append: true
 
-  - content: |
+  - path: /etc/apt/apt.conf.d/10periodic
+    content: |
       APT::Periodic::Update-Package-Lists "0";
       APT::Periodic::Download-Upgradeable-Packages "0";
       APT::Periodic::AutocleanInterval "0";
       APT::Periodic::Unattended-Upgrade "0";
-    path: /etc/apt/apt.conf.d/10periodic
     permissions: "0644"
 
-  - content: |
+  - path: /etc/ssh/sshd_config.d/01-k8s-auth.conf
+    content: |
       PubkeyAuthentication yes
       PasswordAuthentication yes
       KbdInteractiveAuthentication yes
       PermitRootLogin no
-    path: /etc/ssh/sshd_config.d/01-k8s-auth.conf
     permissions: "0600"
 
-
-  - content: |
+  - path: /etc/netplan/01-netplan.yaml
+    content: |
       network:
         version: 2
         renderer: networkd
@@ -76,20 +76,20 @@ ${hosts_content}
                 via: ${gateway_ip}
             nameservers:
               addresses: ${dns_servers_json}
-    path: /etc/netplan/01-netplan.yaml
     permissions: "0600"
 
-  - content: |
+  - path: /K8s-inventory
+    content: |
 ${inventory_content}
-    path: /K8s-inventory
     permissions: "0600"
 
-  - content: |
+  - path: /etc/k8s_cluster_vars.yaml
+    content: |
 ${cluster_vars_content}
-    path: /etc/k8s_cluster_vars.yaml
     permissions: "0600"
 
-  - content: |
+  - path: /ansible_starter.sh
+    content: |
       #!/bin/bash
       set -e
       echo "=== [$(date)] Starting Kubernetes Cluster Automation ==="
@@ -140,7 +140,6 @@ ${cluster_vars_content}
       echo "Executing Ansible playbook ${ansible_playbook}..."
       ansible-playbook -i /${ansible_repo_name}/K8s-inventory "${ansible_playbook}" -e @vars/cluster_vars.yaml --vault-password-file /root/.vault_pass
       echo "=== [$(date)] Kubernetes Cluster Automation Completed Successfully ==="
-    path: /ansible_starter.sh
     permissions: "0755"
 
 runcmd:

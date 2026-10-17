@@ -5,25 +5,25 @@ project = {
 }
 
 vcloud = {
-  server_fqdn              = "https://vcloud.example.com/api"
-  server_ip                = "192.168.1.10" # IP address of vCloud API endpoint
-  allow_unverified_ssl     = "true"
-  max_retry_timeout        = "240"
-  vdc                      = "My-VDC-Name"
-  orgname                  = "My-Org-Name"
-  admin                    = "vcloud_admin_user"
-  admin_pwd                = "vcloud_admin_password"
-  csi_svc                  = "vcloud_csi_service_user"
-  csi_svc_pwd              = "vcloud_csi_service_password"
-  catalogname              = "Templates"
-  catalog_org              = "" # Optional: specify if catalog belongs to another org (e.g. "MWS-Catalogs")
-  vm_template_name         = "ubuntu24.04-uuid-enabled-v1"
-  orgvnet_name             = "routed-k8s-net"
-  vapp_name                = "mts-k8s-lab"     # shared vApp for k8s nodes (required by vCloud CSI)
-  edgegw                   = "edge-gw-01"
-  env_type                 = "public"
-  network_type             = "nsx-v"       # "nsx-v" for Edge Gateway LB, or "nsx-t" for NSX-T ALB
-  alb_service_engine_group = "Default-SEG" # Required when network_type = "nsx-t"
+  server_fqdn          = "https://vcloud.example.com/api"
+  server_ip            = "192.168.1.10" # IP address of vCloud API endpoint
+  allow_unverified_ssl = "true"
+  max_retry_timeout    = "240"
+  vdc                  = "My-VDC-Name"
+  orgname              = "My-Org-Name"
+  admin                = "vcloud_admin_user"
+  admin_pwd            = "vcloud_admin_password"
+  csi_svc              = "vcloud_csi_service_user"
+  csi_svc_pwd          = "vcloud_csi_service_password"
+  catalogname          = "Templates"
+  catalog_org          = "" # Optional: specify if catalog belongs to another org (e.g. "MWS-Catalogs")
+  vm_template_name     = "ubuntu24.04-uuid-enabled-v1"
+  orgvnet_name         = "routed-k8s-net"
+  vapp_name            = "mts-k8s-lab" # shared vApp for k8s nodes (required by vCloud CSI)
+  edgegw               = "edge-gw-01"
+  env_type             = "public"
+  network_type         = "nsx-v" # "nsx-v": Edge Gateway LB + NAT; "nsx-t": kube-vip VIPs + Edge NAT
+  # public_ip              = ""      # NSX-V only: optional public IP override; NSX-T uses kubernetes.vip.public_ip
 }
 
 ip_plan = {
@@ -109,7 +109,7 @@ ansible = {
   git_repo = {
     repo_url      = "https://github.com/werton13/k8s-kubeadm-r2.git"
     repo_name     = "k8s-kubeadm-r2"
-    repo_branch   = "dev-r3"
+    repo_branch   = "dev-r3" # for NSX-T kube-vip use "dev-r3-nsxt"
     playbook_name = "main.yaml"
   }
   vault_secret = "your_vault_password_secret_here"
@@ -133,14 +133,28 @@ kubernetes = {
     controller_nodeport_https = "30443"
     ext_fqdn                  = ""
   }
+
+  # NSX-T only. Ignored when vcloud.network_type = "nsx-v".
+  # Uncomment this block and set public_ip when network_type = "nsx-t".
+  # vip = {
+  #   public_ip                = "203.0.113.10" # required on NSX-T
+  #   public_port_kubeapi      = "6443"         # default
+  #   public_port_ingress_http = "80"           # default
+  #   public_port_dvm_ssh      = ""             # default: no SSH DNAT; e.g. "42768"
+  #   kube_vip_enabled         = true           # default
+  #   kube_vip_version         = "v0.8.10"      # default
+  #   kube_vip_address         = ""             # computed = ip_plan.kubeapi_lb
+  #   ingress_lb_ip            = ""             # computed = ip_plan.ingress_lb
+  #   k8s_api_extra_sans       = ["k8s.example.com"] # default []
+  # }
 }
 
 versions = {
   v1_35 = {
     short      = "1.35.9"
     full       = "1.35.9-1.1"
-    containerd = "2.2.1-0ubuntu1~24.04.3"  # full apt version (noble-updates)
-    cri-tools  = "1.35.0-1.1"              # full apt version (pkgs.k8s.io)
+    containerd = "2.2.1-0ubuntu1~24.04.3" # full apt version (noble-updates)
+    cri-tools  = "1.35.0-1.1"             # full apt version (pkgs.k8s.io)
     cni = {
       calico_version = "v3.31.5"
       tigera_version = "v1.40.8"

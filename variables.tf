@@ -9,30 +9,34 @@ variable "project" {
 
 variable "vcloud" {
   type = object({
-    server_fqdn              = string
-    server_ip                = string
-    allow_unverified_ssl     = optional(string, "true")
-    max_retry_timeout        = optional(string, "240")
-    vdc                      = string
-    orgname                  = string
-    admin                    = string
-    admin_pwd                = string
-    csi_svc                  = string
-    csi_svc_pwd              = string
-    vapp_name                = string                    # shared vApp for k8s nodes (required by vCloud CSI)
-    catalogname              = string
-    catalog_org              = optional(string, "")      # Organization owning the catalog (defaults to vcloud.orgname)
-    vm_template_name         = string
-    orgvnet_name             = string
-    edgegw                   = string
-    env_type                 = optional(string, "public")
-    network_type             = optional(string, "nsx-v") # "nsx-v" or "nsx-t"
-    alb_service_engine_group = optional(string, "")      # required when network_type = "nsx-t" (Avi ALB Service Engine Group name)
-    public_ip                = optional(string, "")      # Optional public IP override (auto-detected from Edge Gateway if empty)
-    external_network_name    = optional(string, "")      # Optional external network override (auto-detected from Edge Gateway if empty)
-    lbvm_count               = optional(string, "0")
+    server_fqdn           = string
+    server_ip             = string
+    allow_unverified_ssl  = optional(string, "true")
+    max_retry_timeout     = optional(string, "240")
+    vdc                   = string
+    orgname               = string
+    admin                 = string
+    admin_pwd             = string
+    csi_svc               = string
+    csi_svc_pwd           = string
+    vapp_name             = string # shared vApp for k8s nodes (required by vCloud CSI)
+    catalogname           = string
+    catalog_org           = optional(string, "") # Organization owning the catalog (defaults to vcloud.orgname)
+    vm_template_name      = string
+    orgvnet_name          = string
+    edgegw                = string
+    env_type              = optional(string, "public")
+    network_type          = optional(string, "nsx-v") # "nsx-v" (Edge LB + NAT) or "nsx-t" (kube-vip VIPs + Edge NAT)
+    public_ip             = optional(string, "")      # NSX-V only: optional public IP override (auto-detected from Edge Gateway if empty). NSX-T uses kubernetes.vip.public_ip
+    external_network_name = optional(string, "")      # NSX-V only: optional external network override (auto-detected from Edge Gateway if empty)
+    lbvm_count            = optional(string, "0")
   })
   description = "VMware Cloud Director connection and environment configuration"
+
+  validation {
+    condition     = contains(["nsx-v", "nsx-t"], var.vcloud.network_type)
+    error_message = "vcloud.network_type must be \"nsx-v\" or \"nsx-t\"."
+  }
 }
 
 variable "ip_plan" {
@@ -228,6 +232,17 @@ variable "kubernetes" {
       controller_nodeport_https = string
       ext_fqdn                  = optional(string, "")
     })
+    vip = optional(object({
+      public_ip                = optional(string, "")        # NSX-T only: public Edge Gateway IP (required for network_type = "nsx-t")
+      public_port_kubeapi      = optional(string, "6443")    # NSX-T: public port DNAT'ed to the KubeAPI VIP:6443
+      public_port_ingress_http = optional(string, "80")      # NSX-T: public port DNAT'ed to the ingress VIP:80
+      public_port_dvm_ssh      = optional(string, "")        # NSX-T: public port DNAT'ed to DVM:22 (empty = no rule)
+      kube_vip_enabled         = optional(bool, true)        # NSX-T: kube-vip owns the KubeAPI and ingress VIPs
+      kube_vip_version         = optional(string, "v0.8.10") # kube-vip image tag
+      kube_vip_address         = optional(string, "")        # Computed as ip_plan.kubeapi_lb / k8s_controlPlane_Endpoint; optional override must match
+      ingress_lb_ip            = optional(string, "")        # Computed as ip_plan.ingress_lb; optional override must match
+      k8s_api_extra_sans       = optional(list(string), [])  # Additional API server SANs; public_ip is appended automatically
+    }), {})
   })
   description = "Kubernetes cluster configuration parameters"
 }

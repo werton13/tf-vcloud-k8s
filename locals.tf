@@ -22,16 +22,60 @@ locals {
   # vCloud API host entry
   vcloud_fqdn_entry = "${var.vcloud.server_ip}  ${split("/", var.vcloud.server_fqdn)[2]}"
 
-  # Automatic Edge Gateway Public IP and External Network discovery
-  egw_public_ip = try(var.vcloud.public_ip, "") != "" ? var.vcloud.public_ip : data.vcd_edgegateway.egw.default_external_network_ip
+  # NSX-T uses kube-vip for the KubeAPI and ingress VIPs; the Edge only performs NAT.
+  use_kube_vip     = var.vcloud.network_type == "nsx-t"
+  kubeapi_vip      = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))
+  ingress_vip      = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.ingress_lb))
+  nsxt_rule_prefix = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}"
 
-  egw_ext_net_name = try(var.vcloud.external_network_name, "") != "" ? var.vcloud.external_network_name : coalesce(
-    try([
-      for net in data.vcd_edgegateway.egw.external_network : net.name
-      if anytrue([for s in net.subnet : s.use_for_default_route])
-    ][0], null),
-    try(tolist(data.vcd_edgegateway.egw.external_network)[0].name, "")
+  # Automatic Edge Gateway Public IP and External Network discovery.
+  # NSX-T: public_ip is mandatory and lives in kubernetes.vip.public_ip (IP Spaces have no default external IP).
+  # NSX-V: vcloud.public_ip is an optional override; otherwise it is auto-detected from the Edge Gateway.
+  egw_public_ip = local.use_kube_vip ? var.kubernetes.vip.public_ip : (
+    try(var.vcloud.public_ip, "") != "" ? var.vcloud.public_ip : data.vcd_edgegateway.egw[0].default_external_network_ip
   )
+
+  egw_ext_net_name = local.use_kube_vip ? "" : (
+    try(var.vcloud.external_network_name, "") != "" ? var.vcloud.external_network_name : coalesce(
+      try([
+        for net in data.vcd_edgegateway.egw[0].external_network : net.name
+        if anytrue([for s in net.subnet : s.use_for_default_route])
+      ][0], null),
+      try(tolist(data.vcd_edgegateway.egw[0].external_network)[0].name, "")
+    )
+  )
+
+  # SSH to the DVM: through the public DNAT port on NSX-T, directly to the internal IP otherwise
+  dvm_ssh_cmd = local.use_kube_vip && var.kubernetes.vip.public_port_dvm_ssh != "" ? "ssh -p ${var.kubernetes.vip.public_port_dvm_ssh} ${var.os_config.vm_user_name}@${local.egw_public_ip}" : "ssh ${var.os_config.vm_user_name}@${local.dvm_ip}"
+
+  # NSX-T DNAT rules: public port on kubernetes.vip.public_ip -> internal address and port
+  nsxt_dnat_rules = merge(
+    {
+      kubeapi = {
+        external_port = var.kubernetes.vip.public_port_kubeapi
+        internal_ip   = local.kubeapi_vip
+        internal_port = "6443"
+      }
+      ingress-http = {
+        external_port = var.kubernetes.vip.public_port_ingress_http
+        internal_ip   = local.ingress_vip
+        internal_port = "80"
+      }
+    },
+    var.kubernetes.vip.public_port_dvm_ssh == "" ? {} : {
+      dvm-ssh = {
+        external_port = var.kubernetes.vip.public_port_dvm_ssh
+        internal_ip   = local.dvm_ip
+        internal_port = "22"
+      }
+    }
+  )
+
+  # Additional API SANs: user-provided list plus the public Edge IP used for the public KubeAPI DNAT.
+  k8s_api_extra_sans = distinct(concat(
+    var.kubernetes.vip.k8s_api_extra_sans,
+    local.egw_public_ip != "" ? [local.egw_public_ip] : []
+  ))
 
   # Hosts file content
   hosts_content = join("\n", concat(
@@ -104,7 +148,7 @@ helm_version: "${local.target_version.helm.helm_version}"
 etcd_ver: "${local.target_version.etcd.etcd_ver}"
 env_type: "${var.vcloud.env_type}"
 docker_mirror: ""
-k8s_controlPlane_Endpoint: "${cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))}"
+k8s_controlPlane_Endpoint: "${local.kubeapi_vip}"
 
 # Networking / CNI
 k8s_service_subnet: "${var.kubernetes.cni.svc_subnet}"
@@ -161,6 +205,15 @@ master_pref: "${var.project.owner_org}-${var.project.name}-${var.project.env_nam
 worker_pref: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk"
 master0_ip: "${local.master_nodes[0].ip}"
 worker0_name: "${local.worker_nodes[0].name}"
+%{if local.use_kube_vip~}
+
+# kube-vip (NSX-T: no Edge load balancer, VIPs are announced via ARP from the masters)
+kube_vip_enabled: ${var.kubernetes.vip.kube_vip_enabled}
+kube_vip_version: "${var.kubernetes.vip.kube_vip_version}"
+kube_vip_address: "${local.kubeapi_vip}"
+ingress_lb_ip: "${local.ingress_vip}"
+k8s_api_extra_sans: ${jsonencode(local.k8s_api_extra_sans)}
+%{endif~}
 
 # Optional: vcd-k8s-node-controller (consumed by the Ansible playbook)
 node_controller_enabled: ${var.node_controller.enabled}

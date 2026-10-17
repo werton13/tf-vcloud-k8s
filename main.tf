@@ -261,3 +261,30 @@ resource "terraform_data" "node_controller_guard" {
     }
   }
 }
+
+# -----------------------------------------------------------------------------
+# NSX-T VIP guard
+# -----------------------------------------------------------------------------
+# NSX-T has no Edge load balancer in this module: kube-vip owns the KubeAPI and
+# ingress VIPs. These checks fail the plan early instead of producing a cluster
+# with an unreachable control plane.
+resource "terraform_data" "nsxt_vip_guard" {
+  count = local.use_kube_vip ? 1 : 0
+
+  lifecycle {
+    precondition {
+      condition     = var.kubernetes.vip.public_ip != ""
+      error_message = "kubernetes.vip.public_ip is required when vcloud.network_type = \"nsx-t\" (Edge Gateway on IP Spaces has no default external IP)."
+    }
+
+    precondition {
+      condition     = var.kubernetes.vip.kube_vip_address == "" || var.kubernetes.vip.kube_vip_address == local.kubeapi_vip
+      error_message = "kubernetes.vip.kube_vip_address must be empty (computed) or equal to ip_plan.kubeapi_lb / k8s_controlPlane_Endpoint."
+    }
+
+    precondition {
+      condition     = var.kubernetes.vip.ingress_lb_ip == "" || var.kubernetes.vip.ingress_lb_ip == local.ingress_vip
+      error_message = "kubernetes.vip.ingress_lb_ip must be empty (computed) or equal to ip_plan.ingress_lb."
+    }
+  }
+}

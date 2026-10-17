@@ -31,28 +31,29 @@ packages:
   - python3
 
 write_files:
-  - content: |
+  - path: /etc/hosts
+    content: |
 ${hosts_content}
-    path: /etc/hosts
     append: true
 
-  - content: |
+  - path: /etc/apt/apt.conf.d/10periodic
+    content: |
       APT::Periodic::Update-Package-Lists "0";
       APT::Periodic::Download-Upgradeable-Packages "0";
       APT::Periodic::AutocleanInterval "0";
       APT::Periodic::Unattended-Upgrade "0";
-    path: /etc/apt/apt.conf.d/10periodic
     permissions: "0644"
 
-  - content: |
+  - path: /etc/ssh/sshd_config.d/01-k8s-auth.conf
+    content: |
       PubkeyAuthentication yes
       PasswordAuthentication yes
       KbdInteractiveAuthentication yes
       PermitRootLogin no
-    path: /etc/ssh/sshd_config.d/01-k8s-auth.conf
     permissions: "0600"
 
-  - content: |
+  - path: /etc/netplan/01-netplan.yaml
+    content: |
       network:
         version: 2
         renderer: networkd
@@ -67,7 +68,6 @@ ${hosts_content}
                 via: ${gateway_ip}
             nameservers:
               addresses: ${dns_servers_json}
-    path: /etc/netplan/01-netplan.yaml
     permissions: "0600"
 
 runcmd:
