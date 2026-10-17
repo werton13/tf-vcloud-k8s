@@ -1,5 +1,7 @@
 ## Kubernetes Cluster Deployment on VMware Cloud Director (vCD)
 
+### Overview
+
 Модуль предназначен для автоматизированного развертывания отказоустойчивого кластера Kubernetes внутри тенанта VMware Cloud Director с использованием публичного доступа в интернет.
 
 Проект поддерживает **Kubernetes v1.35**, базовую ОС **Ubuntu 24.04 LTS (Noble Numbat)**, а также работу с обоими типами сетевой виртуализации: **NSX-V** (Edge Gateway LB) и **NSX-T** (kube-vip + Edge NAT).
@@ -22,7 +24,25 @@
 
 ---
 
-### Архитектура и возможности
+#### Структура проекта
+
+```text
+.
+├── versions.tf               # Требования к версиям Terraform и vcd провайдера
+├── variables.tf              # Входные переменные проекта
+├── main.tf                   # ВМ (DVM, Masters, Workers) и дополнительные диски
+├── vcloud_network_prep.tf    # vApp Org Network, NSX-V Edge LB, NSX-T SNAT/DNAT
+├── locals.tf                 # Расчет IP-плана, генерация inventory и переменных
+├── outputs.tf                # Экспорт эндпоинтов, IP и SSH-команд
+├── example.tfvars            # Пример конфигурации
+└── templates/
+    ├── userdata_dvm.yaml     # Cloud-init конфигурация DVM (генерация inventory и автостарт)
+    ├── userdata_m.yaml       # Cloud-init конфигурация Master-нод
+    └── userdata_w.yaml       # Cloud-init конфигурация Worker-нод
+```
+
+<details>
+<summary><b>Архитектура и возможности</b></summary>
 
 - **Узлы кластера:**
   - Control Plane (Master-ноды): от 1 до $N$ узлов (по умолчанию 3).
@@ -48,9 +68,10 @@
   - **Monitoring:** Стек VictoriaMetrics (`vmoperator`, `vmagent` с поддержкой `remoteWrite`, `node-exporter`, `x509-certificate-exporter`, `vmservicescrapes`).
   - **Backup:** Автоматическое резервное копирование etcd-снимков на DVM-хост.
 
----
+</details>
 
-### VIP и публичные порты (NSX-T)
+<details>
+<summary><b>VIP и публичные порты (NSX-T)</b></summary>
 
 Для `network_type = "nsx-t"` модуль **не создаёт Edge Load Balancer**. VIP KubeAPI
 и Ingress анонсируются kube-vip со static pod на master-нодах, а Edge Gateway
@@ -98,9 +119,10 @@ kubernetes = {
 > задайте `kubernetes.vip.public_ip`; VIP KubeAPI и Ingress будут подняты kube-vip.
 > Для NSX-V поведение не изменилось: используется Edge Gateway LB.
 
----
+</details>
 
-### Опциональный контроллер масштабирования worker-нод (vcd-k8s-node-controller)
+<details>
+<summary><b>Опциональный контроллер масштабирования worker-нод (vcd-k8s-node-controller)</b></summary>
 
 Модуль может передать управление worker-нодами отдельному контроллеру
 [`vcd-k8s-node-controller`](https://github.com/werton13/vcd-k8s-node-controller).
@@ -152,9 +174,10 @@ worker-нодами через Terraform, нужно сначала выключ
 worker-ноды в нужное состояние и выровнять/импортировать Terraform state. Это
 отдельная ручная процедура.
 
----
+</details>
 
-### Требования к окружению vCloud
+<details>
+<summary><b>Требования к окружению vCloud</b></summary>
 
 1. **Routed Network (Org VDC Network):**
    - Тип: Routed (подключена к Edge Gateway).
@@ -172,54 +195,82 @@ worker-ноды в нужное состояние и выровнять/имп�
    - Ansible-ветка с kube-vip: `ansible.git_repo.repo_branch = "dev-r3-nsxt"`.
    - SNAT/DNAT и firewall вручную настраивать не нужно; модуль создаёт NAT-правила с `firewall_match = BYPASS`.
 
----
+</details>
 
 ### Быстрый старт
 
-1. Склонируйте репозиторий:
+1. Создайте отдельный Terraform-проект и скопируйте в него `variables.tf` и пример `tfvars`:
+
    ```bash
-   git clone https://github.com/werton13/tf-vcloud-k8s.git
-   cd tf-vcloud-k8s
+   mkdir tf-vcloud-k8s-deploy && cd tf-vcloud-k8s-deploy
+   git clone --depth 1 --branch dev https://github.com/werton13/tf-vcloud-k8s.git /tmp/tf-vcloud-k8s
+   cp /tmp/tf-vcloud-k8s/variables.tf .
+   cp /tmp/tf-vcloud-k8s/example.tfvars terraform.tfvars
    ```
 
-2. Скопируйте и настройте файл переменных:
-   ```bash
-   cp example.tfvars terraform.tfvars
-   # Отредактируйте terraform.tfvars под ваши параметры vCloud
+2. Создайте `main.tf`:
+
+   ```hcl
+   terraform {
+     required_version = ">= 1.5.0, < 2.0.0"
+
+     required_providers {
+       vcd = {
+         source  = "vmware/vcd"
+         version = ">= 3.13.0, < 4.0.0"
+       }
+     }
+   }
+
+   provider "vcd" {
+     user                 = var.vcloud.admin
+     password             = var.vcloud.admin_pwd
+     org                  = var.vcloud.orgname
+     vdc                  = var.vcloud.vdc
+     url                  = var.vcloud.server_fqdn
+     allow_unverified_ssl = var.vcloud.allow_unverified_ssl
+     max_retry_timeout    = var.vcloud.max_retry_timeout
+   }
+
+   module "vcloud-k8s-cluster" {
+     source = "github.com/werton13/tf-vcloud-k8s?ref=dev" # for production, pin a tag or commit
+
+     project         = var.project
+     vcloud          = var.vcloud
+     ip_plan         = var.ip_plan
+     vms_config      = var.vms_config
+     disks_config    = var.disks_config
+     os_config       = var.os_config
+     ansible         = var.ansible
+     kubernetes      = var.kubernetes
+     versions        = var.versions
+     obs_config      = var.obs_config
+     node_controller = var.node_controller
+   }
    ```
 
-3. Инициализируйте и запустите Terraform:
+   > [!NOTE]
+   > Модуль уже содержит настройку провайдера `vcd` в `versions.tf` и использует значения `var.vcloud.*`.
+   > Блок `provider "vcd"` в корневом `main.tf` показан для наглядности; его можно удалить, чтобы не дублировать
+   > конфигурацию. Блок `required_providers` оставьте для корректного источника провайдера `vmware/vcd`.
+
+3. Отредактируйте `terraform.tfvars` под ваши параметры vCloud. Для NSX-T раскомментируйте блок `kubernetes.vip`, задайте `public_ip` и установите `ansible.git_repo.repo_branch = "dev-r3-nsxt"`.
+
+4. Инициализируйте и запустите Terraform:
+
    ```bash
    terraform init
    terraform plan -out=tfplan
    terraform apply tfplan
    ```
 
-4. Отслеживание развертывания:
+5. Отслеживание развертывания:
    Terraform выведет удобные команды в `outputs`:
+
    ```bash
-   # Подключение к DVM:
+   # Подключение к DVM (для NSX-T с public_port_dvm_ssh используйте output ssh_connect_to_dvm):
    ssh k8sadmin@<DVM_IP>
 
    # Просмотр логов bootstrap кластера:
    ssh k8sadmin@<DVM_IP> 'tail -f /var/log/ansible-bootstrap.log'
    ```
-
----
-
-### Структура проекта
-
-```
-.
-├── versions.tf               # Требования к версиям Terraform и vcd провайдера
-├── variables.tf              # Входные переменные проекта
-├── main.tf                   # ВМ (DVM, Masters, Workers) и дополнительные диски
-├── vcloud_network_prep.tf    # vApp Org Network, NSX-V Edge LB, NSX-T SNAT/DNAT
-├── locals.tf                 # Расчет IP-плана, генерация inventory и переменных
-├── outputs.tf                # Экспорт эндпоинтов, IP и SSH-команд
-├── example.tfvars            # Пример конфигурации
-└── templates/
-    ├── userdata_dvm.yaml     # Cloud-init конфигурация DVM (генерация inventory и автостарт)
-    ├── userdata_m.yaml       # Cloud-init конфигурация Master-нод
-    └── userdata_w.yaml       # Cloud-init конфигурация Worker-нод
-```
