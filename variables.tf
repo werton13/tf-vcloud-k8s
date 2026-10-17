@@ -154,6 +154,61 @@ variable "ansible" {
   description = "Ansible repository configuration and vault secret for encrypting inventory credentials"
 }
 
+variable "node_controller" {
+  type = object({
+    enabled                              = optional(bool, false)
+    acknowledge_terraform_ownership_loss = optional(bool, false)
+    namespace                            = optional(string, "vcd-nodescale-system")
+    release_name                         = optional(string, "vcd-nodescale")
+    chart_repo                           = optional(string, "https://werton13.github.io/vcd-k8s-node-controller")
+    chart_name                           = optional(string, "vcd-nodescale")
+    chart_version                        = optional(string, "0.1.0")
+    image_repository                     = optional(string, "docker.io/werton13/vcd-k8s-node-controller")
+    image_tag                            = optional(string, "0.1.0")
+    image_pull_policy                    = optional(string, "IfNotPresent")
+    create_namespace                     = optional(bool, true)
+    create_vcd_secret                    = optional(bool, true)
+    vcd_secret_name                      = optional(string, "vcd-credentials")
+    vcd_user                             = optional(string, "")
+    vcd_password                         = optional(string, "")
+    vcd_insecure                         = optional(bool, true)
+    helm_timeout                         = optional(string, "10m")
+    helm_atomic                          = optional(bool, true)
+  })
+  default     = {}
+  description = <<-EOT
+    Optional vcd-k8s-node-controller (worker autoscaling) configuration.
+
+    All settings have defaults. When enabling the controller, the only values a
+    project normally must provide are:
+      - acknowledge_terraform_ownership_loss = true
+      - vcd_user / vcd_password (a dedicated vCD service account)
+
+    WARNING: enabling this controller transfers ownership of worker scaling and
+    worker LB pool membership from Terraform to the controller/CRD. After it is
+    enabled, Terraform must not be used to manage the cluster (no further apply
+    for worker count, node configuration, or LB membership).
+  EOT
+
+  validation {
+    condition     = !var.node_controller.enabled || var.node_controller.acknowledge_terraform_ownership_loss
+    error_message = "Enabling node_controller requires acknowledge_terraform_ownership_loss = true. Terraform will no longer own worker scaling or worker LB pool membership."
+  }
+
+  validation {
+    condition = !var.node_controller.enabled || (
+      var.node_controller.namespace != "" &&
+      var.node_controller.release_name != "" &&
+      var.node_controller.chart_repo != "" &&
+      var.node_controller.chart_name != "" &&
+      var.node_controller.chart_version != "" &&
+      var.node_controller.image_repository != "" &&
+      var.node_controller.image_tag != ""
+    )
+    error_message = "When node_controller.enabled = true, namespace, release_name, chart_repo, chart_name, chart_version, image_repository and image_tag must be set."
+  }
+}
+
 variable "kubernetes" {
   type = object({
     cluster = object({

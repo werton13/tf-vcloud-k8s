@@ -4,6 +4,22 @@
 
 Проект поддерживает **Kubernetes v1.35**, базовую ОС **Ubuntu 24.04 LTS (Noble Numbat)**, а также работу с обоими типами сетевой виртуализации: **NSX-V** и современным **NSX-T ALB (Avi)**.
 
+> [!WARNING]
+> **Enabling `node_controller` transfers cluster ownership away from Terraform.**
+> Once `node_controller.enabled = true`, the `vcd-k8s-node-controller` owns worker
+> scaling and worker LB pool membership. Do **not** use `terraform apply` to change
+> worker count, node configuration, or LB membership afterwards. Terraform is only
+> responsible for the initial bootstrap. Use the `K8sWorkerPool` CRD (`kubectl`)
+> instead. You must also set
+> `node_controller.acknowledge_terraform_ownership_loss = true`.
+>
+> **Включение `node_controller` передаёт управление кластером контроллеру.**
+> После `node_controller.enabled = true` масштабированием worker-нод и составом
+> worker LB pool управляет `vcd-k8s-node-controller`. Не используйте
+> `terraform apply` для изменения количества worker-нод, конфигурации нод или
+> состава LB pool — используйте CRD `K8sWorkerPool`. Обязательно установите
+> `node_controller.acknowledge_terraform_ownership_loss = true`.
+
 ---
 
 ### Архитектура и возможности
@@ -31,6 +47,60 @@
   - **Metrics:** Kubernetes Metrics Server (публичный Helm-чарт).
   - **Monitoring:** Стек VictoriaMetrics (`vmoperator`, `vmagent` с поддержкой `remoteWrite`, `node-exporter`, `x509-certificate-exporter`, `vmservicescrapes`).
   - **Backup:** Автоматическое резервное копирование etcd-снимков на DVM-хост.
+
+---
+
+### Опциональный контроллер масштабирования worker-нод (vcd-k8s-node-controller)
+
+Модуль может передать управление worker-нодами отдельному контроллеру
+[`vcd-k8s-node-controller`](https://github.com/werton13/vcd-k8s-node-controller).
+По умолчанию контроллер **выключен** (`node_controller.enabled = false`).
+
+**Важно:** после включения контроллера Terraform больше не управляет
+масштабированием worker-нод и составом worker LB pool. Не выполняйте
+`terraform apply` для изменения этих параметров — используйте CRD
+`K8sWorkerPool`. Terraform отвечает только за первоначальный bootstrap.
+
+Минимальное включение в `terraform.tfvars` (все остальные параметры имеют
+значения по умолчанию в `variables.tf`):
+
+```hcl
+node_controller = {
+  enabled                              = true
+  acknowledge_terraform_ownership_loss = true
+  vcd_user                             = "vcd-node-controller-svc"
+  vcd_password                         = "***"
+}
+```
+
+Параметры `namespace`, `release_name`, `chart_repo`, `chart_name`,
+`chart_version`, `image_repository`, `image_tag`, `image_pull_policy`,
+`create_namespace`, `create_vcd_secret`, `vcd_secret_name`, `vcd_insecure`,
+`helm_timeout` и `helm_atomic` имеют значения по умолчанию. Переопределяйте их
+только при необходимости (например, если чарт опубликован в другом репозитории).
+
+Terraform передаёт эти значения в Ansible через `cluster_vars_content`
+(`/etc/k8s_cluster_vars.yaml` на DVM) с префиксом `node_controller_`. Ansible
+playbook должен:
+
+1. Создать namespace (если `node_controller_create_namespace = true`).
+2. Создать Secret `node_controller_vcd_secret_name` с ключами `url`, `user`,
+   `password`, `org`, `vdc`, `insecure` (если
+   `node_controller_create_vcd_secret = true`).
+3. Установить Helm-чарт `node_controller_chart_name` версии
+   `node_controller_chart_version` из `node_controller_chart_repo` в namespace
+   `node_controller_namespace` с release name `node_controller_release_name`,
+   передав `image.repository`, `image.tag`, `image.pullPolicy` и
+   `vcd.existingSecret`.
+
+Перед включением опубликуйте Helm-чарт (или укажите `chart_repo` на OCI-репозиторий)
+и создайте сервисный аккаунт vCD с правами на VM и LB pool. Не используйте
+admin-учётную запись в production.
+
+Откат: контроллер не возвращает ownership автоматически. Чтобы снова управлять
+worker-нодами через Terraform, нужно сначала выключить контроллер, привести
+worker-ноды в нужное состояние и выровнять/импортировать Terraform state. Это
+отдельная ручная процедура.
 
 ---
 

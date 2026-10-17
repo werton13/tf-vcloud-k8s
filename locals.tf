@@ -161,6 +161,26 @@ master_pref: "${var.project.owner_org}-${var.project.name}-${var.project.env_nam
 worker_pref: "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk"
 master0_ip: "${local.master_nodes[0].ip}"
 worker0_name: "${local.worker_nodes[0].name}"
+
+# Optional: vcd-k8s-node-controller (consumed by the Ansible playbook)
+node_controller_enabled: ${var.node_controller.enabled}
+node_controller_acknowledge_terraform_ownership_loss: ${var.node_controller.acknowledge_terraform_ownership_loss}
+node_controller_namespace: "${var.node_controller.namespace}"
+node_controller_release_name: "${var.node_controller.release_name}"
+node_controller_chart_repo: "${var.node_controller.chart_repo}"
+node_controller_chart_name: "${var.node_controller.chart_name}"
+node_controller_chart_version: "${var.node_controller.chart_version}"
+node_controller_image_repository: "${var.node_controller.image_repository}"
+node_controller_image_tag: "${var.node_controller.image_tag}"
+node_controller_image_pull_policy: "${var.node_controller.image_pull_policy}"
+node_controller_create_namespace: ${var.node_controller.create_namespace}
+node_controller_create_vcd_secret: ${var.node_controller.create_vcd_secret}
+node_controller_vcd_secret_name: "${var.node_controller.vcd_secret_name}"
+node_controller_vcd_user: "${var.node_controller.vcd_user}"
+node_controller_vcd_password: "${var.node_controller.vcd_password}"
+node_controller_vcd_insecure: ${var.node_controller.vcd_insecure}
+node_controller_helm_timeout: "${var.node_controller.helm_timeout}"
+node_controller_helm_atomic: ${var.node_controller.helm_atomic}
 EOT
     ) : "      ${line}"
   ])

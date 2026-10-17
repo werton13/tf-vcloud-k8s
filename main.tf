@@ -229,3 +229,35 @@ resource "vcd_vm" "dvm" {
     "guestinfo.metadata.encoding" = "base64"
   }
 }
+
+# -----------------------------------------------------------------------------
+# Optional: vcd-k8s-node-controller ownership guard
+# -----------------------------------------------------------------------------
+# Enabling the controller hands worker scaling and worker LB pool membership over
+# to the controller/CRD. This check warns on every plan/apply while it is enabled.
+check "node_controller_ownership_warning" {
+  assert {
+    condition     = !var.node_controller.enabled
+    error_message = "WARNING: vcd-k8s-node-controller is enabled. Terraform no longer owns worker scaling or worker LB pool membership. Do not use terraform apply to change worker count, node configuration, or LB membership; use the K8sWorkerPool CRD instead."
+  }
+}
+
+# Planning-time hard guard. The controller is optional, so this resource is only
+# created when it is enabled.
+resource "terraform_data" "node_controller_guard" {
+  count = var.node_controller.enabled ? 1 : 0
+
+  lifecycle {
+    precondition {
+      condition     = var.node_controller.acknowledge_terraform_ownership_loss
+      error_message = "Set node_controller.acknowledge_terraform_ownership_loss = true to confirm that Terraform will no longer manage worker scaling or worker LB pool membership after the controller is enabled."
+    }
+
+    precondition {
+      condition = !var.node_controller.create_vcd_secret || (
+        var.node_controller.vcd_user != "" && var.node_controller.vcd_password != ""
+      )
+      error_message = "node_controller.create_vcd_secret = true requires node_controller.vcd_user and node_controller.vcd_password. Use a dedicated vCD service account with VM and LB pool permissions, or set create_vcd_secret = false and pre-create the Secret."
+    }
+  }
+}

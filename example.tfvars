@@ -213,3 +213,23 @@ obs_config = {
     }
   }
 }
+
+# -----------------------------------------------------------------------------
+# Optional: vcd-k8s-node-controller (worker autoscaling)
+#
+# WARNING: enabling this controller transfers ownership of worker scaling and
+# worker LB pool membership from Terraform to the controller/CRD. After enabling,
+# do NOT use terraform apply to change worker count, node configuration, or
+# worker LB pool membership; use the K8sWorkerPool CRD instead.
+#
+# All other settings (namespace, release, chart, image, secret name, timeouts,
+# etc.) have defaults in variables.tf and normally do not need editing.
+# -----------------------------------------------------------------------------
+node_controller = {
+  enabled = false
+
+  # Required when enabled:
+  # acknowledge_terraform_ownership_loss = true
+  # vcd_user     = "vcd-node-controller-svc"
+  # vcd_password = "***"
+}
