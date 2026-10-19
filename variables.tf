@@ -168,7 +168,7 @@ variable "node_controller" {
     chart_name                           = optional(string, "vcd-nodescale")
     chart_version                        = optional(string, "0.1.0")
     image_repository                     = optional(string, "docker.io/werton13/vcd-k8s-node-controller")
-    image_tag                            = optional(string, "0.1.0")
+    image_tag                            = optional(string, "0.1.1")
     image_pull_policy                    = optional(string, "IfNotPresent")
     create_namespace                     = optional(bool, true)
     create_vcd_secret                    = optional(bool, true)
