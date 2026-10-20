@@ -234,6 +234,27 @@ node_controller_vcd_password: "${var.node_controller.vcd_password}"
 node_controller_vcd_insecure: ${var.node_controller.vcd_insecure}
 node_controller_helm_timeout: "${var.node_controller.helm_timeout}"
 node_controller_helm_atomic: ${var.node_controller.helm_atomic}
+
+# K8sWorkerPool applied by stage_plays/11_create_node_controller_pool.yaml
+node_controller_create_pool: ${var.node_controller.create_pool}
+node_controller_pool_namespace: "default"
+node_controller_pool_name: "${lower(join("-", [var.project.owner_org, var.project.name, var.project.env_name]))}"
+node_controller_pool_token_ttl: "1h"
+node_controller_pool_min_replicas: 1
+node_controller_pool_cidr: "${var.os_config.vm_ip_cidr}"
+node_controller_pool_ip_m_node: ${var.ip_plan.m_node}
+node_controller_pool_ip_w_node: ${var.ip_plan.w_node}
+node_controller_pool_ip_dvm: ${var.ip_plan.dvm}
+node_controller_pool_ip_kubeapi_lb: ${var.ip_plan.kubeapi_lb}
+node_controller_pool_ip_ingress_lb: ${var.ip_plan.ingress_lb}
+node_controller_pool_os_password_hash: "${var.os_config.vm_user_password}"
+node_controller_pool_ssh_authorized_key: "${try(var.os_config.vm_user_ssh_key, "")}"
+node_controller_pool_worker_cpu: ${var.vms_config.workers.vm_cpu_count}
+node_controller_pool_worker_ram: ${var.vms_config.workers.vm_ram_size}
+node_controller_pool_worker_disk1_gb: ${var.disks_config.diskw1.sizegb}
+node_controller_pool_worker_disk2_gb: ${var.disks_config.diskw2.sizegb}
+node_controller_pool_catalog_org: "${var.vcloud.catalog_org}"
+node_controller_pool_ingress_type: "${var.vcloud.network_type == "nsx-v" ? "nsxv" : "nsxt"}"
 EOT
     ) : "      ${line}"
   ])

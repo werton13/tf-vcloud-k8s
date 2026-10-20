@@ -178,6 +178,7 @@ variable "node_controller" {
     vcd_insecure                         = optional(bool, true)
     helm_timeout                         = optional(string, "10m")
     helm_atomic                          = optional(bool, true)
+    create_pool                          = optional(bool, true)
   })
   default     = {}
   description = <<-EOT

@@ -142,8 +142,9 @@ node_controller = {
 Параметры `namespace`, `release_name`, `chart_repo`, `chart_name`,
 `chart_version`, `image_repository`, `image_tag`, `image_pull_policy`,
 `create_namespace`, `create_vcd_secret`, `vcd_secret_name`, `vcd_insecure`,
-`helm_timeout` и `helm_atomic` имеют значения по умолчанию. Переопределяйте их
-только при необходимости (например, если чарт опубликован в другом репозитории).
+`helm_timeout`, `helm_atomic` и `create_pool` имеют значения по умолчанию.
+Переопределяйте их только при необходимости (например, если чарт опубликован в
+другом репозитории).
 
 Terraform передаёт эти значения в Ansible через `cluster_vars_content`
 (`/etc/k8s_cluster_vars.yaml` на DVM) с префиксом `node_controller_`. Ansible
@@ -158,6 +159,13 @@ playbook должен:
    `node_controller_namespace` с release name `node_controller_release_name`,
    передав `image.repository`, `image.tag`, `image.pullPolicy` и
    `vcd.existingSecret`.
+4. Создать объект `K8sWorkerPool` (если `node_controller_create_pool = true`)
+   в namespace `default`, когда worker-ноды уже установлены: `replicas` =
+   `vms_config.workers.vm_count`, `namePrefix` = имя кластера, остальные поля
+   (`bootstrap`, `flavor`, `vcd`, `ipPlan`, `ingressPool`) — из
+   `cluster_vars_content` (`node_controller_pool_*`). Существующий пул не
+   изменяется, чтобы повторный `terraform apply` не сбрасывал ручное
+   масштабирование через CRD.
 
 Перед включением опубликуйте Helm-чарт (или укажите `chart_repo` на OCI-репозиторий)
 и создайте сервисный аккаунт vCD с правами на VM и LB pool. Не используйте
