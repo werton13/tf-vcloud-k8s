@@ -141,7 +141,7 @@ variable "ansible" {
     git_repo = object({
       repo_url      = optional(string, "https://github.com/werton13/k8s-kubeadm-r2.git")
       repo_name     = optional(string, "k8s-kubeadm-r2")
-      repo_branch   = optional(string, "dev-r3")
+      repo_branch   = optional(string, "dev")
       playbook_name = optional(string, "main.yaml")
     })
     vault_secret = optional(string, "vault_k8s_super_secret_password")
@@ -150,7 +150,7 @@ variable "ansible" {
     git_repo = {
       repo_url      = "https://github.com/werton13/k8s-kubeadm-r2.git"
       repo_name     = "k8s-kubeadm-r2"
-      repo_branch   = "dev-r3"
+      repo_branch   = "dev"
       playbook_name = "main.yaml"
     }
     vault_secret = "vault_k8s_super_secret_password"

@@ -109,7 +109,7 @@ ansible = {
   git_repo = {
     repo_url      = "https://github.com/werton13/k8s-kubeadm-r2.git"
     repo_name     = "k8s-kubeadm-r2"
-    repo_branch   = "dev-r3" # for NSX-T kube-vip use "dev-r3-nsxt"
+    repo_branch   = "dev"    # branch must carry the k8s_addons_node_controller role
     playbook_name = "main.yaml"
   }
   vault_secret = "your_vault_password_secret_here"

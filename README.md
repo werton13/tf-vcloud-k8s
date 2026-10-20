@@ -93,7 +93,8 @@ kubernetes = {
 ```
 
 Для NSX-T Ansible-ветка должна поддерживать kube-vip:
-`ansible.git_repo.repo_branch = "dev-r3-nsxt"` (до merge в `dev-r3`).
+`ansible.git_repo.repo_branch = "dev-r3-nsxt"`. По умолчанию используется `dev` —
+ветка, в которой есть роль `k8s_addons_node_controller`.
 
 > [!NOTE]
 > **NSX-T: ALB больше не используется.**
@@ -232,7 +233,7 @@ worker-ноды в нужное состояние и выровнять/имп�
    }
    ```
 
-3. Отредактируйте `terraform.tfvars` — он создан из `example.tfvars`, который содержит пример всех доступных параметров. Для NSX-T раскомментируйте блок `kubernetes.vip`, задайте `public_ip` и установите `ansible.git_repo.repo_branch = "dev-r3-nsxt"`.
+3. Отредактируйте `terraform.tfvars` — он создан из `example.tfvars`, который содержит пример всех доступных параметров. Для NSX-T раскомментируйте блок `kubernetes.vip`, задайте `public_ip` и установите `ansible.git_repo.repo_branch = "dev-r3-nsxt"`. Для NSX-V оставьте ветку по умолчанию `dev` (в ней есть роль `k8s_addons_node_controller`).
 
 4. Инициализируйте и запустите Terraform:
 
