@@ -75,14 +75,14 @@ disks_config = {
     bus_type        = "paravirtual"
   }
   diskw1 = { # Used for /var on worker nodes
-    sizegb          = "20"
+    sizegb          = "10"
     bus_num         = "1"
     unit_num        = "0"
     storage_profile = ""
     bus_type        = "paravirtual"
   }
   diskw2 = { # Used for /var/lib on worker nodes
-    sizegb          = "60"
+    sizegb          = "30"
     bus_num         = "1"
     unit_num        = "1"
     storage_profile = ""
