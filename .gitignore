@@ -19,3 +19,4 @@ override.tf.json
 *.tfvars
 !example.tfvars
 *.auto.tfvars
+project_state.md
