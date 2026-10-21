@@ -52,6 +52,19 @@ ${hosts_content}
       APT::Periodic::Unattended-Upgrade "0";
     permissions: "0644"
 
+  # The DVM bootstrap runs inside cloud-final. When the package transaction
+  # upgrades a library the running cloud-init uses, needrestart defers a
+  # "systemctl restart cloud-final.service" to the end of that transaction and
+  # then executes it, killing the runcmd stage that is still waiting for those
+  # packages (observed: broken pipe, scripts_user FAIL, no bootstrap log).
+  # List only, never restart: the DVM is rebuilt from scratch, not patched.
+  - path: /etc/needrestart/conf.d/99-cloud-init.conf
+    content: |
+      # Managed by cloud-init (tf-vcloud-k8s-module). Never restart services
+      # from the package transaction that runs inside the final stage.
+      $nrconf{restart} = 'l';
+    permissions: "0644"
+
   - path: /etc/ssh/sshd_config.d/01-k8s-auth.conf
     content: |
       PubkeyAuthentication yes
