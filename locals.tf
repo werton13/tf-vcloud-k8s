@@ -323,36 +323,4 @@ EOT
     ansible_ssh_pass     = var.os_config.ansible_ssh_pass
     vault_secret         = var.ansible.vault_secret
   })
-
-  # vCD Guest Customization scripts (initscript) for each VM type
-  customization_master_script = [
-    for i, node in local.master_nodes : templatefile("${path.module}/templates/customization_node.sh", {
-      node_name        = node.name
-      node_ip          = node.ip
-      cidr_prefix      = local.cidr_prefix
-      gateway_ip       = local.gateway_ip
-      os_nic1_name     = var.os_config.os_nic1_name
-      dns_servers_json = local.dns_servers_json
-    })
-  ]
-
-  customization_worker_script = [
-    for i, node in local.worker_nodes : templatefile("${path.module}/templates/customization_node.sh", {
-      node_name        = node.name
-      node_ip          = node.ip
-      cidr_prefix      = local.cidr_prefix
-      gateway_ip       = local.gateway_ip
-      os_nic1_name     = var.os_config.os_nic1_name
-      dns_servers_json = local.dns_servers_json
-    })
-  ]
-
-  customization_dvm_script = templatefile("${path.module}/templates/customization_node.sh", {
-    node_name        = local.dvm_name
-    node_ip          = local.dvm_ip
-    cidr_prefix      = local.cidr_prefix
-    gateway_ip       = local.gateway_ip
-    os_nic1_name     = var.os_config.os_nic1_name
-    dns_servers_json = local.dns_servers_json
-  })
 }

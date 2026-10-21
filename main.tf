@@ -93,13 +93,6 @@ resource "vcd_vapp_vm" "k8s_masters_vms" {
     value = "TRUE"
   }
 
-  customization {
-    enabled                             = true
-    auto_generate_password              = false
-    allow_local_admin_password          = false
-    must_change_password_on_first_login = false
-    initscript                          = local.customization_master_script[count.index]
-  }
 
   guest_properties = {
     "hostname"                    = local.master_nodes[count.index].name
@@ -149,13 +142,6 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
     value = "TRUE"
   }
 
-  customization {
-    enabled                             = true
-    auto_generate_password              = false
-    allow_local_admin_password          = false
-    must_change_password_on_first_login = false
-    initscript                          = local.customization_worker_script[count.index]
-  }
 
   guest_properties = {
     "hostname"                    = local.worker_nodes[count.index].name
@@ -211,13 +197,6 @@ resource "vcd_vm" "dvm" {
     unit_number = var.disks_config.osdisk.unit_num
   }
 
-  customization {
-    enabled                             = true
-    auto_generate_password              = false
-    allow_local_admin_password          = false
-    must_change_password_on_first_login = false
-    initscript                          = local.customization_dvm_script
-  }
 
   guest_properties = {
     "hostname"                    = local.dvm_name

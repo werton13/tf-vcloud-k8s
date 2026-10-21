@@ -30,6 +30,20 @@ packages:
   - ca-certificates
   - python3
 
+# This network has no DHCP and every VM is created on a static address, so the
+# address has to be applied before cloud-init's network stage can complete and
+# before the package stage runs. vCD guest customization is deliberately not
+# used: it reboots the guest about a minute after first boot, and that reboot
+# cuts cloud-init's apt in the middle of the transaction. cloud-init then skips
+# package_update_upgrade_install on the next boot (the module was already marked
+# as started), leaving dpkg half-configured and ansible missing.
+bootcmd:
+  - mkdir -p /etc/netplan
+  - 'echo "network: {version: 2, renderer: networkd, ethernets: {${os_nic1_name}: {dhcp4: false, dhcp6: false, addresses: [${node_ip}/${cidr_prefix}], routes: [{to: default, via: ${gateway_ip}}], nameservers: {addresses: ${dns_servers_json}}}}}" > /etc/netplan/01-netplan.yaml'
+  - chmod 600 /etc/netplan/01-netplan.yaml
+  - rm -f /etc/netplan/50-cloud-init.yaml
+  - netplan apply
+
 write_files:
   - path: /etc/hosts
     content: |
@@ -50,24 +64,6 @@ ${hosts_content}
       PasswordAuthentication yes
       KbdInteractiveAuthentication yes
       PermitRootLogin no
-    permissions: "0600"
-
-  - path: /etc/netplan/01-netplan.yaml
-    content: |
-      network:
-        version: 2
-        renderer: networkd
-        ethernets:
-          ${os_nic1_name}:
-            dhcp4: false
-            dhcp6: false
-            addresses:
-              - ${node_ip}/${cidr_prefix}
-            routes:
-              - to: default
-                via: ${gateway_ip}
-            nameservers:
-              addresses: ${dns_servers_json}
     permissions: "0600"
 
 runcmd:
