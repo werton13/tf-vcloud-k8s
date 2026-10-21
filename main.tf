@@ -154,7 +154,7 @@ resource "vcd_vapp_vm" "k8s_workers_vms" {
   }
 }
 
-# Wait for master and worker nodes to finish booting and guest customization before creating DVM
+# Give the nodes time to boot and apply their cloud-init address before the DVM starts
 resource "time_sleep" "wait_for_nodes_ready" {
   depends_on = [
     vcd_vapp_vm.k8s_masters_vms,
