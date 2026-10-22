@@ -167,6 +167,30 @@ playbook должен:
    изменяется, чтобы повторный `terraform apply` не сбрасывал ручное
    масштабирование через CRD.
 
+Контроллер получает из `cluster_vars_content` не только форму VM, но и размер
+системного диска (`flavor.osDiskGB` = `disks_config.osdisk.sizegb`) и параметры
+ingress-пула (`ingressPool.port` = NodePort ingress-контроллера,
+`ingressPool.edge` = `vcloud.edgegw`). Без `osDiskGB` клонированная VM получает
+системный диск шаблона (10 ГБ вместо 20 ГБ у Terraform-нод), а без `edge`
+контроллер не может убрать ноду из NSX-V пула при удалении.
+
+Масштабирование и удаление worker-нод выполняются только через CRD:
+
+- `spec.replicas` — уменьшение удаляет worker с наибольшим порядковым номером;
+- `spec.scaleDown.deleteWorkers: ["<cluster>-wrk-02"]` — удаляет конкретный
+  worker; после удаления запись убирается из списка, `replicas` уменьшается,
+  нода не пересоздаётся;
+- `kubectl annotate node <cluster>-wrk-03 infra.example.com/delete-worker=true`
+  — удаляет конкретную ноду и позволяет пулу создать замену (rolling
+  replacement).
+
+Удаление идёт в порядке cordon → исключение из ingress-пула → drain через
+eviction API (PodDisruptionBudget соблюдается) → ожидание отсоединения
+VolumeAttachment → удаление Node и VM → освобождение IP. `minReplicas` и
+проверка локальных PV (hostPath/local) защищают от потери данных;
+`scaleDown.force` снимает только проверку PV, но не PDB. Таймаут drain —
+`scaleDown.drainTimeout`; по таймауту нода получает `Failed`, а VM сохраняется.
+
 Перед включением опубликуйте Helm-чарт (или укажите `chart_repo` на OCI-репозиторий)
 и создайте сервисный аккаунт vCD с правами на VM и LB pool. Не используйте
 admin-учётную запись в production.

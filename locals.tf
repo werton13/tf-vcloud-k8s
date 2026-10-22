@@ -253,6 +253,14 @@ node_controller_pool_worker_cpu: ${var.vms_config.workers.vm_cpu_count}
 node_controller_pool_worker_ram: ${var.vms_config.workers.vm_ram_size}
 node_controller_pool_worker_disk1_gb: ${var.disks_config.diskw1.sizegb}
 node_controller_pool_worker_disk2_gb: ${var.disks_config.diskw2.sizegb}
+# The controller clones a template, so it must grow the system disk itself;
+# without this a controller-created worker has the template's 10 GB instead of
+# the 20 GB the Terraform nodes get from override_template_disk.
+node_controller_pool_worker_osdisk_gb: ${var.disks_config.osdisk.sizegb}
+# NSX-V pool members point at the ingress controller NodePort, not at the
+# virtual-server port.
+node_controller_pool_ingress_port: ${var.kubernetes.ingress.controller_nodeport_http}
+node_controller_pool_ingress_edge: "${var.vcloud.edgegw}"
 node_controller_pool_catalog_org: "${var.vcloud.catalog_org}"
 node_controller_pool_ingress_type: "${var.vcloud.network_type == "nsx-v" ? "nsxv" : "nsxt"}"
 EOT
