@@ -166,9 +166,9 @@ variable "node_controller" {
     release_name                         = optional(string, "vcd-nodescale")
     chart_repo                           = optional(string, "https://werton13.github.io/vcd-k8s-node-controller")
     chart_name                           = optional(string, "vcd-nodescale")
-    chart_version                        = optional(string, "0.3.2")
+    chart_version                        = optional(string, "0.5.0")
     image_repository                     = optional(string, "docker.io/werton13/vcd-k8s-node-controller")
-    image_tag                            = optional(string, "0.3.2")
+    image_tag                            = optional(string, "0.5.0")
     image_pull_policy                    = optional(string, "IfNotPresent")
     create_namespace                     = optional(bool, true)
     create_vcd_secret                    = optional(bool, true)
@@ -179,6 +179,16 @@ variable "node_controller" {
     helm_timeout                         = optional(string, "10m")
     helm_atomic                          = optional(bool, true)
     create_pool                          = optional(bool, true)
+
+    # Placement. Control plane is the default because the pool must be able to
+    # reach zero: on a worker, the last-worker guard refuses to delete the node
+    # the controller runs on (WorkerHostsController).
+    replica_count       = optional(number, 1)
+    node_selector       = optional(map(string), { "node-role.kubernetes.io/control-plane" = "" })
+    tolerations         = optional(list(map(string)), [{ key = "node-role.kubernetes.io/control-plane", operator = "Exists", effect = "NoSchedule" }])
+    affinity            = optional(any, {})
+    priority_class_name = optional(string, "system-cluster-critical")
+    dns_policy          = optional(string, "")
   })
   default     = {}
   description = <<-EOT

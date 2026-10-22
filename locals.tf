@@ -234,6 +234,12 @@ node_controller_vcd_password: "${var.node_controller.vcd_password}"
 node_controller_vcd_insecure: ${var.node_controller.vcd_insecure}
 node_controller_helm_timeout: "${var.node_controller.helm_timeout}"
 node_controller_helm_atomic: ${var.node_controller.helm_atomic}
+node_controller_replica_count: ${var.node_controller.replica_count}
+node_controller_node_selector: ${jsonencode(var.node_controller.node_selector)}
+node_controller_tolerations: ${jsonencode(var.node_controller.tolerations)}
+node_controller_affinity: ${jsonencode(var.node_controller.affinity)}
+node_controller_priority_class_name: "${var.node_controller.priority_class_name}"
+node_controller_dns_policy: "${var.node_controller.dns_policy}"
 
 # K8sWorkerPool applied by stage_plays/11_create_node_controller_pool.yaml
 node_controller_create_pool: ${var.node_controller.create_pool}
