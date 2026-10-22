@@ -186,10 +186,40 @@ ingress-пула (`ingressPool.port` = NodePort ingress-контроллера,
 
 Удаление идёт в порядке cordon → исключение из ingress-пула → drain через
 eviction API (PodDisruptionBudget соблюдается) → ожидание отсоединения
-VolumeAttachment → удаление Node и VM → освобождение IP. `minReplicas` и
-проверка локальных PV (hostPath/local) защищают от потери данных;
-`scaleDown.force` снимает только проверку PV, но не PDB. Таймаут drain —
-`scaleDown.drainTimeout`; по таймауту нода получает `Failed`, а VM сохраняется.
+VolumeAttachment → **power off VM** → удаление Node → удаление VM →
+освобождение IP. Гостевая ОС выключается до удаления Node: Node, удалённый при
+живом kubelet, регистрируется заново за секунды и остаётся в кластере навсегда
+как `NotReady` (его поды тогда никто не собирает). `minReplicas` и проверка
+локальных PV (hostPath/local) защищают от потери данных; `scaleDown.force`
+снимает только проверку PV, но не PDB. Таймаут drain —
+`scaleDown.drainTimeout`; по таймауту нода получает `Failed`, а VM сохраняется;
+пока запрос на удаление не снят, следующий проход начинает новый бюджет drain
+(запрос не «залипает», но и не каскадируется на другие ноды).
+
+**Все worker-ноды с префиксом `<namePrefix>-wrk-*` принадлежат контроллеру**,
+включая созданные Terraform при bootstrap: они попадают в `status.nodes`,
+резервируют адрес в `status.ledger` и удаляются теми же путями, что и
+созданные контроллером. Поэтому нельзя удалять bootstrap-ноды через
+`deleteWorkers`: Terraform помнит эту VM в state и пересоздаст её с тем же
+адресом, который пул уже отдал другому worker. Bootstrap-ноды удаляйте через
+Terraform (`workers.vm_count`) и в том же изменении уменьшайте `spec.replicas`.
+
+**Политика реконсиляции (0.4.0): `spec.reconciliation.policy`**. По умолчанию
+`Notify`: worker, исчезнувший вне цикла (удалён руками в vCD, упал хост),
+не пересоздаётся автоматически — слот остаётся зарезервированным, а в CR
+появляется `Ready=False` с причиной `WorkerMissing` и именем ноды/IP.
+`AutoHeal` — явный opt-in: пересоздаёт worker в его слоте с тем же именем и
+адресом. Если `deleteWorkers` указывает на уже отсутствующую ноду, контроллер
+выравнивает `spec.replicas` по факту и ничего не создаёт.
+
+**Размещение на control-plane (0.4.0).** Для удаления последнего worker и
+масштабирования из нуля нужен pod, который не живёт на worker-ноде. Менеджер
+просит 100m/512Mi — на master это незаметно, а master-ноды никогда не входят в
+пул (префикс `-wrk-`). С таким размещением `scaleDown.minReplicas: 0` и
+`spec.replicas: 0 → N` работают; при размещении на worker последний worker
+защищён отказом `LastWorkerProtected`. Настройки размещения
+(`node_selector`/`tolerations`/`replicas`/`priority_class_name`/`dns_policy`) появятся в переменных
+модуля в 0.4.0; до этого — `helm upgrade -f values-control-plane.yaml`.
 
 Перед включением опубликуйте Helm-чарт (или укажите `chart_repo` на OCI-репозиторий)
 и создайте сервисный аккаунт vCD с правами на VM и LB pool. Не используйте
