@@ -180,7 +180,7 @@ ingress-пула (`ingressPool.port` = NodePort ingress-контроллера,
 - `spec.scaleDown.deleteWorkers: ["<cluster>-wrk-02"]` — удаляет конкретный
   worker; после удаления запись убирается из списка, `replicas` уменьшается,
   нода не пересоздаётся;
-- `kubectl annotate node <cluster>-wrk-03 infra.example.com/delete-worker=true`
+- `kubectl annotate node <cluster>-wrk-03 k8s-nodescale.github.io/delete-worker=true`
   — удаляет конкретную ноду и позволяет пулу создать замену (rolling
   replacement).
 
