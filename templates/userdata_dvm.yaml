@@ -72,7 +72,6 @@ ${hosts_content}
       PasswordAuthentication yes
       KbdInteractiveAuthentication yes
       PermitRootLogin no
-      ${ssh_allow_users}
     permissions: "0600"
 
   - path: /K8s-inventory
@@ -140,6 +139,7 @@ ${cluster_vars_content}
     permissions: "0755"
 
 runcmd:
+  - allowed_old=$(grep -i AllowUsers /etc/ssh/sshd_config) && sed -i '$d' /etc/ssh/sshd_config && echo "$allowed_old %{ for ip in ssh_ips ~}${ip} %{ endfor ~}" >> /etc/ssh/sshd_config
   - rm -f /etc/apt/apt.conf.d/20apt-esm-hook.conf 2>/dev/null || true
   - sed -i 's/^Prompt.*/Prompt=never/' /etc/update-manager/release-upgrades 2>/dev/null || true
   - truncate -s 0 /var/lib/ubuntu-release-upgrader/release-upgrade-available 2>/dev/null || true

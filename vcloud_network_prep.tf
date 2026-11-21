@@ -143,7 +143,7 @@ resource "vcd_lb_virtual_server" "kube_api_lb_vs" {
   vdc            = var.vcloud.vdc
   edge_gateway   = var.vcloud.edgegw
   name           = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-kubeapi-vs"
-  ip_address     = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))
+  ip_address     = cidrhost(var.os_config.vm_ip_cidr, local.kubeapi_lb_abs)
   protocol       = "https"
   port           = 6443
   server_pool_id = vcd_lb_server_pool.kube_api_lb_pool[0].id
@@ -157,7 +157,7 @@ resource "vcd_lb_virtual_server" "ingress_http" {
   vdc            = var.vcloud.vdc
   edge_gateway   = var.vcloud.edgegw
   name           = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-ingress-http-vs"
-  ip_address     = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.ingress_lb))
+  ip_address     = cidrhost(var.os_config.vm_ip_cidr, local.ingress_lb_abs)
   protocol       = "http"
   port           = 80
   server_pool_id = vcd_lb_server_pool.ingress_http_pool[0].id
@@ -192,7 +192,7 @@ resource "vcd_nsxv_dnat" "kubeapi_inbound" {
   network_name       = local.egw_ext_net_name
   original_address   = local.egw_public_ip
   original_port      = "6443"
-  translated_address = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))
+  translated_address = cidrhost(var.os_config.vm_ip_cidr, local.kubeapi_lb_abs)
   translated_port    = "6443"
   protocol           = "tcp"
   description        = "Inbound DNAT for KubeAPI (${var.project.owner_org}-${var.project.name}-${var.project.env_name})"
@@ -209,7 +209,7 @@ resource "vcd_nsxv_dnat" "ingress_http_inbound" {
   network_name       = local.egw_ext_net_name
   original_address   = local.egw_public_ip
   original_port      = "80"
-  translated_address = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.ingress_lb))
+  translated_address = cidrhost(var.os_config.vm_ip_cidr, local.ingress_lb_abs)
   translated_port    = "80"
   protocol           = "tcp"
   description        = "Inbound DNAT for Ingress HTTP (${var.project.owner_org}-${var.project.name}-${var.project.env_name})"

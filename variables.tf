@@ -100,22 +100,23 @@ variable "os_config" {
     docker_mirror       = optional(string, "")
     os_nic1_name        = string
     allowed_ssh_ips = optional(list(string), [
-      "*@10.97.6.219",    # CORP
-      "*@10.99.231.0/24", # CORP
-      "*@10.199.186.0/24",
-      "*@11.111.0.0/16",
-      "*@11.216.0.0/16",
-      "*@10.31.203.203",
+      "*@192.168.100.0/24", # the cluster nodes' subnet (os_config.vm_ip_cidr)
     ])
   })
   description = <<-EOT
     Operating system configuration, credentials and network settings.
 
-    allowed_ssh_ips is the sshd AllowUsers list every node of the cluster admits,
-    written into the guest exactly as the vSphere baseline writes it. The same
-    list is put in the K8sWorkerPool (spec.bootstrap.sshAllowedSources), so a
-    worker the controller creates accepts SSH from the operator's networks and
-    not only from wherever the template image happened to allow.
+    allowed_ssh_ips is the sshd AllowUsers list every node of the cluster
+    admits, written into the guest exactly as the vSphere baseline writes it.
+
+    The default is the cluster nodes' own subnet (os_config.vm_ip_cidr): the DVM
+    is a node of that subnet and every other node is reached from there, so it is
+    the one source a worker has to admit on any platform. Add further sources in
+    the tfvars, where the networks reaching this cluster are known.
+
+    The same list is put in the K8sWorkerPool
+    (spec.bootstrap.sshAllowedSources), so a worker the controller creates
+    admits the same sources as the nodes Terraform built.
   EOT
 }
 

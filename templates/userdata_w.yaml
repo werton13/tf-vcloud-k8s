@@ -64,10 +64,10 @@ ${hosts_content}
       PasswordAuthentication yes
       KbdInteractiveAuthentication yes
       PermitRootLogin no
-      ${ssh_allow_users}
     permissions: "0600"
 
 runcmd:
+  - allowed_old=$(grep -i AllowUsers /etc/ssh/sshd_config) && sed -i '$d' /etc/ssh/sshd_config && echo "$allowed_old %{ for ip in ssh_ips ~}${ip} %{ endfor ~}" >> /etc/ssh/sshd_config
   - apt-get purge --auto-remove -y unattended-upgrades ubuntu-advantage-tools ubuntu-pro-client 2>/dev/null || true
   - rm -f /etc/apt/apt.conf.d/20apt-esm-hook.conf 2>/dev/null || true
   - sed -i 's/^Prompt.*/Prompt=never/' /etc/update-manager/release-upgrades 2>/dev/null || true

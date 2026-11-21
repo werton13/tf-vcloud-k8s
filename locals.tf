@@ -11,11 +11,6 @@ locals {
   kubeapi_lb_abs = tonumber(var.ip_plan.kubeapi_lb) + local.vm_ip_offset
   ingress_lb_abs = tonumber(var.ip_plan.ingress_lb) + local.vm_ip_offset
 
-  # The sshd AllowUsers line the guest writes. Empty list keeps the template
-  # image's own line, which is what the cluster did before allowed_ssh_ips
-  # existed.
-  ssh_allow_users = length(var.os_config.allowed_ssh_ips) == 0 ? "" : "AllowUsers ${join(" ", var.os_config.allowed_ssh_ips)}"
-
   # Master nodes metadata
   master_nodes = [
     for i in range(tonumber(var.vms_config.masters.vm_count)) : {
@@ -315,7 +310,7 @@ EOT
       cidr_prefix         = local.cidr_prefix
       gateway_ip          = local.gateway_ip
       dns_servers_json    = local.dns_servers_json
-      ssh_allow_users     = local.ssh_allow_users
+      ssh_ips             = var.os_config.allowed_ssh_ips
     })
   ]
 
@@ -332,7 +327,7 @@ EOT
       cidr_prefix         = local.cidr_prefix
       gateway_ip          = local.gateway_ip
       dns_servers_json    = local.dns_servers_json
-      ssh_allow_users     = local.ssh_allow_users
+      ssh_ips             = var.os_config.allowed_ssh_ips
     })
   ]
 
@@ -351,7 +346,7 @@ EOT
     cidr_prefix          = local.cidr_prefix
     gateway_ip           = local.gateway_ip
     dns_servers_json     = local.dns_servers_json
-    ssh_allow_users      = local.ssh_allow_users
+    ssh_ips              = var.os_config.allowed_ssh_ips
     cluster_node_ips     = local.cluster_node_ips
     inventory_content    = local.inventory_content
     cluster_vars_content = local.cluster_vars_content
