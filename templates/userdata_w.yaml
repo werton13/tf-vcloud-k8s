@@ -64,6 +64,7 @@ ${hosts_content}
       PasswordAuthentication yes
       KbdInteractiveAuthentication yes
       PermitRootLogin no
+      ${ssh_allow_users}
     permissions: "0600"
 
 runcmd:

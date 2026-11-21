@@ -1,9 +1,26 @@
 locals {
+  # ip_plan.vm_ip_offset shifts the whole VM range inside the prefix, the same
+  # way the controller's ipam shifts the K8sWorkerPool plan, so Terraform and the
+  # controller agree on every address. The shift is applied to the range, not to
+  # a negative offset: dvm = "-3" is counted from the end of the prefix and is
+  # already absolute.
+  vm_ip_offset   = tonumber(var.ip_plan.vm_ip_offset)
+  m_node_abs     = tonumber(var.ip_plan.m_node) + local.vm_ip_offset
+  w_node_abs     = tonumber(var.ip_plan.w_node) + local.vm_ip_offset
+  dvm_abs        = tonumber(var.ip_plan.dvm) < 0 ? tonumber(var.ip_plan.dvm) : tonumber(var.ip_plan.dvm) + local.vm_ip_offset
+  kubeapi_lb_abs = tonumber(var.ip_plan.kubeapi_lb) + local.vm_ip_offset
+  ingress_lb_abs = tonumber(var.ip_plan.ingress_lb) + local.vm_ip_offset
+
+  # The sshd AllowUsers line the guest writes. Empty list keeps the template
+  # image's own line, which is what the cluster did before allowed_ssh_ips
+  # existed.
+  ssh_allow_users = length(var.os_config.allowed_ssh_ips) == 0 ? "" : "AllowUsers ${join(" ", var.os_config.allowed_ssh_ips)}"
+
   # Master nodes metadata
   master_nodes = [
     for i in range(tonumber(var.vms_config.masters.vm_count)) : {
       name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-mst-${format("%02s", i + 1)}"
-      ip   = cidrhost(var.os_config.vm_ip_cidr, i + tonumber(var.ip_plan.m_node))
+      ip   = cidrhost(var.os_config.vm_ip_cidr, i + local.m_node_abs)
     }
   ]
 
@@ -11,12 +28,12 @@ locals {
   worker_nodes = [
     for i in range(tonumber(var.vms_config.workers.vm_count)) : {
       name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-wrk-${format("%02s", i + 1)}"
-      ip   = cidrhost(var.os_config.vm_ip_cidr, i + tonumber(var.ip_plan.w_node))
+      ip   = cidrhost(var.os_config.vm_ip_cidr, i + local.w_node_abs)
     }
   ]
 
   # DVM host metadata
-  dvm_ip   = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.dvm))
+  dvm_ip   = cidrhost(var.os_config.vm_ip_cidr, local.dvm_abs)
   dvm_name = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}-dvm"
 
   # vCloud API host entry
@@ -24,8 +41,8 @@ locals {
 
   # NSX-T uses kube-vip for the KubeAPI and ingress VIPs; the Edge only performs NAT.
   use_kube_vip     = var.vcloud.network_type == "nsx-t"
-  kubeapi_vip      = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.kubeapi_lb))
-  ingress_vip      = cidrhost(var.os_config.vm_ip_cidr, tonumber(var.ip_plan.ingress_lb))
+  kubeapi_vip      = cidrhost(var.os_config.vm_ip_cidr, local.kubeapi_lb_abs)
+  ingress_vip      = cidrhost(var.os_config.vm_ip_cidr, local.ingress_lb_abs)
   nsxt_rule_prefix = "${var.project.owner_org}-${var.project.name}-${var.project.env_name}"
 
   # Automatic Edge Gateway Public IP and External Network discovery.
@@ -248,6 +265,9 @@ node_controller_pool_name: "${lower(join("-", [var.project.owner_org, var.projec
 node_controller_pool_token_ttl: "1h"
 node_controller_pool_min_replicas: 1
 node_controller_pool_cidr: "${var.os_config.vm_ip_cidr}"
+# The pool carries the same plan, relative offsets plus the shift, so the
+# controller reserves exactly the addresses Terraform used (ipPlan.vmIPOffset).
+node_controller_pool_ip_vm_ip_offset: ${var.ip_plan.vm_ip_offset}
 node_controller_pool_ip_m_node: ${var.ip_plan.m_node}
 node_controller_pool_ip_w_node: ${var.ip_plan.w_node}
 node_controller_pool_ip_dvm: ${var.ip_plan.dvm}
@@ -255,6 +275,9 @@ node_controller_pool_ip_kubeapi_lb: ${var.ip_plan.kubeapi_lb}
 node_controller_pool_ip_ingress_lb: ${var.ip_plan.ingress_lb}
 node_controller_pool_os_password_hash: "${var.os_config.vm_user_password}"
 node_controller_pool_ssh_authorized_key: "${try(var.os_config.vm_user_ssh_key, "")}"
+# The same AllowUsers list the cluster nodes write, so a worker the controller
+# creates is reachable from the same networks as the nodes Terraform built.
+node_controller_pool_ssh_allowed_sources: ${jsonencode(var.os_config.allowed_ssh_ips)}
 node_controller_pool_worker_cpu: ${var.vms_config.workers.vm_cpu_count}
 node_controller_pool_worker_ram: ${var.vms_config.workers.vm_ram_size}
 node_controller_pool_worker_disk1_gb: ${var.disks_config.diskw1.sizegb}
@@ -292,6 +315,7 @@ EOT
       cidr_prefix         = local.cidr_prefix
       gateway_ip          = local.gateway_ip
       dns_servers_json    = local.dns_servers_json
+      ssh_allow_users     = local.ssh_allow_users
     })
   ]
 
@@ -308,6 +332,7 @@ EOT
       cidr_prefix         = local.cidr_prefix
       gateway_ip          = local.gateway_ip
       dns_servers_json    = local.dns_servers_json
+      ssh_allow_users     = local.ssh_allow_users
     })
   ]
 
@@ -326,6 +351,7 @@ EOT
     cidr_prefix          = local.cidr_prefix
     gateway_ip           = local.gateway_ip
     dns_servers_json     = local.dns_servers_json
+    ssh_allow_users      = local.ssh_allow_users
     cluster_node_ips     = local.cluster_node_ips
     inventory_content    = local.inventory_content
     cluster_vars_content = local.cluster_vars_content

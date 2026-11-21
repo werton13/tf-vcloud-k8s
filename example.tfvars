@@ -27,11 +27,12 @@ vcloud = {
 }
 
 ip_plan = {
-  m_node     = "4"  # first master node IP will be x.x.x.4
-  w_node     = "7"  # first worker node IP will be x.x.x.7
-  dvm        = "-3" # DVM IP will be -3 from end of subnet (e.g. 192.168.100.253)
-  kubeapi_lb = "2"  # KubeAPI LB VIP (x.x.x.2)
-  ingress_lb = "3"  # Ingress LB VIP (x.x.x.3)
+  m_node       = "4"  # first master node IP will be x.x.x.4
+  w_node       = "7"  # first worker node IP will be x.x.x.7
+  dvm          = "-3" # DVM IP: third from the end of the subnet (192.168.100.253)
+  kubeapi_lb   = "2"  # KubeAPI LB VIP (x.x.x.2)
+  ingress_lb   = "3"  # Ingress LB VIP (x.x.x.3)
+  vm_ip_offset = "0"  # addresses skipped at the start of the CIDR; same plan as the pool
 }
 
 vms_config = {
@@ -102,14 +103,16 @@ os_config = {
   env_dns2            = "1.1.1.1"
   env_dns3            = "1.0.0.1"
   ubuntu_animal_code  = "noble" # Ubuntu 24.04 LTS Noble Numbat
-  os_nic1_name        = "ens192"
+  # sshd AllowUsers for every node and for the workers the controller creates.
+  allowed_ssh_ips = ["*@10.97.6.219", "*@10.99.231.0/24"]
+  os_nic1_name    = "ens192"
 }
 
 ansible = {
   git_repo = {
     repo_url      = "https://github.com/werton13/k8s-kubeadm-r2.git"
     repo_name     = "k8s-kubeadm-r2"
-    repo_branch   = "dev"    # branch must carry the k8s_addons_node_controller role
+    repo_branch   = "dev" # branch must carry the k8s_addons_node_controller role
     playbook_name = "main.yaml"
   }
   vault_secret = "your_vault_password_secret_here"

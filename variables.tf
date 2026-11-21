@@ -41,20 +41,35 @@ variable "vcloud" {
 
 variable "ip_plan" {
   type = object({
-    m_node     = string
-    w_node     = string
-    dvm        = string
-    kubeapi_lb = string
-    ingress_lb = string
+    m_node       = string
+    w_node       = string
+    dvm          = string
+    kubeapi_lb   = string
+    ingress_lb   = string
+    vm_ip_offset = optional(string, "0") # skip addresses at the start of the CIDR
   })
   default = {
-    m_node     = "4"  # first master node IP will be x.x.x.4
-    w_node     = "7"  # first worker node IP will be x.x.x.7
-    dvm        = "-3" # DVM IP will be -3 from the end of subnet - i.e. 192.168.0.253 for 192.168.0.0/24
-    kubeapi_lb = "2"  # KubeAPI LB VIP (e.g. x.x.x.2)
-    ingress_lb = "3"  # Ingress LB VIP (e.g. x.x.x.3)
+    m_node       = "4"  # first master node IP will be x.x.x.4
+    w_node       = "7"  # first worker node IP will be x.x.x.7
+    dvm          = "-3" # DVM IP will be x.x.x.253 - counted from the end of a /24
+    kubeapi_lb   = "2"  # KubeAPI LB VIP (e.g. x.x.x.2)
+    ingress_lb   = "3"  # Ingress LB VIP (e.g. x.x.x.3)
+    vm_ip_offset = "0"  # cluster starts at the prefix; raise it to skip ip space
   }
-  description = "Here we define IP address distribution for VMs and virtual services from the network CIDR"
+  description = <<-EOT
+    IP address distribution for the VMs and virtual services of the cluster.
+
+    Every offset is relative to the start of the VM range, and vm_ip_offset says
+    where that range starts inside the prefix:
+
+      address = prefix + vm_ip_offset + offset
+
+    It is the same plan the K8sWorkerPool carries (ipPlan.vmIPOffset), so the
+    controller hands out the addresses Terraform left free instead of a second
+    set, and it exists for the case where the cluster cannot sit at the start of
+    a clean subnet. A negative dvm is counted from the end of the prefix, which
+    is already absolute, so it is not shifted.
+  EOT
 }
 
 variable "vms_config" {
@@ -84,8 +99,24 @@ variable "os_config" {
     ubuntu_animal_code  = optional(string, "noble") # noble for Ubuntu 24.04, jammy for 22.04
     docker_mirror       = optional(string, "")
     os_nic1_name        = string
+    allowed_ssh_ips = optional(list(string), [
+      "*@10.97.6.219",    # CORP
+      "*@10.99.231.0/24", # CORP
+      "*@10.199.186.0/24",
+      "*@11.111.0.0/16",
+      "*@11.216.0.0/16",
+      "*@10.31.203.203",
+    ])
   })
-  description = "Operating system configuration, credentials and network settings"
+  description = <<-EOT
+    Operating system configuration, credentials and network settings.
+
+    allowed_ssh_ips is the sshd AllowUsers list every node of the cluster admits,
+    written into the guest exactly as the vSphere baseline writes it. The same
+    list is put in the K8sWorkerPool (spec.bootstrap.sshAllowedSources), so a
+    worker the controller creates accepts SSH from the operator's networks and
+    not only from wherever the template image happened to allow.
+  EOT
 }
 
 variable "disks_config" {

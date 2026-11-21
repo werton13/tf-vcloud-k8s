@@ -11,10 +11,9 @@ provider "registry.terraform.io/hashicorp/time" {
 }
 
 provider "registry.terraform.io/vmware/vcd" {
-  version     = "3.14.2"
-  constraints = ">= 3.8.0, < 4.0.0"
+  version     = "3.14.1"
+  constraints = ">= 3.13.0, < 4.0.0"
   hashes = [
-    "h1:BEo9zgDK9Vw6AikOJAvUpV17rIr43CKf6H8Ao+MA6m8=",
-    "h1:gvm7uFQyaMjyvX618yDjN4Vm+FlanqhcjhTnMWO7Z+8=",
+    "h1:YuUuEVNWdazzR0PlAAF8KrWJG0AQ/HissfrerQLn/A0=",
   ]
 }
