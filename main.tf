@@ -234,9 +234,9 @@ resource "terraform_data" "node_controller_guard" {
 
     precondition {
       condition = !var.node_controller.create_vcd_secret || (
-        var.node_controller.vcd_user != "" && var.node_controller.vcd_password != ""
+        var.vcloud.admin != "" && var.vcloud.admin_pwd != ""
       )
-      error_message = "node_controller.create_vcd_secret = true requires node_controller.vcd_user and node_controller.vcd_password. Use a dedicated vCD service account with VM and LB pool permissions, or set create_vcd_secret = false and pre-create the Secret."
+      error_message = "node_controller.create_vcd_secret = true requires vcloud.admin and vcloud.admin_pwd: the controller logs in with the account the cluster was installed with. Set create_vcd_secret = false to pre-create the Secret with a different account."
     }
   }
 }

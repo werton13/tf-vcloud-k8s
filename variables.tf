@@ -205,8 +205,6 @@ variable "node_controller" {
     create_namespace                     = optional(bool, true)
     create_vcd_secret                    = optional(bool, true)
     vcd_secret_name                      = optional(string, "vcd-credentials")
-    vcd_user                             = optional(string, "")
-    vcd_password                         = optional(string, "")
     vcd_insecure                         = optional(bool, true)
     helm_timeout                         = optional(string, "10m")
     helm_atomic                          = optional(bool, true)
@@ -215,6 +213,19 @@ variable "node_controller" {
     # The management page (chart value ui.*). It is a second container in the
     # same release: a small API over the same CRD plus the page itself, served
     # through the cluster's ingress.
+    # Guest policy for the workers the controller creates, the same shape as the
+    # vSphere pair. Empty fields keep the chart's own defaults; the pool in the
+    # CR can override any of them per pool.
+    bootstrap = optional(object({
+      ntp_servers              = optional(list(string), [])
+      apt_mirror               = optional(string, "")
+      sysctls                  = optional(map(string), {})
+      kernel_modules           = optional(list(string), [])
+      containerd_sandbox_image = optional(string, "")
+      ca_bundle_file           = optional(string, "")
+      ssh_allowed_sources      = optional(list(string), [])
+    }), {})
+
     ui = optional(object({
       enabled          = optional(bool, false) # deploy the page and its API
       ingress_enabled  = optional(bool, true)  # reach it through the ingress controller
@@ -238,10 +249,12 @@ variable "node_controller" {
   description = <<-EOT
     Optional vcd-k8s-node-controller (worker autoscaling) configuration.
 
-    All settings have defaults. When enabling the controller, the only values a
-    project normally must provide are:
-      - acknowledge_terraform_ownership_loss = true
-      - vcd_user / vcd_password (a dedicated vCD service account)
+    All settings have defaults. When enabling the controller, the only value a
+    project normally must provide is acknowledge_terraform_ownership_loss = true.
+
+    The vCD account is not a setting of its own: the controller logs in with the
+    same account the cluster was installed with, i.e. vcloud.admin and
+    vcloud.admin_pwd, so there is one credential to rotate, not two.
 
     WARNING: enabling this controller transfers ownership of worker scaling and
     worker LB pool membership from Terraform to the controller/CRD. After it is

@@ -241,8 +241,9 @@ node_controller_image_pull_policy: "${var.node_controller.image_pull_policy}"
 node_controller_create_namespace: ${var.node_controller.create_namespace}
 node_controller_create_vcd_secret: ${var.node_controller.create_vcd_secret}
 node_controller_vcd_secret_name: "${var.node_controller.vcd_secret_name}"
-node_controller_vcd_user: "${var.node_controller.vcd_user}"
-node_controller_vcd_password: "${var.node_controller.vcd_password}"
+# The same account the cluster is installed with: one credential, not two.
+node_controller_vcd_user: "${var.vcloud.admin}"
+node_controller_vcd_password: "${var.vcloud.admin_pwd}"
 node_controller_vcd_insecure: ${var.node_controller.vcd_insecure}
 node_controller_helm_timeout: "${var.node_controller.helm_timeout}"
 node_controller_helm_atomic: ${var.node_controller.helm_atomic}
@@ -255,6 +256,14 @@ node_controller_dns_policy: "${var.node_controller.dns_policy}"
 
 # Management page (chart ui.*). The ingress is the cluster's, so the page is
 # reachable on whatever name or IP the ingress controller answers on.
+node_controller_bootstrap_ntp_servers: ${jsonencode(var.node_controller.bootstrap.ntp_servers)}
+node_controller_bootstrap_apt_mirror: "${var.node_controller.bootstrap.apt_mirror}"
+node_controller_bootstrap_sysctls: ${jsonencode(var.node_controller.bootstrap.sysctls)}
+node_controller_bootstrap_kernel_modules: ${jsonencode(var.node_controller.bootstrap.kernel_modules)}
+node_controller_bootstrap_containerd_sandbox_image: "${var.node_controller.bootstrap.containerd_sandbox_image}"
+node_controller_bootstrap_ca_bundle_file: "${var.node_controller.bootstrap.ca_bundle_file}"
+node_controller_bootstrap_ssh_allowed_sources: ${jsonencode(var.node_controller.bootstrap.ssh_allowed_sources)}
+
 node_controller_ui_enabled: ${var.node_controller.ui.enabled}
 node_controller_ui_ingress_enabled: ${var.node_controller.ui.ingress_enabled}
 node_controller_ui_auth_enabled: ${var.node_controller.ui.auth_enabled}
