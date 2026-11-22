@@ -250,4 +250,20 @@ node_controller = {
   # acknowledge_terraform_ownership_loss = true
   # vcd_user     = "vcd-node-controller-svc"
   # vcd_password = "***"
+  # chart_version = "1.3.33"
+  # image_tag     = "1.3.33"
+
+  # The management page: a second container in the same release, served through
+  # the cluster's ingress on /nodescale-ui (catch-all host, so any address the
+  # ingress answers on works). ingress_enabled = false keeps it cluster-internal;
+  # auth_enabled = false is only for a trusted network - the server then refuses
+  # nothing.
+  # ui = {
+  #   enabled          = true
+  #   ingress_enabled  = true
+  #   auth_enabled     = true
+  #   auth_secret_name = "nodescale-ui-auth"
+  #   admin_username   = "admin"
+  #   viewer_username  = "viewer"
+  # }
 }
