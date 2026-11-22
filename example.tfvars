@@ -244,62 +244,63 @@ obs_config = {
 # etc.) have defaults in variables.tf and normally do not need editing.
 # -----------------------------------------------------------------------------
 node_controller = {
-  enabled                              = false # install the nodescale worker controller
-  acknowledge_terraform_ownership_loss = false # required with enabled = true
+  enabled                              = false # default false; install the nodescale worker controller
+  acknowledge_terraform_ownership_loss = false # default false; must be true when enabled
 
-  namespace         = "vcd-nodescale-system"                                    # release namespace
-  release_name      = "vcd-nodescale"                                           # helm release name
-  chart_repo        = "https://k8s-nodescale.github.io/vcd-k8s-node-controller" # chart repository
-  chart_name        = "vcd-nodescale"                                           # chart name
-  chart_version     = "1.3.33"                                                  # chart version; keep in step with image_tag
-  image_repository  = "docker.io/werton13/vcd-k8s-node-controller"              # controller image
-  image_tag         = "1.3.33"                                                  # image tag; the same release as the chart
-  image_pull_policy = "IfNotPresent"                                            # pull only when the tag is missing
+  namespace         = "nodescale-system"                                        # default nodescale-system
+  release_name      = "vcd-nodescale"                                           # default vcd-nodescale
+  chart_repo        = "https://k8s-nodescale.github.io/vcd-k8s-node-controller" # default this repository
+  chart_name        = "vcd-nodescale"                                           # default vcd-nodescale
+  chart_version     = "1.3.33"                                                  # default 1.3.33; keep equal to image_tag
+  image_repository  = "docker.io/werton13/vcd-k8s-node-controller"              # default this image
+  image_tag         = "1.3.33"                                                  # default 1.3.33; the same release as the chart
+  image_pull_policy = "IfNotPresent"                                            # default IfNotPresent
 
   # The controller logs in with vcloud.admin / vcloud.admin_pwd - the account the
   # cluster is installed with - so no credentials are set here.
-  create_vcd_secret = true              # create the Secret holding that account
-  vcd_secret_name   = "vcd-credentials" # its name in the release namespace
-  vcd_insecure      = true              # skip the vCD API certificate check
+  create_vcd_secret = true              # default true; create the Secret with that account
+  vcd_secret_name   = "vcd-credentials" # default vcd-credentials; its name in the namespace
+  vcd_insecure      = true              # default true; skip the vCD API certificate check
 
-  create_namespace = true  # create the release namespace
-  helm_timeout     = "10m" # wait this long for the release to become ready
-  helm_atomic      = true  # roll the release back on failure
-  create_pool      = true  # apply the K8sWorkerPool for the workers Terraform made
+  create_namespace = true  # default true; create the release namespace
+  helm_timeout     = "10m" # default 10m; how long to wait for the release
+  helm_atomic      = true  # default true; roll the release back on failure
+  create_pool      = true  # default true; apply the K8sWorkerPool from these settings
 
   # Placement: the control plane is the default because the pool must be able to
   # reach zero - the last-worker guard refuses to delete the node it runs on.
-  replica_count       = 1                                                # controller replicas
-  priority_class_name = "system-cluster-critical"                        # keeps it above the workloads it evicts
-  node_selector       = { "node-role.kubernetes.io/control-plane" = "" } # where it runs
-  tolerations = [{                                                       # tolerate the control-plane taint
+  replica_count       = 1                                                # default 1; controller replicas
+  priority_class_name = "system-cluster-critical"                        # default system-cluster-critical
+  node_selector       = { "node-role.kubernetes.io/control-plane" = "" } # default control plane
+  tolerations = [{                                                       # default control-plane taint
     key      = "node-role.kubernetes.io/control-plane"
     operator = "Exists"
     effect   = "NoSchedule"
   }]
-  affinity   = {} # extra affinity/podAntiAffinity
-  dns_policy = "" # empty keeps cluster DNS; "Default" if CoreDNS cannot run on a master
+  affinity   = {} # default {}; extra affinity/podAntiAffinity
+  dns_policy = "" # default ""; empty keeps cluster DNS, "Default" if CoreDNS cannot run on a master
 
   # Guest policy for the workers the controller creates (chart bootstrap.defaults);
   # a pool may override any of it in its own spec.bootstrap.
   bootstrap = {
-    ntp_servers              = ["ntp1.example.com", "ntp2.example.com"]         # chrony sources in new workers
-    apt_mirror               = ""                                               # empty keeps the image's sources
-    sysctls                  = { "net.netfilter.nf_conntrack_max" = "2621440" } # sysctl.d entries
-    kernel_modules           = ["nf_conntrack"]                                 # loaded before the sysctls
-    containerd_sandbox_image = ""                                               # empty keeps the image's pause image
-    ca_bundle_file           = ""                                               # PEM file trusted in the guests
-    ssh_allowed_sources      = []                                               # extra sshd AllowUsers sources
+    ntp_servers              = ["ntp1.example.com", "ntp2.example.com"]         # default []; chrony sources
+    apt_mirror               = ""                                               # default ""; empty keeps the image's
+    sysctls                  = { "net.netfilter.nf_conntrack_max" = "2621440" } # default {}; sysctl.d entries
+    kernel_modules           = ["nf_conntrack"]                                 # default []; loaded before the sysctls
+    containerd_sandbox_image = ""                                               # default ""; empty keeps the image's
+    ca_bundle_file           = ""                                               # default ""; PEM file trusted in the guests
+    ssh_allowed_sources      = []                                               # default []; extra sshd AllowUsers sources
   }
 
   # The management page: a second container in the same release, served through
-  # the cluster's ingress on /nodescale-ui.
+  # the cluster's ingress on /nodescale-ui. The ingress exists only while the page
+  # is enabled, so the two are switched on together.
   ui = {
-    enabled          = false               # deploy the page and its API
-    ingress_enabled  = true                # publish it through the cluster ingress
-    auth_enabled     = true                # the admin/viewer Secret
-    auth_secret_name = "nodescale-ui-auth" # its name; created on first install
-    admin_username   = "admin"             # account that may change the pool
-    viewer_username  = "viewer"            # account that may only read it
+    enabled          = false               # default false; deploy the page and its API
+    ingress_enabled  = false               # default true; publish it through the ingress (only used when enabled)
+    auth_enabled     = true                # default true; the admin/viewer Secret
+    auth_secret_name = "nodescale-ui-auth" # default nodescale-ui-auth; created on first install
+    admin_username   = "admin"             # default admin; may change the pool
+    viewer_username  = "viewer"            # default viewer; may only read it
   }
 }
