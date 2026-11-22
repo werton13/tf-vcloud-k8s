@@ -212,6 +212,18 @@ variable "node_controller" {
     helm_atomic                          = optional(bool, true)
     create_pool                          = optional(bool, true)
 
+    # The management page (chart value ui.*). It is a second container in the
+    # same release: a small API over the same CRD plus the page itself, served
+    # through the cluster's ingress.
+    ui = optional(object({
+      enabled          = optional(bool, false) # deploy the page and its API
+      ingress_enabled  = optional(bool, true)  # reach it through the ingress controller
+      auth_enabled     = optional(bool, true)  # the accounts Secret (admin/viewer)
+      auth_secret_name = optional(string, "nodescale-ui-auth")
+      admin_username   = optional(string, "admin")
+      viewer_username  = optional(string, "viewer")
+    }), {})
+
     # Placement. Control plane is the default because the pool must be able to
     # reach zero: on a worker, the last-worker guard refuses to delete the node
     # the controller runs on (WorkerHostsController).

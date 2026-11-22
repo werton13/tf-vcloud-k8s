@@ -253,6 +253,15 @@ node_controller_affinity: ${jsonencode(var.node_controller.affinity)}
 node_controller_priority_class_name: "${var.node_controller.priority_class_name}"
 node_controller_dns_policy: "${var.node_controller.dns_policy}"
 
+# Management page (chart ui.*). The ingress is the cluster's, so the page is
+# reachable on whatever name or IP the ingress controller answers on.
+node_controller_ui_enabled: ${var.node_controller.ui.enabled}
+node_controller_ui_ingress_enabled: ${var.node_controller.ui.ingress_enabled}
+node_controller_ui_auth_enabled: ${var.node_controller.ui.auth_enabled}
+node_controller_ui_auth_secret_name: "${var.node_controller.ui.auth_secret_name}"
+node_controller_ui_admin_username: "${var.node_controller.ui.admin_username}"
+node_controller_ui_viewer_username: "${var.node_controller.ui.viewer_username}"
+
 # K8sWorkerPool applied by stage_plays/11_create_node_controller_pool.yaml
 node_controller_create_pool: ${var.node_controller.create_pool}
 node_controller_pool_namespace: "default"
@@ -270,6 +279,10 @@ node_controller_pool_ip_kubeapi_lb: ${var.ip_plan.kubeapi_lb}
 node_controller_pool_ip_ingress_lb: ${var.ip_plan.ingress_lb}
 node_controller_pool_os_password_hash: "${var.os_config.vm_user_password}"
 node_controller_pool_ssh_authorized_key: "${try(var.os_config.vm_user_ssh_key, "")}"
+# The cluster's NTP sources, so a worker the controller creates keeps the same
+# time as the nodes Terraform built (the pool carries them in
+# spec.bootstrap.ntpServers).
+node_controller_pool_ntp_servers: ${jsonencode(compact([var.os_config.ntp_srv1, var.os_config.ntp_srv2]))}
 # The same AllowUsers list the cluster nodes write, so a worker the controller
 # creates is reachable from the same networks as the nodes Terraform built.
 node_controller_pool_ssh_allowed_sources: ${jsonencode(var.os_config.allowed_ssh_ips)}
