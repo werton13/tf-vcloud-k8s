@@ -102,11 +102,9 @@ os_config = {
   env_dns1            = "8.8.8.8"
   env_dns2            = "1.1.1.1"
   env_dns3            = "1.0.0.1"
-  ubuntu_animal_code  = "noble" # Ubuntu 24.04 LTS Noble Numbat
-  # sshd AllowUsers. Omitted = "*@<vm_ip_cidr>" (the cluster nodes' subnet, which
-  # is how the DVM reaches every node); state it only to replace the default.
-  # allowed_ssh_ips = ["*@192.168.100.0/24"]
-  os_nic1_name = "ens192"
+  ubuntu_animal_code  = "noble"                # Ubuntu 24.04 LTS Noble Numbat
+  allowed_ssh_ips     = ["*@192.168.100.0/24"] # default ["*@192.168.100.0/24"]; add the subnets allowed for SSH
+  os_nic1_name        = "ens192"
 }
 
 ansible = {
