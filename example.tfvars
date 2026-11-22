@@ -248,10 +248,57 @@ node_controller = {
 
   # Required when enabled:
   # acknowledge_terraform_ownership_loss = true
-  # vcd_user     = "vcd-node-controller-svc"
-  # vcd_password = "***"
-  # chart_version = "1.3.33"
-  # image_tag     = "1.3.33"
+
+  # Release identity. The chart and the image are one release: both tags move
+  # together.
+  # namespace         = "vcd-nodescale-system"
+  # release_name      = "vcd-nodescale"
+  # chart_repo        = "https://k8s-nodescale.github.io/vcd-k8s-node-controller"
+  # chart_name        = "vcd-nodescale"
+  # chart_version     = "1.3.33"
+  # image_repository  = "docker.io/werton13/vcd-k8s-node-controller"
+  # image_tag         = "1.3.33"
+  # image_pull_policy = "IfNotPresent"
+
+  # The vCD account is not a setting: the controller logs in with vcloud.admin /
+  # vcloud.admin_pwd, the account the cluster is installed with, so there is one
+  # credential to rotate instead of two.
+  # create_vcd_secret = true
+  # vcd_secret_name   = "vcd-credentials"
+  # vcd_insecure      = true
+
+  # create_namespace = true
+  # helm_timeout     = "10m"
+  # helm_atomic      = true
+  # create_pool      = true
+
+  # Placement. The control plane is the default because the pool must be able to
+  # reach zero: on a worker, the last-worker guard refuses to delete the node the
+  # controller runs on.
+  # replica_count       = 1
+  # priority_class_name = "system-cluster-critical"
+  # node_selector = {
+  #   "node-role.kubernetes.io/control-plane" = ""
+  # }
+  # tolerations = [{
+  #   key      = "node-role.kubernetes.io/control-plane"
+  #   operator = "Exists"
+  #   effect   = "NoSchedule"
+  # }]
+  # affinity   = {}
+  # dns_policy = ""
+
+  # Guest policy for the workers the controller creates (chart
+  # bootstrap.defaults). A pool may override any field in its own spec.bootstrap.
+  # bootstrap = {
+  #   ntp_servers              = ["ntp1.example.com", "ntp2.example.com"]
+  #   apt_mirror               = "https://nexus.example.com/repository/ubuntu"
+  #   sysctls                  = { "net.netfilter.nf_conntrack_max" = "2621440" }
+  #   kernel_modules           = ["nf_conntrack"]
+  #   containerd_sandbox_image = "registry.example.com/pause:3.9"
+  #   ca_bundle_file           = "/path/to/ca-bundle.pem"
+  #   ssh_allowed_sources      = ["*@10.99.231.0/24"]
+  # }
 
   # The management page: a second container in the same release, served through
   # the cluster's ingress on /nodescale-ui (catch-all host, so any address the
