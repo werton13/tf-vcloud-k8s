@@ -249,9 +249,9 @@ node_controller = {
   release_name      = "vcd-nodescale"                                           # default vcd-nodescale
   chart_repo        = "https://k8s-nodescale.github.io/vcd-k8s-node-controller" # default this repository
   chart_name        = "vcd-nodescale"                                           # default vcd-nodescale
-  chart_version     = "1.3.37"                                                  # default 1.3.37; keep equal to image_tag
+  chart_version     = "1.3.41"                                                  # default 1.3.41; keep equal to image_tag
   image_repository  = "docker.io/werton13/vcd-k8s-node-controller"              # default this image
-  image_tag         = "1.3.37"                                                  # default 1.3.37; the same release as the chart
+  image_tag         = "1.3.41"                                                  # default 1.3.41; the same release as the chart
   image_pull_policy = "IfNotPresent"                                            # default IfNotPresent
 
   # The controller logs in with vcloud.admin / vcloud.admin_pwd - the account the
