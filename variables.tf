@@ -231,8 +231,11 @@ variable "node_controller" {
       ingress_enabled  = optional(bool, false) # reach it through the ingress controller
       auth_enabled     = optional(bool, true)  # the accounts Secret (admin/viewer)
       auth_secret_name = optional(string, "nodescale-ui-auth")
-      admin_username   = optional(string, "admin")
-      viewer_username  = optional(string, "viewer")
+      # The plaintext passwords, written once next to the hashes; the owner
+      # reads this Secret and deletes it, the server never reads it.
+      initial_passwords_secret_name = optional(string, "nodescale-ui-initial-passwords")
+      admin_username                = optional(string, "admin")
+      viewer_username               = optional(string, "viewer")
     }), {})
 
     # Placement. Control plane is the default because the pool must be able to

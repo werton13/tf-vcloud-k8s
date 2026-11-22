@@ -294,11 +294,12 @@ node_controller = {
   # the cluster's ingress on /nodescale-ui. The ingress exists only while the page
   # is enabled, so the two are switched on together.
   ui = {
-    enabled          = false               # default false; deploy the page and its API
-    ingress_enabled  = false               # default false; publish it through the ingress
-    auth_enabled     = true                # default true; the admin/viewer Secret
-    auth_secret_name = "nodescale-ui-auth" # default nodescale-ui-auth; created on first install
-    admin_username   = "admin"             # default admin; may change the pool
-    viewer_username  = "viewer"            # default viewer; may only read it
+    enabled                       = false                            # default false; deploy the page and its API
+    ingress_enabled               = false                            # default false; publish it through the ingress
+    auth_enabled                  = true                             # default true; the admin/viewer Secret
+    auth_secret_name              = "nodescale-ui-auth"              # default nodescale-ui-auth; bcrypt hashes, read by the server
+    initial_passwords_secret_name = "nodescale-ui-initial-passwords" # default nodescale-ui-initial-passwords; plaintext, deletable
+    admin_username                = "admin"                          # default admin; may change the pool
+    viewer_username               = "viewer"                         # default viewer; may only read it
   }
 }

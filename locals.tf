@@ -268,6 +268,7 @@ node_controller_ui_enabled: ${var.node_controller.ui.enabled}
 node_controller_ui_ingress_enabled: ${var.node_controller.ui.ingress_enabled}
 node_controller_ui_auth_enabled: ${var.node_controller.ui.auth_enabled}
 node_controller_ui_auth_secret_name: "${var.node_controller.ui.auth_secret_name}"
+node_controller_ui_initial_passwords_secret_name: "${var.node_controller.ui.initial_passwords_secret_name}"
 node_controller_ui_admin_username: "${var.node_controller.ui.admin_username}"
 node_controller_ui_viewer_username: "${var.node_controller.ui.viewer_username}"
 
