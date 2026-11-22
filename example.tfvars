@@ -297,7 +297,7 @@ node_controller = {
   # is enabled, so the two are switched on together.
   ui = {
     enabled          = false               # default false; deploy the page and its API
-    ingress_enabled  = false               # default true; publish it through the ingress (only used when enabled)
+    ingress_enabled  = false               # default false; publish it through the ingress
     auth_enabled     = true                # default true; the admin/viewer Secret
     auth_secret_name = "nodescale-ui-auth" # default nodescale-ui-auth; created on first install
     admin_username   = "admin"             # default admin; may change the pool

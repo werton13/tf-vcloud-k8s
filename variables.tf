@@ -228,7 +228,7 @@ variable "node_controller" {
 
     ui = optional(object({
       enabled          = optional(bool, false) # deploy the page and its API
-      ingress_enabled  = optional(bool, true)  # reach it through the ingress controller
+      ingress_enabled  = optional(bool, false) # reach it through the ingress controller
       auth_enabled     = optional(bool, true)  # the accounts Secret (admin/viewer)
       auth_secret_name = optional(string, "nodescale-ui-auth")
       admin_username   = optional(string, "admin")
