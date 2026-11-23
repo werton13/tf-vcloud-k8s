@@ -180,5 +180,7 @@ runcmd:
   - systemctl daemon-reload
   - systemctl restart ssh ssh.socket ssh.service 2>/dev/null || true
   - systemctl daemon-reload
-  - systemctl enable vcd-grow-disks.service
-  - systemctl start vcd-grow-disks.service || true
+  # Not enabled and not started here: the unit is provisioned for a later run,
+  # but guest bootstrap must not touch / or the data LVs while Ansible is moving
+  # /var into them. k8s-kubeadm-r2 runs the script once, at the end of
+  # prepare_k8s_nodes, after the move.

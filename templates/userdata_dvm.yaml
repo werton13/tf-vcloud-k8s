@@ -253,5 +253,7 @@ runcmd:
   - git clone -b "${ansible_repo_branch}" "${ansible_repo_url}" /${ansible_repo_name}
   - /ansible_starter.sh 2>&1 | tee /var/log/ansible-bootstrap.log
   - systemctl daemon-reload
-  - systemctl enable vcd-grow-disks.service
-  - systemctl start vcd-grow-disks.service || true
+  # Not enabled and not started here: the unit is provisioned for a later run,
+  # but guest bootstrap must not touch / or the data LVs while Ansible is moving
+  # /var into them. k8s-kubeadm-r2 runs the script once, at the end of
+  # prepare_k8s_nodes, after the move.
